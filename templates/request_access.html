@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Solicitar acceso · PidoNeiva{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="bg-white rounded-4 shadow-soft p-4">
+      <h1 class="h5 fw-bold">Solicitar acceso</h1>
+      <p class="text-secondary small">Llena estos datos y te contactamos para activar tu espacio en PidoNeiva.</p>
+
+      <form method="post" class="mt-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-brand text-white w-100">Enviar solicitud</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  <h1 class="h5 fw-bold">Tu panel</h1>
+
+  {% if not business %}
+    <p class="text-secondary">Aún no tienes un negocio asignado. Escríbenos para activarte.</p>
+  {% else %}
+
+    <div class="mb-3">
+      {% if business.plan == "FREE" and business.trial_ends_at and business.days_remaining > 0 %}
+        <div class="alert alert-info">
+          Estás en período de prueba gratis.
+          Te quedan <strong>{{ business.days_remaining }} días</strong>.
+          Termina el: <strong>{{ business.trial_ends_at|date:"M d, Y, P" }}</strong>
+        </div>
+      {% endif %}
+
+      {% if business.grace_ends_at and not business.paid_until %}
+        <div class="alert alert-warning">
+          Periodo de pago: tienes hasta <strong>{{ business.grace_ends_at|date:"M d, Y, P" }}</strong> (5 días hábiles)
+          para pagar y seguir publicado.
+          <a class="btn btn-sm btn-outline-primary ms-2" href="{% url 'change_plan' %}">Ver planes</a>
+        </div>
+      {% endif %}
+
+      {% if not business.is_plan_valid %}
+        <div class="alert alert-danger">
+          Tu publicación está vencida. Para aparecer en PidoNeiva debes activar un plan.
+          <a class="btn btn-sm btn-danger ms-2" href="{% url 'change_plan' %}">Activar plan</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <a class="btn btn-brand text-white" href="{% url 'business_edit' %}">Editar perfil</a>
+      <a class="btn btn-outline-secondary" href="{% url 'category_list' %}">Categorías</a>
+      <a class="btn btn-outline-secondary" href="{% url 'item_list' %}">Productos</a>
+      <a class="btn btn-outline-secondary" href="{% url 'pdf_list' %}">Menú PDF</a>
+
+      <!-- ✅ NUEVO BOTÓN -->
+      <a class="btn btn-outline-secondary" href="{% url 'stats' %}">Estadísticas</a>
+
+      <a class="btn btn-outline-primary" target="_blank" href="{% url 'business_detail' business.slug %}">
+        Ver mi página
+      </a>
+
+      {% if not business.is_approved %}
+        {% if business.review_requested %}
+          <span class="badge text-bg-warning">En revisión</span>
+        {% else %}
+          <form method="post" action="{% url 'request_review' %}" style="display:inline;">
+            {% csrf_token %}
+            <button class="btn btn-outline-primary">Enviar a revisión</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="row g-3 mt-3">
+      <div class="col-md-6">
+        <div class="bg-white rounded-4 shadow-soft p-3">
+          <div class="text-secondary small">Visitas</div>
+          <div class="h4 fw-bold mb-0">{{ business.visits_count }}</div>
+          {% if business.last_visited_at %}
+            <div class="small text-secondary">Última: {{ business.last_visited_at|date:"M d, Y, P" }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="bg-white rounded-4 shadow-soft p-3">
+          <div class="text-secondary small">Clics en WhatsApp</div>
+          <div class="h4 fw-bold mb-0">{{ business.whatsapp_clicks }}</div>
+          {% if business.last_whatsapp_click_at %}
+            <div class="small text-secondary">Último: {{ business.last_whatsapp_click_at|date:"M d, Y, P" }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ HORARIO (FORM) -->
+    {% if form %}
+      <div class="bg-white rounded-4 shadow-soft p-3 mt-3">
+        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+          <div>
+            <div class="fw-bold">Horario del negocio</div>
+            <div class="text-secondary small">
+              Selecciona hora de apertura y cierre. Si no abre un día, déjalo vacío.
+            </div>
+          </div>
+
+          <span class="badge {% if business.is_open_now %}text-bg-success{% else %}text-bg-secondary{% endif %}">
+            {{ business.open_status_label }}
+          </span>
+        </div>
+
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="form-check form-switch mb-3">
+            {{ form.is_accepting_orders }}
+            <label class="form-check-label ms-2" for="{{ form.is_accepting_orders.id_for_label }}">
+              {{ form.is_accepting_orders.label }}
+            </label>
+          </div>
+
+          <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-4 fw-semibold text-secondary small">Día</div>
+            <div class="col-6 col-md-4 fw-semibold text-secondary small">Apertura</div>
+            <div class="col-6 col-md-4 fw-semibold text-secondary small">Cierre</div>
+
+            <div class="col-12 col-md-4">Lunes</div>
+            <div class="col-6 col-md-4">{{ form.mon_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.mon_end }}
+              {% if form.mon_end.errors %}<div class="text-danger small mt-1">{{ form.mon_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Martes</div>
+            <div class="col-6 col-md-4">{{ form.tue_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.tue_end }}
+              {% if form.tue_end.errors %}<div class="text-danger small mt-1">{{ form.tue_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Miércoles</div>
+            <div class="col-6 col-md-4">{{ form.wed_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.wed_end }}
+              {% if form.wed_end.errors %}<div class="text-danger small mt-1">{{ form.wed_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Jueves</div>
+            <div class="col-6 col-md-4">{{ form.thu_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.thu_end }}
+              {% if form.thu_end.errors %}<div class="text-danger small mt-1">{{ form.thu_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Viernes</div>
+            <div class="col-6 col-md-4">{{ form.fri_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.fri_end }}
+              {% if form.fri_end.errors %}<div class="text-danger small mt-1">{{ form.fri_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Sábado</div>
+            <div class="col-6 col-md-4">{{ form.sat_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.sat_end }}
+              {% if form.sat_end.errors %}<div class="text-danger small mt-1">{{ form.sat_end.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12 col-md-4">Domingo</div>
+            <div class="col-6 col-md-4">{{ form.sun_start }}</div>
+            <div class="col-6 col-md-4">
+              {{ form.sun_end }}
+              {% if form.sun_end.errors %}<div class="text-danger small mt-1">{{ form.sun_end.errors }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-brand text-white" type="submit">Guardar horario</button>
+            <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancelar</a>
+          </div>
+
+          <div class="text-secondary small mt-2">
+            Ejemplo: Viernes 18:00 a 02:00 (cruza medianoche) ✅
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

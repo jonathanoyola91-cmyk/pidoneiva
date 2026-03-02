@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Enviar a revisión{% endblock %}
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  {% include "dashboard/_back_to_dashboard.html" %}
+  <h1 class="h5 fw-bold">Enviar a revisión</h1>
+  <p class="text-secondary">
+    Confirmas que ya completaste tu perfil y tu menú para que el administrador lo revise y lo publique?
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-brand text-white">Sí, enviar</button>
+    <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

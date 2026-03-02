@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% block title %}{{ business.name }} · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+
+  <!-- =======================
+       HERO NUEVO (CONTENEDOR)
+       ======================= -->
+  <div class="business-hero-card">
+    <div class="business-hero-bg">
+      {% if business.cover_image %}
+        <img src="{{ business.cover_image.url }}" class="business-hero-img" alt="{{ business.name }}">
+      {% elif business.logo %}
+        <img src="{{ business.logo.url }}" class="business-hero-img" alt="{{ business.name }}">
+      {% endif %}
+      <div class="business-hero-gradient"></div>
+
+      <!-- Estado (abierto/cerrado) arriba derecha -->
+      <div class="business-hero-status">
+        {% if business.is_open_now %}
+          <span class="pill pill-success"><span class="dot"></span> Abierto</span>
+        {% else %}
+          <span class="pill pill-muted">Cerrado</span>
+        {% endif %}
+      </div>
+
+      <!-- Contenido encima -->
+      <div class="business-hero-content">
+        {% if business.logo %}
+          <div class="business-hero-logo">
+            <img src="{{ business.logo.url }}" alt="{{ business.name }}">
+          </div>
+        {% endif %}
+
+        <div class="business-hero-text">
+          <h1 class="business-hero-name">{{ business.name }}</h1>
+          <div class="business-hero-sub">
+            {{ business.zone }}{% if business.address %} · {{ business.address }}{% endif %}
+          </div>
+
+          {% if business.maps_url %}
+            <div class="mt-1">
+              <a href="{{ business.maps_url }}" target="_blank" rel="noopener" class="business-hero-link">
+                📍 Ver ubicación en Google Maps
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones debajo del hero (los mismos que ya tienes) -->
+    <div class="business-hero-actions">
+      <!-- Acciones rápidas -->
+      <div class="d-flex flex-wrap gap-2 mt-3">
+
+        {% if not is_pdf_only %}
+
+          <a class="btn btn-outline-primary" href="#menu">
+            🛒 Ver menú
+          </a>
+
+          {% if cart_items %}
+            <a class="btn btn-success" href="#cart">
+              🧾 Ver mi pedido
+            </a>
+          {% endif %}
+
+          {% if business.phone %}
+            <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
+          {% endif %}
+
+          {% if business.instagram %}
+            <a class="btn btn-outline-secondary" target="_blank"
+               href="https://instagram.com/{{ business.instagram|cut:'@' }}">
+              Instagram
+            </a>
+          {% endif %}
+
+        {% else %}
+
+          {% if business.whatsapp %}
+            <a class="btn btn-success" target="_blank" href="{% url 'whatsapp_redirect' business.slug %}">
+              💬 Pedir por WhatsApp
+            </a>
+          {% endif %}
+
+          {% if business.phone %}
+            <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
+          {% endif %}
+
+          {% if business.instagram %}
+            <a class="btn btn-outline-secondary" target="_blank"
+               href="https://instagram.com/{{ business.instagram|cut:'@' }}">
+              Instagram
+            </a>
+          {% endif %}
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Horario -->
+  <div class="small mt-2">
+    {% if business.opening_hours %}
+      <span class="text-secondary">Horario: {{ business.opening_hours }}</span>
+    {% elif business.hours %}
+      <span class="text-secondary">Horario: {{ business.hours }}</span>
+    {% elif business.opening_time and business.closing_time %}
+      <span class="text-secondary">Horario: {{ business.opening_time }} - {{ business.closing_time }}</span>
+    {% endif %}
+  </div>
+
+  {% if business.description %}
+    <div class="text-secondary mt-2">{{ business.description }}</div>
+  {% endif %}
+
+  <!-- 🔥 PROMOCIÓN -->
+  {% if business.promo_active and business.promo_title %}
+    <div class="alert alert-warning rounded-4 shadow-soft mt-3 mb-0">
+      <div class="fw-bold">🔥 {{ business.promo_title }}</div>
+      {% if business.promo_text %}
+        <div class="small">{{ business.promo_text }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if not business.is_open_now %}
+    <div class="alert alert-warning mt-3 mb-0">
+      Este negocio está <strong>cerrado</strong>. Puedes ver productos, pero no enviar pedidos hasta que abra.
+    </div>
+  {% endif %}
+
+  <hr>
+
+  <!-- Aviso carrito activo en otro negocio -->
+  {% if cart_warning %}
+    <div class="alert alert-warning mt-3">
+      ⚠️ Tienes un carrito activo en otro negocio. Aquí se guardará un pedido separado.
+    </div>
+  {% endif %}
+
+  <!-- Tabs -->
+  <ul class="nav nav-pills gap-2" id="pnTabs" role="tablist">
+
+    {% if not is_pdf_only %}
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-products" type="button">
+          Productos
+        </button>
+      </li>
+    {% endif %}
+
+    <li class="nav-item">
+      <button class="nav-link {% if is_pdf_only %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#tab-pdf" type="button">
+        Menú PDF
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-info" type="button">
+        Info
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3">
+
+    {% if not is_pdf_only %}
+      <!-- =======================
+           TAB PRODUCTOS
+           ======================= -->
+      <div class="tab-pane fade show active" id="tab-products">
+        <div id="menu"></div>
+
+        {% for cat in categories %}
+          {% if cat.items.all|length %}
+            <div class="mt-4">
+              <h3 class="h6 fw-bold">{{ cat.name }}</h3>
+              <div class="row g-3">
+                {% for item in cat.items.all %}
+                  {% if item.is_available %}
+                  <div class="col-md-4">
+                    <div class="card shadow-soft p-3 h-100">
+                      {% if item.photo %}
+                        <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
+                      {% endif %}
+
+                      <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="fw-bold fs-5 text-dark">
+                          ${{ item.price|floatformat:0 }}
+                        </div>
+                      </div>
+
+                      {% if item.description %}
+                        <div class="small text-secondary mt-1">{{ item.description }}</div>
+                      {% endif %}
+
+                      <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
+                        {% csrf_token %}
+                        {% if business.is_open_now %}
+                          <button class="btn btn-success w-100">Agregar al pedido</button>
+                        {% else %}
+                          <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
+                        {% endif %}
+                      </form>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- =======================
+         TAB PDF
+         ======================= -->
+    <div class="tab-pane fade {% if is_pdf_only %}show active{% endif %}" id="tab-pdf">
+      <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+          Este negocio usa <strong>menú en PDF</strong>. Para pedir, contáctalo directamente:
+        </div>
+
+        {% if business.whatsapp %}
+          <a class="btn btn-success" target="_blank"
+             href="{% url 'whatsapp_redirect' business.slug %}">
+            Contactar por WhatsApp
+          </a>
+        {% else %}
+          <span class="text-danger small">
+            ⚠️ Este negocio aún no tiene WhatsApp configurado.
+          </span>
+        {% endif %}
+      </div>
+
+      {% if menu_files %}
+        <div class="d-flex flex-column gap-2">
+          {% for f in menu_files %}
+            <a class="btn btn-outline-primary" target="_blank" href="{{ f.file.url }}">
+              📄 Descargar menú PDF ({{ f.uploaded_at|date:"M d, Y" }})
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-secondary">Aún no han subido un PDF.</div>
+      {% endif %}
+    </div>
+
+    <!-- =======================
+         TAB INFO
+         ======================= -->
+    <div class="tab-pane fade" id="tab-info">
+      <div class="text-secondary">
+        {% if business.address %}<div><strong>Dirección:</strong> {{ business.address }}</div>{% endif %}
+        {% if business.zone %}<div><strong>Zona:</strong> {{ business.zone }}</div>{% endif %}
+        {% if business.phone %}<div><strong>Teléfono:</strong> {{ business.phone }}</div>{% endif %}
+        {% if business.whatsapp %}<div><strong>WhatsApp:</strong> {{ business.whatsapp }}</div>{% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  {% if not is_pdf_only %}
+    <!-- =======================
+         CARRITO + FORM (ABAJO)
+         ======================= -->
+    <hr class="my-4">
+    
+    <h2 id="mi-pedido" class="h6 fw-bold mb-3">
+🧾 Mi pedido
+    </h2>
+    
+    <div id="cart"></div>
+
+    {% if not cart_items %}
+      <div class="alert alert-secondary">
+        Aún no has agregado productos. Ve al menú y presiona <strong>“Agregar al pedido”</strong>.
+      </div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th style="width:180px;">Cantidad</th>
+              <th class="text-end">Subtotal</th>
+              <th class="text-end" style="width:90px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ci in cart_items %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ ci.name }}</div>
+                  <div class="text-secondary small">${{ ci.price|floatformat:0 }}</div>
+                </td>
+
+                <td>
+                  <div class="d-flex gap-2 align-items-center">
+                    <form method="post" action="{% url 'cart_update' business.slug ci.id %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="qty" value="{{ ci.qty|add:'-1' }}">
+                      <button class="btn btn-outline-secondary btn-sm" {% if ci.qty <= 1 %}disabled{% endif %}>–</button>
+                    </form>
+
+                    <div class="px-2 py-1 border rounded-3">{{ ci.qty }}</div>
+
+                    <form method="post" action="{% url 'cart_update' business.slug ci.id %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="qty" value="{{ ci.qty|add:'1' }}">
+                      <button class="btn btn-outline-secondary btn-sm">+</button>
+                    </form>
+                  </div>
+                </td>
+
+                <td class="text-end fw-bold">
+                  ${{ ci.subtotal|floatformat:0 }}
+                </td>
+
+                <td class="text-end">
+                  <form method="post" action="{% url 'cart_remove' business.slug ci.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger btn-sm">✕</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-end fw-bold">Total aprox:</td>
+              <td class="text-end fw-bold">${{ cart_total|floatformat:0 }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <form method="post" action="{% url 'cart_clear' business.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-outline-danger">Vaciar pedido</button>
+        </form>
+
+        {% if business.whatsapp %}
+          <a class="btn btn-success" target="_blank" href="{% url 'cart_whatsapp' business.slug %}">
+            Enviar pedido por WhatsApp
+          </a>
+        {% endif %}
+      </div>
+
+      <hr class="my-4">
+
+      <h3 class="h6 fw-bold mb-3">👤 Datos para el envío</h3>
+
+      <form method="post" action="{% url 'cart_set_buyer' business.slug %}">
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label">Nombre</label>
+            <input class="form-control" name="name" value="{{ buyer.name|default:'' }}" required>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input class="form-control" name="phone" value="{{ buyer.phone|default:'' }}" placeholder="Ej: 3xx xxx xxxx" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Dirección</label>
+            <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto..." required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" rows="3" name="notes" placeholder="Ej: sin cebolla, tocar timbre...">{{ buyer.notes|default:'' }}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3 flex-wrap">
+          <button class="btn btn-primary">Guardar datos</button>
+
+          {% if business.whatsapp %}
+            <a class="btn btn-success" target="_blank" href="{% url 'cart_whatsapp' business.slug %}">
+              Enviar pedido por WhatsApp
+            </a>
+          {% else %}
+            <span class="text-danger small align-self-center">
+              ⚠️ Este negocio aún no tiene WhatsApp configurado.
+            </span>
+          {% endif %}
+        </div>
+      </form>
+    {% endif %}
+  {% endif %}
+
+</div>
+
+
+{% if not is_pdf_only and cart_items %}
+  <div class="cart-floatbar">
+    <div class="cart-floatbar-left">
+      <div class="cart-floatbar-icon">🛒</div>
+      <div class="cart-floatbar-text">
+        <div class="cart-floatbar-title">Mi pedido</div>
+        <div class="cart-floatbar-sub">
+          {{ cart_items|length }} item{{ cart_items|length|pluralize }} · ${{ cart_total|floatformat:0 }}
+        </div>
+      </div>
+    </div>
+
+    <a href="#mi-pedido" class="btn btn-light cart-floatbar-btn" onclick="this.closest('.cart-floatbar').style.display='none'">
+      Ver pedido
+    </a>
+  </div>
+{% endif %}
+
+<script>
+  // Scroll suave al carrito cuando agregas y la página recarga con #cart
+  (function () {
+    if (window.location.hash === "#cart") {
+      const el = document.getElementById("cart");
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  })();
+</script>
+{% endblock %}

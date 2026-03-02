@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% block title %}PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+
+    <div class="p-4 bg-white rounded-4 shadow-soft hero-search">
+      <h1 class="h4 fw-bold mb-3">
+        {% if request.GET.type == "RESTAURANT" %}
+          Restaurantes en Neiva
+        {% elif request.GET.type == "COMMERCE" %}
+          Comercios en Neiva
+        {% else %}
+          Directorio Comercial de Neiva
+        {% endif %}
+      </h1>
+<!-- =======================
+     Contador animado
+     ======================= -->
+<div class="home-metrics">
+  <div class="metric-card">
+    <div class="metric-number"
+         data-count="{% if total_businesses %}{{ total_businesses }}{% else %}{{ businesses|length }}{% endif %}">
+      0
+    </div>
+    <div class="metric-label">
+      Negocios en Neiva
+      {% if request.GET.type == "RESTAURANT" %}(Restaurantes){% elif request.GET.type == "COMMERCE" %}(Comercios){% endif %}
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-number"
+         data-count="{{ businesses|length }}">
+      0
+    </div>
+    <div class="metric-label">Resultados mostrados</div>
+  </div>
+</div>
+
+<!-- =======================
+     CHIPS DE CATEGORÍAS (UI)
+     usa type y q (no cambia lógica)
+     ======================= -->
+<div class="chips-row mb-3">
+  <!-- Tipo principal -->
+  <a class="chip {% if request.GET.type == 'RESTAURANT' %}chip-active{% endif %}"
+     href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    🍽️ Restaurantes
+  </a>
+
+  <a class="chip {% if request.GET.type == 'COMMERCE' %}chip-active{% endif %}"
+     href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    🛍️ Comercios
+  </a>
+
+  <!-- “Búsquedas rápidas” por q -->
+  <a class="chip {% if request.GET.q|lower == 'droguería' or request.GET.q|lower == 'drogueria' %}chip-active{% endif %}"
+     href="/?q=Droguería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    💊 Droguerías
+  </a>
+
+  <a class="chip {% if request.GET.q|lower == 'café' or request.GET.q|lower == 'cafe' %}chip-active{% endif %}"
+     href="/?q=Café{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    ☕ Cafés
+  </a>
+
+  <a class="chip {% if request.GET.q|lower == 'pizza' or request.GET.q|lower == 'pizzería' or request.GET.q|lower == 'pizzeria' %}chip-active{% endif %}"
+     href="/?q=Pizza{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    🍕 Pizzerías
+  </a>
+
+  <a class="chip {% if request.GET.q|lower == 'barbería' or request.GET.q|lower == 'barberia' %}chip-active{% endif %}"
+     href="/?q=Barbería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    ✂️ Barberías
+  </a>
+
+  <a class="chip {% if request.GET.q|lower == 'market' %}chip-active{% endif %}"
+     href="/?q=Market{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+    🧺 Market
+  </a>
+
+  <a class="chip chip-more"
+     href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
+    ➕ Más
+  </a>
+</div>
+      <!-- 🔥 BOTONES DE SECTOR -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+
+        <a class="btn {% if request.GET.zone == 'Oriente' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="/?zone=Oriente{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+          📍 Oriente
+        </a>
+
+        <a class="btn {% if request.GET.zone == 'Sur' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="/?zone=Sur{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+          📍 Sur
+        </a>
+
+        <a class="btn {% if request.GET.zone == 'Centro' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="/?zone=Centro{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+          📍 Centro
+        </a>
+
+        <a class="btn {% if request.GET.zone == 'Norte' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="/?zone=Norte{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+          📍 Norte
+        </a>
+
+        <a class="btn btn-outline-dark ms-auto"
+           href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
+          Ver todo
+        </a>
+
+      </div>
+
+      <!-- 🔥 FILTRO ABIERTOS -->
+      <div class="mb-3">
+        <a class="btn btn-sm {% if request.GET.open != '0' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="?{% if request.GET.zone %}zone={{ request.GET.zone }}&{% endif %}
+                  {% if request.GET.type %}type={{ request.GET.type }}&{% endif %}
+                  {% if request.GET.q %}q={{ request.GET.q }}&{% endif %}
+                  open=1">
+          🟢 Abiertos ahora
+        </a>
+
+        <a class="btn btn-sm {% if request.GET.open == '0' %}btn-brand text-white{% else %}btn-outline-secondary{% endif %}"
+           href="?{% if request.GET.zone %}zone={{ request.GET.zone }}&{% endif %}
+                  {% if request.GET.type %}type={{ request.GET.type }}&{% endif %}
+                  {% if request.GET.q %}q={{ request.GET.q }}&{% endif %}
+                  open=0">
+          Ver todos
+        </a>
+      </div>
+
+      <!-- 🔍 BUSCADOR -->
+      <form class="row g-2" method="get">
+        <div class="col-12 col-md-6">
+          <input class="form-control"
+                 name="q"
+                 placeholder="Busca: hamburguesa, café, droguería..."
+                 value="{{ request.GET.q }}">
+        </div>
+
+        <div class="col-6 col-md-3">
+          <select class="form-select" name="type">
+            <option value="">Todos</option>
+            <option value="RESTAURANT" {% if request.GET.type == "RESTAURANT" %}selected{% endif %}>
+              Restaurantes
+            </option>
+            <option value="COMMERCE" {% if request.GET.type == "COMMERCE" %}selected{% endif %}>
+              Comercios
+            </option>
+          </select>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <select class="form-select" name="zone">
+            <option value="">Zona</option>
+            {% for z in zones %}
+              <option value="{{ z }}" {% if request.GET.zone == z %}selected{% endif %}>
+                {{ z }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-brand text-white w-100">
+            Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 🔥 LISTADO -->
+    <div class="mt-4">
+      <div class="row g-3">
+
+        {% for b in businesses %}
+          <div class="col-md-6">
+            <a class="text-decoration-none text-dark" href="{% url 'business_detail' b.slug %}">
+
+              <div class="card shadow-soft overflow-hidden rounded-4 business-card">
+
+                <!-- PORTADA -->
+                <div class="position-relative business-hero">
+
+                  {% if b.cover_image %}
+                    <img src="{{ b.cover_image.url }}" alt="{{ b.name }}" class="business-cover">
+                  {% elif b.logo %}
+                    <img src="{{ b.logo.url }}" alt="{{ b.name }}" class="business-cover">
+                  {% else %}
+                    <div class="business-cover-fallback">
+                      <span style="font-size:34px;">🏪</span>
+                    </div>
+                  {% endif %}
+
+                  <!-- Gradiente oscuro abajo -->
+                  <div class="hero-gradient"></div>
+
+                  <!-- Badges izquierda -->
+                  <div class="badge-absolute">
+                    {% if b.plan == "PREMIUM" %}
+                      <span class="pill featured">⭐ Destacado</span>
+                    {% endif %}
+                    {% if b.visits_count > 100 %}
+                      <span class="pill popular">🔥 Popular</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Badge derecha -->
+                  <div class="badge-absolute-right">
+                    {% if b.is_open_now %}
+                      <span class="pill pill-success"><span class="dot"></span> Abierto</span>
+                    {% else %}
+                      <span class="pill pill-muted">Cerrado</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Nombre encima de la portada -->
+                  <div class="hero-title">
+                    <div class="hero-name">{{ b.name }}</div>
+                    <div class="hero-sub">
+                      {{ b.zone }}{% if b.address %} · {{ b.address }}{% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Logo redondo flotante (opcional) -->
+                  {% if b.logo %}
+                    <div class="hero-logo">
+                      <img src="{{ b.logo.url }}" alt="{{ b.name }}">
+                    </div>
+                  {% endif %}
+
+                </div>
+
+                <!-- CUERPO -->
+                <div class="p-3">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="small text-secondary">
+                      {% if b.visits_count > 0 %}
+                        👀 {{ b.visits_count }} visitas
+                      {% endif %}
+                    </div>
+
+                    <span class="tag">
+                      {{ b.get_business_type_display }}
+                    </span>
+                  </div>
+
+                  {% if b.description %}
+                    <div class="small mt-2 text-secondary">
+                      {{ b.description|truncatechars:90 }}
+                    </div>
+                  {% endif %}
+                </div>
+
+              </div>
+
+            </a>
+          </div>
+
+        {% empty %}
+          <div class="col-12 text-secondary">
+            Aún no hay negocios publicados.
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 🔥 SIDEBAR (se mantiene como la tenías) -->
+  <div class="col-lg-4">
+    <div class="sidebar-sticky"> 
+      <!-- =======================
+           Banner Premium
+           ======================= -->
+      <div class="premium-banner mb-4">
+        <div class="premium-content">
+          <div class="premium-title">
+            🚀 Destaca tu negocio
+          </div>
+          <div class="premium-sub">
+            Aparece primero, recibe más visitas y aumenta tus pedidos.
+          </div>
+
+          <a href="{% url 'request_access' %}" class="btn btn-light premium-btn">
+            Ver planes
+          </a>
+        </div>
+      </div>
+    <div class="p-4 bg-white rounded-4 shadow-soft sidebar-card">
+      <h3 class="h6 fw-bold">¿Tienes un negocio?</h3>
+
+      <ul class="small text-secondary mb-3">
+        <li>✔ Aparece en tu sector</li>
+        <li>✔ Botón directo a WhatsApp</li>
+        <li>✔ Ubicación en Google Maps</li>
+        <li>✔ Estadísticas de visitas</li>
+        <li>✔ Opción de destacarte como ⭐ Premium</li>
+        <li>✔ Posibilidad de aparecer como 🔥 Popular</li>
+      </ul>
+
+      <div class="d-grid gap-2">
+        <a class="btn btn-brand text-white"
+           href="{% url 'request_access' %}">
+          🏪 Registrar mi negocio (Prueba gratis)
+        </a>
+
+        <a class="btn btn-outline-secondary"
+           href="https://wa.me/57XXXXXXXXXX"
+           target="_blank">
+          Soporte por WhatsApp
+        </a>
+      </div>
+  </div>
+
+      <hr>
+
+      <!-- =======================
+           Negocios Destacados (UI)
+           usa el orden actual de "businesses"
+           ======================= -->
+      <div class="mt-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <h3 class="h6 fw-bold mb-2">🏆 Negocios Destacados</h3>
+          <a class="small text-decoration-none" href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
+            Ver todos
+          </a>
+        </div>
+
+        <div class="list-group list-group-flush ranked-list">
+          {% for b in businesses|slice:":5" %}
+            <a href="{% url 'business_detail' b.slug %}" class="list-group-item ranked-item">
+              <div class="rank-badge">{{ forloop.counter }}</div>
+
+              <div class="ranked-thumb">
+                {% if b.logo %}
+                  <img src="{{ b.logo.url }}" alt="{{ b.name }}">
+                {% else %}
+                  <div class="ranked-thumb-fallback">🏪</div>
+                {% endif %}
+              </div>
+
+              <div class="ranked-meta">
+                <div class="ranked-name">
+                  {{ b.name }}
+                  {% if b.plan == "PREMIUM" %}
+                    <span class="mini-pill">⭐</span>
+                  {% endif %}
+                </div>
+                <div class="ranked-sub">
+                  {{ b.zone }} · 👀 {{ b.visits_count|default:0 }}
+                </div>
+              </div>
+
+              <div class="ranked-status">
+                {% if b.is_open_now %}
+                  <span class="mini-dot mini-dot-open"></span>
+                {% else %}
+                  <span class="mini-dot mini-dot-closed"></span>
+                {% endif %}
+              </div>
+            </a>
+          {% empty %}
+            <div class="text-secondary small">Aún no hay negocios publicados.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="small text-secondary">
+        PidoNeiva.com
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    const els = document.querySelectorAll(".metric-number[data-count]");
+    if (!els.length) return;
+
+    const animate = (el) => {
+      const target = parseInt(el.getAttribute("data-count") || "0", 10);
+      if (!target || target < 0) { el.textContent = target || 0; return; }
+
+      const duration = 900; // ms
+      const start = performance.now();
+      const from = 0;
+
+      const step = (t) => {
+        const p = Math.min((t - start) / duration, 1);
+        // easeOutCubic
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = Math.floor(from + (target - from) * eased);
+        el.textContent = val.toLocaleString("es-CO");
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    // Animar solo cuando se ve en pantalla (pro)
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animate(e.target);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+
+    els.forEach(el => io.observe(el));
+  })();
+</script>
+{% endblock %}

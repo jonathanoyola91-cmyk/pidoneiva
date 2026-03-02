@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Planes · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  {% include "dashboard/_back_to_dashboard.html" %}
+  <h1 class="h5 fw-bold">Planes disponibles</h1>
+
+  <div class="row mt-4">
+
+    <div class="col-md-4">
+      <div class="border rounded-4 p-3">
+        <h5>Plan Básico</h5>
+        <p>Solo menú PDF</p>
+        <h4>$20.000 / mes</h4>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="border rounded-4 p-3">
+        <h5>Plan Estándar</h5>
+        <p>Productos con imágenes</p>
+        <h4>$40.000 / mes</h4>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="border rounded-4 p-3 border-warning">
+        <h5>Plan Premium</h5>
+        <p>Aparece primero + destacado</p>
+        <h4>$60.000 / mes</h4>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <h5>¿Cómo activar?</h5>
+  <p>
+    Realiza el pago por Nequi o transferencia y envía el comprobante por WhatsApp.
+  </p>
+
+  <div class="alert alert-light">
+    📲 Nequi: 317 331 5060<br>
+    🏦 Cuenta Bancolombia: XXXXXXX
+  </div>
+
+  <a class="btn btn-success" target="_blank"
+     href="https://wa.me/573173315060?text=Hola,%20quiero%20activar%20mi%20plan%20en%20PidoNeiva.">
+     Enviar comprobante por WhatsApp
+  </a>
+</div>
+{% endblock %}

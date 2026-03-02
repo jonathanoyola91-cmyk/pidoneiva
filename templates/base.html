@@ -1,0 +1,75 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}PidoNeiva{% endblock %}</title>
+
+  <!-- Bootstrap primero -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand: #E11D2E;
+      --brand-2: #F97316;
+      --bg: #F8FAFC;
+    }
+    body{ background: #F8FAFC;
+}
+    .navbar{ background: white; }
+    .brand-badge{ background: var(--brand); color:white; border-radius:14px; padding:.25rem .6rem; font-weight:700; }
+    .card{ border:0; border-radius:18px; }
+    .shadow-soft{ box-shadow: 0 10px 30px rgba(2, 6, 23, .08); }
+    .btn-brand{ background: var(--brand); border:0; }
+    .btn-brand:hover{ filter: brightness(.95); }
+    .tag{ background:#e8fbfb; color:#087b7a; border-radius:999px; padding:.25rem .6rem; font-size:.85rem; }
+  </style>
+
+  <!-- ✅ Tu CSS global al final para que tenga prioridad -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=12">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg border-bottom">
+  <div class="container py-2">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img src="{% static 'img/logo-pidoneiva.png' %}" alt="PidoNeiva" class="brand-logo">
+      <span class="brand-name">PidoNeiva</span>
+      
+    </a>
+
+    <div class="ms-auto d-flex gap-2 align-items-center">
+      <a class="btn btn-sm btn-outline-secondary" href="/?type=RESTAURANT">Restaurantes</a>
+      <a class="btn btn-sm btn-outline-secondary" href="/?type=COMMERCE">Comercios</a>
+
+      {% if user.is_authenticated %}
+        <a class="btn btn-sm btn-brand text-white" href="{% url 'dashboard' %}">Mi Panel</a>
+        <a class="btn btn-sm btn-outline-danger" href="/accounts/logout/">Salir</a>
+      {% else %}
+        <a class="btn btn-sm btn-outline-primary" href="/accounts/login/">Ingresar</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<main class="container my-4">
+
+  <!-- Mensajes (success/error/warning/info) -->
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-2" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

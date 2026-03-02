@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  {% include "dashboard/_back_to_dashboard.html" %}
+  <div class="d-flex justify-content-between align-items-center">
+    <h1 class="h5 fw-bold mb-0">Productos</h1>
+    <a class="btn btn-brand text-white" href="{% url 'item_create' %}">Nuevo</a>
+  </div>
+
+  <table class="table mt-3">
+    <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Disponible</th><th></th></tr>
+    {% for i in items %}
+      <tr>
+        <td>{{ i.name }}</td>
+        <td>{% if i.category %}{{ i.category.name }}{% endif %}</td>
+        <td>${{ i.price|floatformat:0 }}</td>
+        <td>{% if i.is_available %}Sí{% else %}No{% endif %}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'item_edit' i.id %}">Editar</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'item_delete' i.id %}">Eliminar</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

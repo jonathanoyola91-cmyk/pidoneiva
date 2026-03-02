@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Menú PDF{% endblock %}
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  {% include "dashboard/_back_to_dashboard.html" %}
+  <div class="d-flex justify-content-between align-items-center">
+    <h1 class="h5 fw-bold mb-0">Menú PDF</h1>
+    <a class="btn btn-brand text-white" href="{% url 'pdf_upload' %}">Subir</a>
+  </div>
+
+  <table class="table mt-3">
+    <tr><th>Archivo</th><th>Activo</th><th>Fecha</th><th></th></tr>
+    {% for p in pdfs %}
+      <tr>
+        <td><a target="_blank" href="{{ p.file.url }}">Ver</a></td>
+        <td>{% if p.is_active %}Sí{% else %}No{% endif %}</td>
+        <td>{{ p.uploaded_at }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'pdf_delete' p.id %}">Eliminar</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
