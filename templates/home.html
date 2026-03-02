@@ -16,53 +16,55 @@
         {% endif %}
       </h1>
 
-      <!-- =======================
-           CHIPS DE CATEGORÍAS (UI)
-           usa type y q (no cambia lógica)
-           ======================= -->
-      <div class="chips-row mb-3">
-        <!-- Tipo principal -->
-        <a class="chip {% if request.GET.type == 'RESTAURANT' %}chip-active{% endif %}"
-           href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          🍽️ Restaurantes
-        </a>
+     <!-- =======================
+     CHIPS CON SCROLL HORIZONTAL
+     ======================= -->
+<div class="chip-scroll mb-3">
+  <div class="chips-row">
 
-        <a class="chip {% if request.GET.type == 'COMMERCE' %}chip-active{% endif %}"
-           href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          🛍️ Comercios
-        </a>
+    <!-- Tipo principal -->
+    <a class="chip {% if request.GET.type == 'RESTAURANT' %}chip-active{% endif %}"
+       href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      🍽️ Restaurantes
+    </a>
 
-        <!-- “Búsquedas rápidas” por q -->
-        <a class="chip {% if request.GET.q|lower == 'droguería' or request.GET.q|lower == 'drogueria' %}chip-active{% endif %}"
-           href="/?q=Droguería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          💊 Droguerías
-        </a>
+    <a class="chip {% if request.GET.type == 'COMMERCE' %}chip-active{% endif %}"
+       href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      🛍️ Comercios
+    </a>
 
-        <a class="chip {% if request.GET.q|lower == 'café' or request.GET.q|lower == 'cafe' %}chip-active{% endif %}"
-           href="/?q=Café{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          ☕ Cafés
-        </a>
+    <a class="chip {% if request.GET.q|lower == 'droguería' or request.GET.q|lower == 'drogueria' %}chip-active{% endif %}"
+       href="/?q=Droguería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      💊 Droguerías
+    </a>
 
-        <a class="chip {% if request.GET.q|lower == 'pizza' or request.GET.q|lower == 'pizzería' or request.GET.q|lower == 'pizzeria' %}chip-active{% endif %}"
-           href="/?q=Pizza{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          🍕 Pizzerías
-        </a>
+    <a class="chip {% if request.GET.q|lower == 'café' or request.GET.q|lower == 'cafe' %}chip-active{% endif %}"
+       href="/?q=Café{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      ☕ Cafés
+    </a>
 
-        <a class="chip {% if request.GET.q|lower == 'barbería' or request.GET.q|lower == 'barberia' %}chip-active{% endif %}"
-           href="/?q=Barbería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          ✂️ Barberías
-        </a>
+    <a class="chip {% if request.GET.q|lower == 'pizza' or request.GET.q|lower == 'pizzería' or request.GET.q|lower == 'pizzeria' %}chip-active{% endif %}"
+       href="/?q=Pizza{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      🍕 Pizzerías
+    </a>
 
-        <a class="chip {% if request.GET.q|lower == 'market' %}chip-active{% endif %}"
-           href="/?q=Market{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          🧺 Market
-        </a>
+    <a class="chip {% if request.GET.q|lower == 'barbería' or request.GET.q|lower == 'barberia' %}chip-active{% endif %}"
+       href="/?q=Barbería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      ✂️ Barberías
+    </a>
 
-        <a class="chip chip-more"
-           href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
-          ➕ Más
-        </a>
-      </div>
+    <a class="chip {% if request.GET.q|lower == 'market' %}chip-active{% endif %}"
+       href="/?q=Market{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      🧺 Market
+    </a>
+
+    <a class="chip chip-more"
+       href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
+      ➕ Más
+    </a>
+
+  </div>
+</div>
 
       <!-- 🔥 BOTONES DE SECTOR -->
       <div class="d-flex flex-wrap gap-2 mb-3">
