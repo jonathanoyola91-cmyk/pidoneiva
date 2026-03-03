@@ -181,8 +181,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =========================
 # R2 (Cloudflare) / S3 compatible
 # =========================
-# ✅ Por defecto OFF en local para no romper tu Windows.
-# ✅ En Render debes poner USE_R2=1 (Environment).
 USE_R2 = os.environ.get("USE_R2", "0") == "1"
 
 if USE_R2:
@@ -191,51 +189,26 @@ if USE_R2:
     AWS_STORAGE_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "").strip()
     AWS_S3_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL", "").strip()
 
-    # ✅ Validación para evitar 500 al subir (si falta algo, falla al arrancar con mensaje claro)
-    missing = []
-    if not AWS_ACCESS_KEY_ID:
-        missing.append("R2_ACCESS_KEY_ID")
-    if not AWS_SECRET_ACCESS_KEY:
-        missing.append("R2_SECRET_ACCESS_KEY")
-    if not AWS_STORAGE_BUCKET_NAME:
-        missing.append("R2_BUCKET_NAME")
-    if not AWS_S3_ENDPOINT_URL:
-        missing.append("R2_ENDPOINT_URL")
-    if missing:
-        raise RuntimeError(f"USE_R2=1 pero faltan env vars: {', '.join(missing)}")
+    # ⚠️ NO tumbamos el servidor si algo falta
+    if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME and AWS_S3_ENDPOINT_URL:
 
-    # ✅ Detectar placeholders típicos
-    if AWS_STORAGE_BUCKET_NAME in {"R2_BUCKET_NAME", "YOUR_BUCKET_NAME"}:
-        raise RuntimeError("R2_BUCKET_NAME tiene placeholder. Pon el nombre REAL del bucket.")
-    if "TU_ACCOUNT_ID" in AWS_S3_ENDPOINT_URL or "YOUR_ACCOUNT_ID" in AWS_S3_ENDPOINT_URL:
-        raise RuntimeError("R2_ENDPOINT_URL tiene placeholder. Pon tu Account ID REAL en la URL.")
+        AWS_S3_REGION_NAME = "auto"
+        AWS_S3_SIGNATURE_VERSION = "s3v4"
+        AWS_S3_ADDRESSING_STYLE = "path"
 
-    AWS_S3_REGION_NAME = "auto"
-    AWS_S3_SIGNATURE_VERSION = "s3v4"
+        AWS_DEFAULT_ACL = None
+        AWS_QUERYSTRING_AUTH = False
+        AWS_S3_FILE_OVERWRITE = False
 
-    # ✅ CLAVE para Cloudflare R2 (evita 500 al subir archivos)
-    AWS_S3_ADDRESSING_STYLE = "path"
+        DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-    AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = False
-    AWS_S3_FILE_OVERWRITE = False
+        # ✅ Dominio público (r2.dev)
+        PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE_URL", "").strip().rstrip("/")
 
-    # ✅ MEDIA a R2 (subida por S3)
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-    # ✅ Dominio público para SERVIR archivos (r2.dev o tu dominio)
-    # Esto es lo que hace que {{ obj.logo.url }} use r2.dev en vez de r2.cloudflarestorage.com
-    PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE_URL", "").strip().rstrip("/")
-    if not PUBLIC_BASE:
-        raise RuntimeError(
-            "USE_R2=1 pero falta R2_PUBLIC_BASE_URL (usa el Public Development URL r2.dev o tu dominio)."
-        )
-
-    AWS_S3_CUSTOM_DOMAIN = PUBLIC_BASE.replace("https://", "").replace("http://", "")
-    AWS_S3_URL_PROTOCOL = "https:"
-
-    # MEDIA_URL (para templates y consistencia)
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+        if PUBLIC_BASE:
+            AWS_S3_CUSTOM_DOMAIN = PUBLIC_BASE.replace("https://", "").replace("http://", "")
+            AWS_S3_URL_PROTOCOL = "https:"
+            MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 
 # =========================
