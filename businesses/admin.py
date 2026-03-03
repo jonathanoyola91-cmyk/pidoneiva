@@ -143,3 +143,31 @@ class BusinessAdmin(admin.ModelAdmin):
             b.paid_until = add_one_month(base)
             b.save()
         messages.success(request, "Plan Premium activado/renovado por 1 mes.")
+
+    # ==================================================
+    # DEBUG temporal: verificar subida a Storage (R2/S3)
+    # ==================================================
+    def save_model(self, request, obj, form, change):
+        print("ADMIN DEBUG FILES:", list(request.FILES.keys()))
+        r = super().save_model(request, obj, form, change)
+
+        # comprobar inmediatamente si el objeto existe en R2/storage
+        if obj.cover_image:
+            try:
+                exists = obj.cover_image.storage.exists(obj.cover_image.name)
+            except Exception as e:
+                print("ADMIN DEBUG exists() ERROR:", repr(e))
+                exists = None
+            print("ADMIN DEBUG cover name:", obj.cover_image.name)
+            print("ADMIN DEBUG cover exists in storage?:", exists)
+
+        if obj.logo:
+            try:
+                exists = obj.logo.storage.exists(obj.logo.name)
+            except Exception as e:
+                print("ADMIN DEBUG logo exists() ERROR:", repr(e))
+                exists = None
+            print("ADMIN DEBUG logo name:", obj.logo.name)
+            print("ADMIN DEBUG logo exists in storage?:", exists)
+
+        return r
