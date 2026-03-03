@@ -75,9 +75,24 @@ def business_edit(request):
         return HttpResponseForbidden("No tienes un negocio asignado. Contacta al admin.")
 
     if request.method == "POST":
+        # =========================
+        # DEBUG temporal (subida de imágenes)
+        # =========================
+        print("DEBUG POST keys:", list(request.POST.keys()))
+        print("DEBUG FILES keys:", list(request.FILES.keys()))
+        print("DEBUG logo in FILES?:", "logo" in request.FILES)
+        print("DEBUG cover_image in FILES?:", "cover_image" in request.FILES)
+
         form = BusinessForm(request.POST, request.FILES, instance=business)
-        if form.is_valid():
-            form.save()
+
+        ok = form.is_valid()
+        print("DEBUG is_valid:", ok)
+        print("DEBUG errors:", form.errors)
+
+        if ok:
+            obj = form.save()
+            print("DEBUG saved logo:", obj.logo.name if obj.logo else None)
+            print("DEBUG saved cover:", obj.cover_image.name if obj.cover_image else None)
             return redirect("dashboard")
     else:
         form = BusinessForm(instance=business)
