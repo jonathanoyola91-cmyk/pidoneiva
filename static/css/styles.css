@@ -1,18 +1,98 @@
 /* =========================
-   HOME + CARDS (PidoNeiva)
+   PidoNeiva — styles.css (LIMPIO)
+   ✅ sin duplicados
+   ✅ sin conflictos de hover
+   ✅ home como el mockup (tabs + search + filtros + categorías tipo tarjeta)
    ========================= */
 
-/* ===== Card Hover Elevación ===== */
+/* =========================
+   Variables / Base
+   ========================= */
+:root{
+  --brand: #E11D2E;     /* rojo */
+  --brand-2: #F97316;   /* naranja acento */
+  --bg: #F8FAFC;        /* fondo */
+  --text: #0F172A;
+  --muted: #64748B;
+  --line: #EAEFF5;
+}
+
+body{
+  background: var(--bg) !important;
+  color: var(--text);
+  padding-bottom: 90px; /* deja espacio para cart bar si aparece */
+}
+
+/* =========================
+   Navbar / Branding
+   ========================= */
+.navbar{
+  background: #fff !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.brand-logo{
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.brand-name{
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+/* =========================
+   Buttons / Tags / Shadows
+   ========================= */
+.btn-brand,
+.btn.btn-brand{
+  background: var(--brand) !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+}
+.btn-brand:hover{ filter: brightness(.92); }
+
+.btn-outline-secondary{
+  border-radius: 999px !important;
+  border-color: #D9E2EC !important;
+  color: #334155 !important;
+}
+.btn-outline-secondary:hover{ background: #F1F5F9 !important; }
+
+.shadow-soft{
+  box-shadow: 0 14px 40px rgba(2,6,23,.06) !important;
+}
+
+.tag{
+  background: #ECFEFF !important;
+  color: #0E7490 !important;
+  border-radius: 999px !important;
+  padding: .35rem .7rem !important;
+  font-weight: 700 !important;
+}
+
+.text-secondary{ color: var(--muted) !important; }
+
+/* =========================
+   Cards (general)
+   ========================= */
 .card{
-  transition: transform .25s ease, box-shadow .25s ease;
+  border: 0 !important;
+  border-radius: 22px !important;
+  transition: box-shadow .25s ease;
 }
 
+/* ✅ NO mover todas las cards (solo business-card). Evita efectos raros */
 .card:hover{
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(2, 6, 23, .18);
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-/* ===== Business Card PRO ===== */
+/* =========================
+   Business Card PRO
+   ========================= */
 .business-card{
   border: 0;
   border-radius: 22px;
@@ -20,13 +100,15 @@
   background: #fff;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(2,6,23,.06);
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .business-card:hover{
-  box-shadow: 0 20px 50px rgba(2,6,23,.18);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 50px rgba(2,6,23,.12);
 }
 
-/* ===== Portada ===== */
+/* Portada */
 .business-hero{
   position: relative;
   height: 180px;
@@ -40,9 +122,7 @@
   transition: transform .35s ease;
 }
 
-.business-card:hover .business-cover{
-  transform: scale(1.04);
-}
+.business-card:hover .business-cover{ transform: scale(1.03); }
 
 .business-cover-fallback{
   width: 100%;
@@ -106,11 +186,9 @@
 }
 
 /* Para que el body no choque con el logo flotante */
-.business-card .p-3{
-  padding-top: 38px !important;
-}
+.business-card .p-3{ padding-top: 38px !important; }
 
-/* ===== Badges ===== */
+/* Badges */
 .badge-absolute{
   position: absolute;
   top: 14px;
@@ -128,10 +206,10 @@
   z-index: 7;
 }
 
-/* Badge tipo pill */
+/* Pills */
 .pill{
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 6px 12px;
   border-radius: 999px;
   display: inline-flex;
@@ -145,17 +223,21 @@
   color: #fff;
 }
 
+.pill.featured{
+  background: rgba(249,115,22,.92);
+}
+
 .pill.popular{
-  background: rgba(239,68,68,.90);
+  background: rgba(225,29,46,.92);
   animation: glowPopular 2s ease-in-out infinite;
 }
 
 .pill-success{
-  background: rgba(16,185,129,.90);
+  background: rgba(16,185,129,.92);
 }
 
 .pill-muted{
-  background: rgba(100,116,139,.85);
+  background: rgba(100,116,139,.88);
 }
 
 .pill-success .dot{
@@ -181,18 +263,490 @@
 }
 
 /* Espaciado entre cards */
-.row.g-3{
-  row-gap: 28px !important;
-}
+.row.g-3{ row-gap: 28px !important; }
 
-/* Botones más redondos */
-.btn-outline-secondary,
-.btn-brand{
-  border-radius: 999px !important;
+/* =========================
+   Hero Search (Home panel)
+   ========================= */
+.hero-search{
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 16px 44px rgba(2,6,23,.06) !important;
 }
 
 /* =========================
-   BUSINESS DETAIL HERO
+   HOME — UI mockup (tabs + search + filtros)
+   ========================= */
+.home-tabs{
+  display:flex;
+  gap:12px;
+}
+.home-tab{
+  flex: 1 1 0;
+  text-align:center;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  text-decoration:none;
+  font-weight: 900;
+  color: var(--text);
+}
+.home-tab.active{
+  border-color: rgba(59,130,246,.35);
+  box-shadow: 0 10px 26px rgba(2,6,23,.06);
+  color: #2563eb;
+}
+
+/* Searchbar grande */
+.home-searchbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 14px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.05);
+}
+.home-search-icon{ opacity:.7; font-size: 16px; }
+.home-search-input{
+  border:0;
+  outline:0;
+  width:100%;
+  font-weight:800;
+  background: transparent;
+}
+
+/* Filtros compactos */
+.home-filters{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap: wrap;
+}
+
+.home-filter-pill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.04);
+}
+
+.home-filter-ic{ opacity:.8; }
+.home-filter-label{
+  font-weight:900;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.home-filter-select{
+  border:0;
+  outline:0;
+  font-weight: 900;
+  background: transparent;
+  color: var(--text);
+  padding-right: 6px;
+}
+
+/* Switch */
+.home-switch{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.04);
+  cursor:pointer;
+  user-select:none;
+}
+.home-switch input{ display:none; }
+
+.home-slider{
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  position: relative;
+  background: #E2E8F0;
+  transition: .2s ease;
+}
+.home-slider::after{
+  content:"";
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background:#fff;
+  position:absolute;
+  top:3px;
+  left:3px;
+  transition: .2s ease;
+  box-shadow: 0 8px 16px rgba(2,6,23,.18);
+}
+.home-switch input:checked + .home-slider{
+  background: rgba(16,185,129,.85);
+}
+.home-switch input:checked + .home-slider::after{ left: 21px; }
+
+.home-switch-text{
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* =========================
+   HOME — Categorías tipo tarjeta (mockup)
+   (para tu HTML con chip-card / chip-emoji / chip-text)
+   ========================= */
+.chip-scroll{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+.chips-row{
+  display:flex;
+  gap:12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.chip-card{
+  min-width: 98px;
+  height: 88px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: #fff;
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  box-shadow: 0 12px 28px rgba(2,6,23,.06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.chip-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(2,6,23,.10);
+  border-color: #dbe6f2;
+}
+
+.chip-emoji{ font-size: 28px; line-height: 1; }
+.chip-text{
+  font-weight: 950;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.chip-card-active{
+  background: rgba(225,29,46,.10);
+  border-color: rgba(225,29,46,.22);
+}
+.chip-card-active .chip-text{ color: var(--brand); }
+
+.chip-card-more{
+  background: rgba(249,115,22,.10);
+  border-color: rgba(249,115,22,.22);
+}
+
+/* =========================
+   Ranking sidebar
+   ========================= */
+.ranked-list{
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.ranked-item{
+  display: grid !important;
+  grid-template-columns: 28px 40px 1fr 14px;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  text-decoration: none !important;
+  background: #fff !important;
+}
+
+.ranked-item:last-child{ border-bottom: 0 !important; }
+.ranked-item:hover{ background: #F8FAFC !important; }
+
+.rank-badge{
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(249,115,22,.95);
+}
+
+.ranked-thumb{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 10px 24px rgba(2,6,23,.10);
+  background: #fff;
+}
+
+.ranked-thumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ranked-thumb-fallback{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #EEF2FF;
+  font-size: 18px;
+}
+
+.ranked-meta{ min-width: 0; }
+
+.ranked-name{
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.2;
+}
+
+.ranked-sub{
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(225,29,46,.12);
+  color: var(--brand);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.ranked-status{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mini-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.mini-dot-open{ background: #16A34A; }
+.mini-dot-closed{ background: #94A3B8; }
+
+/* Sidebar sticky */
+.sidebar-sticky{
+  position: sticky;
+  top: 90px;
+}
+@media (max-width: 991px){
+  .sidebar-sticky{ position: static; top: auto; }
+}
+
+/* =========================
+   Banner Premium Sidebar
+   ========================= */
+.premium-banner{
+  background: linear-gradient(135deg, #E11D2E, #F97316);
+  border-radius: 22px;
+  padding: 22px;
+  color: white;
+  box-shadow: 0 20px 50px rgba(225,29,46,.25);
+  position: relative;
+  overflow: hidden;
+}
+.premium-banner::after{
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.premium-content{ position: relative; z-index: 2; }
+
+.premium-title{
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.premium-sub{
+  font-size: 13px;
+  opacity: .95;
+  margin-bottom: 14px;
+}
+.premium-btn{
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  padding: 8px 18px !important;
+  color: #E11D2E !important;
+}
+
+/* Sidebar card border */
+.sidebar-card{ border: 1px solid var(--line); }
+
+/* =========================
+   Home metrics (contador)
+   ========================= */
+.home-metrics{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+}
+
+.metric-card{
+  flex: 1 1 220px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 30px rgba(2,6,23,.05);
+}
+
+.metric-number{
+  font-weight: 950;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.metric-label{
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* =========================
+   CART FLOAT BAR
+   ========================= */
+.cart-floatbar{
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 24px));
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 1200;
+  box-shadow: 0 22px 44px rgba(2,6,23,.22);
+  animation: cartSlideUp .35s ease;
+}
+
+@keyframes cartSlideUp{
+  from{ opacity: 0; transform: translate(-50%, 20px); }
+  to{ opacity: 1; transform: translate(-50%, 0); }
+}
+
+.cart-floatbar-left{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cart-floatbar-icon{
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.cart-floatbar-title{
+  font-weight: 900;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.cart-floatbar-sub{
+  font-size: 12px;
+  opacity: .95;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 52vw;
+}
+
+.cart-floatbar-btn{
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  padding: 10px 14px !important;
+}
+
+/* =========================
+   Responsive tweaks
+   ========================= */
+@media (max-width: 576px){
+  .hero-search{ padding: 16px !important; }
+
+  /* cards más compactas */
+  .row.g-3{ row-gap: 16px !important; }
+
+  .business-hero{ height: 170px; }
+  .business-cover{ height: 170px; }
+  .hero-name{ font-size: 17px; }
+
+  .cart-floatbar{
+    border-radius: 18px;
+    padding: 12px 14px;
+    bottom: 10px;
+  }
+  .cart-floatbar-btn{ padding: 8px 12px !important; }
+  body{ padding-bottom: 110px; }
+
+  .home-tabs{ gap:10px; }
+  .home-tab{ padding: 10px 12px; }
+
+  .chip-card{ min-width: 92px; height: 84px; }
+}
+
+/* =========================
+   BUSINESS DETAIL HERO (si lo usas en detail)
    ========================= */
 .business-hero-card{
   background: #fff;
@@ -278,10 +832,7 @@
   text-decoration: none;
   font-weight: 600;
 }
-
-.business-hero-link:hover{
-  text-decoration: underline;
-}
+.business-hero-link:hover{ text-decoration: underline; }
 
 .business-hero-actions{
   padding: 14px 16px;
@@ -289,765 +840,3 @@
   gap: 10px;
   flex-wrap: wrap;
 }
-
-/* =========================
-   CART FLOAT BAR
-   ========================= */
-.cart-floatbar{
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  width: min(760px, calc(100% - 24px));
-  background: var(--brand);
-  color: #fff;
-  border-radius: 999px;
-  padding: 12px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  z-index: 1200;
-  box-shadow: 0 22px 44px rgba(2,6,23,.22);
-  animation: cartSlideUp .35s ease;
-}
-
-@keyframes cartSlideUp{
-  from{ opacity: 0; transform: translate(-50%, 20px); }
-  to{ opacity: 1; transform: translate(-50%, 0); }
-}
-
-.cart-floatbar-left{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.cart-floatbar-icon{
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex: 0 0 auto;
-}
-
-.cart-floatbar-title{
-  font-weight: 900;
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-
-.cart-floatbar-sub{
-  font-size: 12px;
-  opacity: .95;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 52vw;
-}
-
-.cart-floatbar-btn{
-  border-radius: 999px !important;
-  font-weight: 900 !important;
-  padding: 10px 14px !important;
-}
-
-body{
-  padding-bottom: 90px;
-}
-
-@media (max-width: 576px){
-  .cart-floatbar{
-    border-radius: 18px;
-    padding: 12px 14px;
-    bottom: 10px;
-  }
-  .cart-floatbar-btn{
-    padding: 8px 12px !important;
-  }
-  body{
-    padding-bottom: 110px;
-  }
-}
-
-/* ===== Branding Navbar ===== */
-.brand-logo{
-  height: 34px;
-  width: auto;
-  display: block;
-}
-
-.brand-name{
-  font-weight: 900;
-  letter-spacing: .2px;
-}
-
-/* Navbar más pro */
-.navbar{
-  background: #fff;
-  border-bottom: 1px solid #eef2f7;
-}
-
-/* ===========================
-   PidoNeiva – Premium Elegante
-   (pegar al final)
-   =========================== */
-
-:root{
-  --brand: #E11D2E;     /* rojo */
-  --brand-2: #F97316;   /* naranja acento */
-  --bg: #F8FAFC;        /* fondo limpio */
-  --text: #0F172A;
-  --muted: #64748B;
-  --line: #EAEFF5;
-}
-
-/* Fondo general */
-body{
-  background: var(--bg) !important;
-  color: var(--text);
-}
-
-/* Navbar más premium */
-.navbar{
-  background: #fff !important;
-  border-bottom: 1px solid var(--line) !important;
-}
-
-/* Logo */
-.brand-logo{
-  height: 36px;       /* un poquito más grande */
-  width: auto;
-  display: block;
-}
-.brand-name{
-  font-weight: 900;
-  letter-spacing: .2px;
-}
-
-/* Botón principal (rojo) */
-.btn-brand,
-.btn.btn-brand{
-  background: var(--brand) !important;
-  border: 0 !important;
-  color: #fff !important;
-  border-radius: 999px !important;
-}
-.btn-brand:hover{
-  filter: brightness(.92);
-}
-
-/* Botón secundario (contorno suave) */
-.btn-outline-secondary{
-  border-radius: 999px !important;
-  border-color: #D9E2EC !important;
-  color: #334155 !important;
-}
-.btn-outline-secondary:hover{
-  background: #F1F5F9 !important;
-}
-
-/* Tarjetas y sombras suaves */
-.shadow-soft{
-  box-shadow: 0 14px 40px rgba(2,6,23,.06) !important;
-}
-.card{
-  border: 0 !important;
-  border-radius: 22px !important;
-}
-
-/* Hover premium (más sutil) */
-.business-card:hover,
-.card:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 18px 50px rgba(2,6,23,.12) !important;
-}
-.business-card:hover .business-cover{
-  transform: scale(1.03);
-}
-
-/* Panel buscador (hero-search) */
-.hero-search{
-  border: 1px solid var(--line) !important;
-  box-shadow: 0 16px 44px rgba(2,6,23,.06) !important;
-}
-
-/* Pills (más finas, elegantes) */
-.pill{
-  font-size: 12px;
-  font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  line-height: 1;
-  white-space: nowrap;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-/* Destacado en naranja */
-.pill.featured{
-  background: rgba(249,115,22,.92);
-  color: #fff;
-}
-
-/* Popular en rojo */
-.pill.popular{
-  background: rgba(225,29,46,.92);
-  color: #fff;
-}
-
-/* Abierto (verde) */
-.pill-success{
-  background: rgba(16,185,129,.92);
-  color: #fff;
-}
-
-/* Cerrado (gris) */
-.pill-muted{
-  background: rgba(100,116,139,.88);
-  color: #fff;
-}
-
-/* Chips del filtro (zona) redondeados */
-.btn{
-  border-radius: 999px;
-}
-
-/* CTA del sidebar más premium */
-.sidebar-card{
-  border: 1px solid var(--line);
-}
-
-/* Tag tipo negocio (restaurante/comercio) */
-.tag{
-  background: #ECFEFF !important;
-  color: #0E7490 !important;
-  border-radius: 999px !important;
-  padding: .35rem .7rem !important;
-  font-weight: 700 !important;
-}
-
-/* Texto secundario más suave */
-.text-secondary{
-  color: var(--muted) !important;
-}
-
-/* =======================
-   Chips de categorías
-   ======================= */
-.chips-row{
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.chip{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid var(--line);
-  color: #334155;
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 13px;
-  box-shadow: 0 10px 26px rgba(2,6,23,.05);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-
-.chip:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(2,6,23,.08);
-  border-color: #dbe6f2;
-}
-
-.chip-active{
-  background: rgba(225,29,46,.10);
-  border-color: rgba(225,29,46,.22);
-  color: var(--brand);
-}
-
-.chip-more{
-  background: rgba(249,115,22,.10);
-  border-color: rgba(249,115,22,.22);
-  color: #9a3412;
-}
-
-/* =======================
-   Ranking sidebar
-   ======================= */
-.ranked-list{
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: #fff;
-}
-
-.ranked-item{
-  display: grid !important;
-  grid-template-columns: 28px 40px 1fr 14px;
-  gap: 10px;
-  align-items: center;
-  padding: 12px 12px !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--line) !important;
-  text-decoration: none !important;
-  background: #fff !important;
-}
-
-.ranked-item:last-child{
-  border-bottom: 0 !important;
-}
-
-.ranked-item:hover{
-  background: #F8FAFC !important;
-}
-
-.rank-badge{
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(249,115,22,.95); /* naranja */
-}
-
-.ranked-thumb{
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  overflow: hidden;
-  border: 2px solid #fff;
-  box-shadow: 0 10px 24px rgba(2,6,23,.10);
-  background: #fff;
-}
-
-.ranked-thumb img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.ranked-thumb-fallback{
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  background: #EEF2FF;
-  font-size: 18px;
-}
-
-.ranked-meta{
-  min-width: 0;
-}
-
-.ranked-name{
-  font-weight: 900;
-  font-size: 13px;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.2;
-}
-
-.ranked-sub{
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mini-pill{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 18px;
-  border-radius: 999px;
-  background: rgba(225,29,46,.12);
-  color: var(--brand);
-  font-weight: 900;
-  font-size: 12px;
-}
-
-.ranked-status{
-  display: flex;
-  justify-content: flex-end;
-}
-
-.mini-dot{
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  display: inline-block;
-}
-
-.mini-dot-open{ background: #16A34A; }
-.mini-dot-closed{ background: #94A3B8; }
-
-/* =======================
-   Sidebar sticky (desktop)
-   ======================= */
-.sidebar-sticky{
-  position: sticky;
-  top: 90px;   /* separa de la navbar */
-}
-
-@media (max-width: 991px){
-  .sidebar-sticky{
-    position: static; /* en móvil no se pega */
-    top: auto;
-  }
-}
-
-/* =======================
-   Banner Premium Sidebar
-   ======================= */
-.premium-banner{
-  background: linear-gradient(135deg, #E11D2E, #F97316);
-  border-radius: 22px;
-  padding: 22px;
-  color: white;
-  box-shadow: 0 20px 50px rgba(225,29,46,.25);
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-banner::after{
-  content: "";
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 140px;
-  height: 140px;
-  background: rgba(255,255,255,.08);
-  border-radius: 50%;
-}
-
-.premium-content{
-  position: relative;
-  z-index: 2;
-}
-
-.premium-title{
-  font-weight: 900;
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.premium-sub{
-  font-size: 13px;
-  opacity: .95;
-  margin-bottom: 14px;
-}
-
-.premium-btn{
-  border-radius: 999px !important;
-  font-weight: 800 !important;
-  padding: 8px 18px !important;
-  color: #E11D2E !important;
-}
-
-/* =======================
-   Home metrics (contador)
-   ======================= */
-.home-metrics{
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 10px 0 14px;
-}
-
-.metric-card{
-  flex: 1 1 220px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 14px 16px;
-  box-shadow: 0 12px 30px rgba(2,6,23,.05);
-}
-
-.metric-number{
-  font-weight: 950;
-  font-size: 28px;
-  line-height: 1;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-
-.metric-label{
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-
-/* ✅ Scroll horizontal de chips en móvil (sin duplicar estilos) */
-.chip-scroll{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 6px;
-}
-
-.chips-row{
-  display: flex;
-  gap: 10px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-/* =========================
-   HOME: UI limpia tipo Rappi
-   ========================= */
-
-/* Tabs (Restaurantes / Comercios) */
-.home-tabs{
-  display:flex;
-  gap:12px;
-}
-.home-tab{
-  flex: 1 1 0;
-  text-align:center;
-  padding: 12px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background:#fff;
-  text-decoration:none;
-  font-weight: 900;
-  color: var(--text);
-}
-.home-tab.active{
-  border-color: rgba(59,130,246,.35);
-  box-shadow: 0 10px 26px rgba(2,6,23,.06);
-  color: #2563eb;
-}
-
-/* Search bar */
-.home-searchbar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 12px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background:#fff;
-  box-shadow: 0 10px 26px rgba(2,6,23,.05);
-}
-.home-search-icon{
-  opacity:.7;
-  font-size: 16px;
-}
-.home-search-input{
-  border:0;
-  outline:0;
-  width:100%;
-  font-weight:700;
-  background: transparent;
-}
-
-/* Filters row */
-.home-filters{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  flex-wrap: wrap;
-}
-
-/* Zona pill */
-.home-filter-pill{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background:#fff;
-  box-shadow: 0 10px 26px rgba(2,6,23,.04);
-}
-.home-filter-ic{ opacity:.8; }
-.home-filter-label{
-  font-weight:900;
-  color: var(--text);
-  font-size: 13px;
-}
-.home-filter-select{
-  border:0;
-  outline:0;
-  font-weight: 900;
-  background: transparent;
-  color: var(--text);
-  padding-right: 6px;
-}
-
-/* Switch (Solo Abiertos) */
-.home-switch{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background:#fff;
-  box-shadow: 0 10px 26px rgba(2,6,23,.04);
-  cursor:pointer;
-  user-select:none;
-}
-.home-switch input{
-  display:none;
-}
-.home-slider{
-  width: 42px;
-  height: 24px;
-  border-radius: 999px;
-  position: relative;
-  background: #E2E8F0;
-  transition: .2s ease;
-}
-.home-slider::after{
-  content:"";
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background:#fff;
-  position:absolute;
-  top:3px;
-  left:3px;
-  transition: .2s ease;
-  box-shadow: 0 8px 16px rgba(2,6,23,.18);
-}
-.home-switch input:checked + .home-slider{
-  background: rgba(16,185,129,.85);
-}
-.home-switch input:checked + .home-slider::after{
-  left: 21px;
-}
-.home-switch-text{
-  font-weight: 900;
-  font-size: 13px;
-  color: var(--text);
-}
-
-/* Mobile spacing */
-@media (max-width: 576px){
-  .hero-search{ padding: 16px !important; }
-  .home-tabs{ gap:10px; }
-  .home-tab{ padding: 10px 12px; }
-}
-
-/* =======================
-   Categorías: iconos grandes (mockup)
-   ======================= */
-.chip-scroll{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 10px;
-}
-.chips-row{
-  display:flex;
-  gap:12px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-/* cada chip como "botón redondo" */
-.chip{
-  min-width: 92px;
-  height: 84px;
-  padding: 10px 12px;
-  border-radius: 18px;
-  display:flex;
-  flex-direction: column;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 12px 28px rgba(2,6,23,.06);
-}
-
-/* el emoji se agranda */
-.chip{
-  line-height: 1;
-}
-.chip::first-letter{
-  font-size: 28px;
-}
-
-/* active */
-.chip-active{
-  background: rgba(225,29,46,.10);
-  border-color: rgba(225,29,46,.22);
-  color: var(--brand);
-}
-
-/* =======================
-   Categorías: iconos grandes (mockup)
-   ======================= */
-.chip-scroll{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 10px;
-}
-.chips-row{
-  display:flex;
-  gap:12px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-/* cada chip como tarjeta */
-.chip{
-  min-width: 96px;
-  height: 86px;
-  padding: 10px 12px;
-  border-radius: 18px;
-  display:flex;
-  flex-direction: column;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 12px 28px rgba(2,6,23,.06);
-}
-
-/* agrandar emoji */
-.chip{
-  line-height: 1;
-}
-.chip::first-letter{
-  font-size: 28px;
-}
-
-/* =========================
-   FIXES (parche mínimo)
-   ========================= */
-
-/* ✅ 1) Cierra comentario roto (si lo dejaste abierto arriba, bórralo allá) */
-/* Fondo general más suave */
-
-/* ✅ 2) Evitar hover global duplicado: deja el hover premium SOLO en business-card */
-.card:hover{
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* (tu hover real queda en .business-card:hover) */
