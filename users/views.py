@@ -166,24 +166,34 @@ def item_create(request):
 
     if request.method == "POST":
         form = MenuItemForm(request.POST, request.FILES)
+        # ✅ igual que en edit: limitar categorías también en POST
+        form.fields["category"].queryset = MenuCategory.objects.filter(business=business)
+
         if form.is_valid():
             obj = form.save(commit=False)
             obj.business = business
+
             if obj.category and obj.category.business_id != business.id:
                 return HttpResponseForbidden("Categoría inválida.")
+
             obj.save()
             return redirect("item_list")
     else:
         form = MenuItemForm()
         form.fields["category"].queryset = MenuCategory.objects.filter(business=business)
 
-    return render(request, "dashboard/item_form.html", {"form": form, "title": "Nuevo producto"})
+    return render(
+        request,
+        "dashboard/item_form.html",
+        {"form": form, "title": "Nuevo producto"},
+    )
 
 
 @login_required
 def item_edit(request, pk):
     business = _get_user_business(request.user)
     item = get_object_or_404(MenuItem, pk=pk)
+
     if not business or item.business_id != business.id:
         return HttpResponseForbidden("No autorizado")
 
@@ -194,17 +204,24 @@ def item_edit(request, pk):
     if request.method == "POST":
         form = MenuItemForm(request.POST, request.FILES, instance=item)
         form.fields["category"].queryset = MenuCategory.objects.filter(business=business)
+
         if form.is_valid():
             obj = form.save(commit=False)
+
             if obj.category and obj.category.business_id != business.id:
                 return HttpResponseForbidden("Categoría inválida.")
+
             obj.save()
             return redirect("item_list")
     else:
         form = MenuItemForm(instance=item)
         form.fields["category"].queryset = MenuCategory.objects.filter(business=business)
 
-    return render(request, "dashboard/item_form.html", {"form": form, "title": "Editar producto"})
+    return render(
+        request,
+        "dashboard/item_form.html",
+        {"form": form, "title": "Editar producto"},
+    )
 
 
 @login_required
@@ -213,6 +230,10 @@ def item_delete(request, pk):
     item = get_object_or_404(MenuItem, pk=pk)
     if not business or item.business_id != business.id:
         return HttpResponseForbidden("No autorizado")
+
+    # 🔒 Bloqueo para plan BASIC o modo PDF  ✅ (ajuste recomendado)
+    if business.plan == "BASIC" or business.menu_mode == "PDF":
+        return HttpResponseForbidden("Tu plan actual solo permite menú PDF.")
 
     if request.method == "POST":
         item.delete()
