@@ -5,9 +5,9 @@ Production-ready for Render + Postgres + WhiteNoise + (optional) Cloudflare R2.
 
 import os
 from pathlib import Path
-
 import dj_database_url
 import mimetypes
+
 mimetypes.add_type("image/webp", ".webp", strict=True)
 
 # =========================
@@ -22,22 +22,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-fallback-key-change-me")
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 
-# Allowed hosts (Render)
+# =========================
+# Allowed Hosts
+# =========================
 allowed_hosts_env = os.environ.get("DJANGO_ALLOWED_HOSTS", "").strip()
+
 if allowed_hosts_env:
-    # ejemplo: ".onrender.com,tu-dominio.com,www.tu-dominio.com"
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
 else:
-    # En producción NO uses "*". Pero lo dejamos para no bloquear si aún no configuras env vars.
-    ALLOWED_HOSTS = ["*"] if DEBUG else [".onrender.com"]
+    # En producción NO usar "*"
+    ALLOWED_HOSTS = ["*"] if DEBUG else [
+        ".onrender.com",
+        "pidoneiva.com",
+        "www.pidoneiva.com",
+    ]
 
-# CSRF trusted origins (Render)
+
+# =========================
+# CSRF Trusted Origins
+# =========================
 csrf_env = os.environ.get("CSRF_TRUSTED_ORIGINS", "").strip()
+
 if csrf_env:
-    # ejemplo: "https://*.onrender.com,https://tu-dominio.com,https://www.tu-dominio.com"
     CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_env.split(",") if o.strip()]
 else:
-    CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
+    CSRF_TRUSTED_ORIGINS = [
+        "https://*.onrender.com",
+        "https://pidoneiva.com",
+        "https://www.pidoneiva.com",
+    ]
 
 
 # =========================
@@ -55,8 +68,7 @@ INSTALLED_APPS = [
     "menu",
     "users",
 
-    # django-storages (R2 / S3 compatible)
-    "storages",
+    "storages",  # R2 / S3
 ]
 
 
@@ -65,10 +77,7 @@ INSTALLED_APPS = [
 # =========================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
-    # ✅ WhiteNoise para servir estáticos
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -107,8 +116,6 @@ TEMPLATES = [
 # =========================
 # Database
 # =========================
-# ✅ En Render usa DATABASE_URL (Postgres).
-# ✅ En local, si no existe DATABASE_URL, usa sqlite.
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
@@ -155,14 +162,10 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# ✅ En desarrollo/local puedes tener /static
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 
-# WhiteNoise storage (static)
-# (en Django 4.2/5 funciona perfecto)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media local (si no usas R2)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -181,7 +184,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # =========================
-# R2 (Cloudflare) / S3 compatible
+# R2 (Cloudflare) / S3
 # =========================
 USE_R2 = os.environ.get("USE_R2", "0") == "1"
 
@@ -190,13 +193,17 @@ if USE_R2:
     AWS_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "").strip()
     AWS_STORAGE_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "").strip()
     AWS_S3_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL", "").strip()
+
     AWS_S3_OBJECT_PARAMETERS = {
-    "CacheControl": "max-age=31536000",
-}
+        "CacheControl": "max-age=31536000",
+    }
 
-    # ⚠️ NO tumbamos el servidor si algo falta
-    if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME and AWS_S3_ENDPOINT_URL:
-
+    if (
+        AWS_ACCESS_KEY_ID and
+        AWS_SECRET_ACCESS_KEY and
+        AWS_STORAGE_BUCKET_NAME and
+        AWS_S3_ENDPOINT_URL
+    ):
         AWS_S3_REGION_NAME = "auto"
         AWS_S3_SIGNATURE_VERSION = "s3v4"
         AWS_S3_ADDRESSING_STYLE = "path"
@@ -207,7 +214,6 @@ if USE_R2:
 
         DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-        # ✅ Dominio público (r2.dev)
         PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE_URL", "").strip().rstrip("/")
 
         if PUBLIC_BASE:
@@ -216,18 +222,22 @@ if USE_R2:
             MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 
-
 # =========================
-# Basic security when behind proxy (Render)
+# Security Behind Proxy (Render)
 # =========================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
-SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "1") == "1" and not DEBUG
+
+SECURE_SSL_REDIRECT = (
+    os.environ.get("SECURE_SSL_REDIRECT", "1") == "1"
+    and not DEBUG
+)
 
 
 # =========================
-# Logging (mostrar errores reales en Render runtime logs)
+# Logging
 # =========================
 LOGGING = {
     "version": 1,
