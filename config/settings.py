@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 
 import dj_database_url
+import mimetypes
+mimetypes.add_type("image/webp", ".webp", strict=True)
 
 # =========================
 # Base directory
@@ -188,6 +190,9 @@ if USE_R2:
     AWS_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "").strip()
     AWS_STORAGE_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "").strip()
     AWS_S3_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL", "").strip()
+    AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=31536000",
+}
 
     # ⚠️ NO tumbamos el servidor si algo falta
     if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME and AWS_S3_ENDPOINT_URL:
@@ -209,6 +214,7 @@ if USE_R2:
             AWS_S3_CUSTOM_DOMAIN = PUBLIC_BASE.replace("https://", "").replace("http://", "")
             AWS_S3_URL_PROTOCOL = "https:"
             MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+
 
 
 # =========================
