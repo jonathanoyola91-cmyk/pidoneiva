@@ -33,6 +33,7 @@ class BusinessForm(forms.ModelForm):
             "phone", "whatsapp", "instagram", "description",
             "tags",          # ✅ NUEVO: para que el dueño lo diligencie
             "logo",
+            "cover_image",
 
             # switch de pedidos
             "is_accepting_orders",
@@ -82,6 +83,10 @@ class BusinessForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if "logo" in self.fields:
+            self.fields["logo"].required = False
+        if "cover_image" in self.fields:
+            self.fields["cover_image"].required = False
 
         # ✅ UI del campo tags (placeholder + clase)
         if "tags" in self.fields:
