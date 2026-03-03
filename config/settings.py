@@ -223,15 +223,19 @@ if USE_R2:
     # ✅ MEDIA a R2 (subida por S3)
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-    # ✅ URL pública PARA MOSTRAR en navegador (r2.dev o tu dominio)
-    #    OJO: NO uses el endpoint S3 (r2.cloudflarestorage.com) para mostrar imágenes públicas.
+    # ✅ Dominio público para SERVIR archivos (r2.dev o tu dominio)
+    # Esto es lo que hace que {{ obj.logo.url }} use r2.dev en vez de r2.cloudflarestorage.com
     PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE_URL", "").strip().rstrip("/")
     if not PUBLIC_BASE:
         raise RuntimeError(
             "USE_R2=1 pero falta R2_PUBLIC_BASE_URL (usa el Public Development URL r2.dev o tu dominio)."
         )
 
-    MEDIA_URL = f"{PUBLIC_BASE}/"
+    AWS_S3_CUSTOM_DOMAIN = PUBLIC_BASE.replace("https://", "").replace("http://", "")
+    AWS_S3_URL_PROTOCOL = "https:"
+
+    # MEDIA_URL (para templates y consistencia)
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 
 # =========================
