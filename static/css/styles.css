@@ -393,8 +393,6 @@ body{
   border-bottom: 1px solid #eef2f7;
 }
 
-/* Fondo general más suave
-
 /* ===========================
    PidoNeiva – Premium Elegante
    (pegar al final)
@@ -816,3 +814,240 @@ body{
   white-space: nowrap;
 }
 
+/* =========================
+   HOME: UI limpia tipo Rappi
+   ========================= */
+
+/* Tabs (Restaurantes / Comercios) */
+.home-tabs{
+  display:flex;
+  gap:12px;
+}
+.home-tab{
+  flex: 1 1 0;
+  text-align:center;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  text-decoration:none;
+  font-weight: 900;
+  color: var(--text);
+}
+.home-tab.active{
+  border-color: rgba(59,130,246,.35);
+  box-shadow: 0 10px 26px rgba(2,6,23,.06);
+  color: #2563eb;
+}
+
+/* Search bar */
+.home-searchbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.05);
+}
+.home-search-icon{
+  opacity:.7;
+  font-size: 16px;
+}
+.home-search-input{
+  border:0;
+  outline:0;
+  width:100%;
+  font-weight:700;
+  background: transparent;
+}
+
+/* Filters row */
+.home-filters{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap: wrap;
+}
+
+/* Zona pill */
+.home-filter-pill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.04);
+}
+.home-filter-ic{ opacity:.8; }
+.home-filter-label{
+  font-weight:900;
+  color: var(--text);
+  font-size: 13px;
+}
+.home-filter-select{
+  border:0;
+  outline:0;
+  font-weight: 900;
+  background: transparent;
+  color: var(--text);
+  padding-right: 6px;
+}
+
+/* Switch (Solo Abiertos) */
+.home-switch{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:#fff;
+  box-shadow: 0 10px 26px rgba(2,6,23,.04);
+  cursor:pointer;
+  user-select:none;
+}
+.home-switch input{
+  display:none;
+}
+.home-slider{
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  position: relative;
+  background: #E2E8F0;
+  transition: .2s ease;
+}
+.home-slider::after{
+  content:"";
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background:#fff;
+  position:absolute;
+  top:3px;
+  left:3px;
+  transition: .2s ease;
+  box-shadow: 0 8px 16px rgba(2,6,23,.18);
+}
+.home-switch input:checked + .home-slider{
+  background: rgba(16,185,129,.85);
+}
+.home-switch input:checked + .home-slider::after{
+  left: 21px;
+}
+.home-switch-text{
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Mobile spacing */
+@media (max-width: 576px){
+  .hero-search{ padding: 16px !important; }
+  .home-tabs{ gap:10px; }
+  .home-tab{ padding: 10px 12px; }
+}
+
+/* =======================
+   Categorías: iconos grandes (mockup)
+   ======================= */
+.chip-scroll{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+.chips-row{
+  display:flex;
+  gap:12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* cada chip como "botón redondo" */
+.chip{
+  min-width: 92px;
+  height: 84px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 12px 28px rgba(2,6,23,.06);
+}
+
+/* el emoji se agranda */
+.chip{
+  line-height: 1;
+}
+.chip::first-letter{
+  font-size: 28px;
+}
+
+/* active */
+.chip-active{
+  background: rgba(225,29,46,.10);
+  border-color: rgba(225,29,46,.22);
+  color: var(--brand);
+}
+
+/* =======================
+   Categorías: iconos grandes (mockup)
+   ======================= */
+.chip-scroll{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+.chips-row{
+  display:flex;
+  gap:12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* cada chip como tarjeta */
+.chip{
+  min-width: 96px;
+  height: 86px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 12px 28px rgba(2,6,23,.06);
+}
+
+/* agrandar emoji */
+.chip{
+  line-height: 1;
+}
+.chip::first-letter{
+  font-size: 28px;
+}
+
+/* =========================
+   FIXES (parche mínimo)
+   ========================= */
+
+/* ✅ 1) Cierra comentario roto (si lo dejaste abierto arriba, bórralo allá) */
+/* Fondo general más suave */
+
+/* ✅ 2) Evitar hover global duplicado: deja el hover premium SOLO en business-card */
+.card:hover{
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* (tu hover real queda en .business-card:hover) */

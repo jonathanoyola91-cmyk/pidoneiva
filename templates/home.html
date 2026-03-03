@@ -275,32 +275,123 @@
         </div>
       </div>
 
-      <div class="p-4 bg-white rounded-4 shadow-soft sidebar-card">
-        <h3 class="h6 fw-bold">¿Tienes un negocio?</h3>
+<div class="p-4 bg-white rounded-4 shadow-soft hero-search">
 
-        <ul class="small text-secondary mb-3">
-          <li>✔ Aparece en tu sector</li>
-          <li>✔ Botón directo a WhatsApp</li>
-          <li>✔ Ubicación en Google Maps</li>
-          <li>✔ Estadísticas de visitas</li>
-          <li>✔ Opción de destacarte como ⭐ Premium</li>
-          <li>✔ Posibilidad de aparecer como 🔥 Popular</li>
-        </ul>
+  <h1 class="h4 fw-bold mb-3">
+    {% if request.GET.type == "RESTAURANT" %}
+      Restaurantes en Neiva
+    {% elif request.GET.type == "COMMERCE" %}
+      Comercios en Neiva
+    {% else %}
+      Directorio Comercial de Neiva
+    {% endif %}
+  </h1>
 
-        <div class="d-grid gap-2">
-          <a class="btn btn-brand text-white"
-             href="{% url 'request_access' %}">
-            🏪 Registrar mi negocio (Prueba gratis)
-          </a>
+  <!-- =======================
+       TOP: Tabs (Tipo)
+       ======================= -->
+  <div class="home-tabs mb-3">
+    <a class="home-tab {% if request.GET.type != 'COMMERCE' %}active{% endif %}"
+       href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      Restaurantes
+    </a>
 
-          <a class="btn btn-outline-secondary"
-             href="https://wa.me/57XXXXXXXXXX"
-             target="_blank">
-            Soporte por WhatsApp
-          </a>
-        </div>
+    <a class="home-tab {% if request.GET.type == 'COMMERCE' %}active{% endif %}"
+       href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      Comercios
+    </a>
+  </div>
+
+  <!-- =======================
+       Search (protagonista)
+       ======================= -->
+  <form method="get" class="home-search">
+
+    <!-- ✅ FIX 2: Mantener type solo si existe (evita duplicar / comportamiento consistente) -->
+    {% if request.GET.type %}
+      <input type="hidden" name="type" value="{{ request.GET.type }}">
+    {% endif %}
+
+    <!-- Q -->
+    <div class="home-searchbar mb-3">
+      <span class="home-search-icon">🔎</span>
+      <input class="home-search-input"
+             name="q"
+             placeholder="Buscar hamburguesa, café, droguería..."
+             value="{{ request.GET.q }}">
+    </div>
+
+    <!-- =======================
+         Filtros compactos
+         ======================= -->
+    <div class="home-filters mb-3">
+      <div class="home-filter-pill">
+        <span class="home-filter-ic">📍</span>
+        <span class="home-filter-label">Zona:</span>
+
+        <select class="home-filter-select" name="zone">
+          <option value="">Todas</option>
+          {% for z in zones %}
+            <option value="{{ z }}" {% if request.GET.zone == z %}selected{% endif %}>{{ z }}</option>
+          {% endfor %}
+        </select>
       </div>
 
+      <!-- ✅ FIX 1: Enviar siempre open=0 y si activas switch open=1 -->
+      <input type="hidden" name="open" value="0">
+
+      <label class="home-switch">
+        <input type="checkbox" name="open" value="1" {% if request.GET.open == "1" %}checked{% endif %}>
+        <span class="home-slider"></span>
+        <span class="home-switch-text">Solo Abiertos</span>
+      </label>
+    </div>
+
+    <button class="btn btn-brand text-white w-100">
+      Buscar
+    </button>
+  </form>
+
+  <!-- =======================
+       Categorías: carrusel (chips)
+       ======================= -->
+  <div class="chip-scroll mt-3">
+    <div class="chips-row">
+
+      <a class="chip {% if request.GET.q|lower == 'droguería' or request.GET.q|lower == 'drogueria' %}chip-active{% endif %}"
+         href="/?q=Droguería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+        💊 Droguerías
+      </a>
+
+      <a class="chip {% if request.GET.q|lower == 'café' or request.GET.q|lower == 'cafe' %}chip-active{% endif %}"
+         href="/?q=Café{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+        ☕ Cafés
+      </a>
+
+      <a class="chip {% if request.GET.q|lower == 'pizza' or request.GET.q|lower == 'pizzería' or request.GET.q|lower == 'pizzeria' %}chip-active{% endif %}"
+         href="/?q=Pizza{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+        🍕 Pizza
+      </a>
+
+      <a class="chip {% if request.GET.q|lower == 'barbería' or request.GET.q|lower == 'barberia' %}chip-active{% endif %}"
+         href="/?q=Barbería{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+        ✂️ Barbería
+      </a>
+
+      <a class="chip {% if request.GET.q|lower == 'market' %}chip-active{% endif %}"
+         href="/?q=Market{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+        🧺 Market
+      </a>
+
+      <a class="chip chip-more"
+         href="/{% if request.GET.type %}?type={{ request.GET.type }}{% endif %}">
+        ➕ Más
+      </a>
+
+    </div>
+  </div>
+
+</div>
       <hr>
 
       <!-- =======================
