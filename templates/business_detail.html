@@ -174,10 +174,18 @@
            ======================= -->
       <div class="tab-pane fade show active" id="tab-products">
         <div id="menu"></div>
-
+        <div class="menu-categories mt-3 mb-2">
+          {% for cat in categories %}
+            {% if cat.items.all|length %}
+              <a class="menu-category" href="#cat-{{ cat.id }}">
+                {{ cat.name }} 
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
         {% for cat in categories %}
           {% if cat.items.all|length %}
-            <div class="mt-4">
+            <div class="mt-4" id="cat-{{ cat.id }}">
               <h3 class="h6 fw-bold">{{ cat.name }}</h3>
               <div class="products-row">
                 {% for item in cat.items.all %}
