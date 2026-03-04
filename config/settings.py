@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "businesses",
     "menu",
     "users",
+    "orders.apps.OrdersConfig",
 
     "storages",  # R2 / S3
 ]
