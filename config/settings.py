@@ -190,12 +190,10 @@ USE_R2 = os.environ.get("USE_R2", "0") == "1"
 
 if USE_R2:
 
-    INSTALLED_APPS += ["storages"]
-
-    AWS_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME")
-    AWS_S3_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL")
+    AWS_ACCESS_KEY_ID = (os.environ.get("R2_ACCESS_KEY_ID") or "").strip()
+    AWS_SECRET_ACCESS_KEY = (os.environ.get("R2_SECRET_ACCESS_KEY") or "").strip()
+    AWS_STORAGE_BUCKET_NAME = (os.environ.get("R2_BUCKET_NAME") or "").strip()
+    AWS_S3_ENDPOINT_URL = (os.environ.get("R2_ENDPOINT_URL") or "").strip()
 
     AWS_S3_REGION_NAME = "auto"
     AWS_S3_SIGNATURE_VERSION = "s3v4"
@@ -209,35 +207,31 @@ if USE_R2:
         "CacheControl": "public, max-age=31536000",
     }
 
-    PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE_URL", "").rstrip("/")
+    PUBLIC_BASE = (os.environ.get("R2_PUBLIC_BASE_URL") or "").strip().rstrip("/")
 
     if PUBLIC_BASE:
         AWS_S3_CUSTOM_DOMAIN = PUBLIC_BASE.replace("https://", "").replace("http://", "")
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    else:
+        MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 
     STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
+        "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     }
 
 else:
-
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
     STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     }
 
+# límites de subida recomendados
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 # =========================
 # Security Behind Proxy (Render)
 # =========================
