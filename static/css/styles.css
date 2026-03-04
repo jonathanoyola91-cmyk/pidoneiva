@@ -42,6 +42,88 @@ body{
   letter-spacing: .2px;
 }
 
+/* =======================
+   Chips (Carrusel categorías)
+   ======================= */
+
+/* contenedor con scroll horizontal */
+.chip-scroll{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+.chip-scroll::-webkit-scrollbar{ display:none; } /* Chrome */
+
+/* fila */
+.chips-row{
+  display:flex;
+  gap:10px;
+  padding: 2px 2px 8px;
+  white-space: nowrap;
+  scroll-snap-type: x mandatory;
+}
+
+/* chip base */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#F1F5F9;
+  border:1px solid #E2E8F0;
+  color: var(--text);
+  font-size:14px;
+  font-weight:700;
+  flex:0 0 auto; /* ← importante */
+  scroll-snap-align:start;
+
+  text-decoration:none;   /* ✅ que no parezca link */
+  cursor:pointer;
+  user-select:none;
+
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+/* efecto táctil cuando se presiona el chip */
+.chip:active{
+  transform: scale(.97);
+}
+
+/* hover con tinte del brand (rojo suave) */
+.chip:hover{
+  background: rgba(225,29,46,.10);
+  border-color: rgba(225,29,46,.35);
+  transform: translateY(-1px);
+}
+
+/* activo: rojo branding */
+.chip-active{
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  
+  box-shadow: 
+    0 6px 14px rgba(0,0,0,.08),
+    0 10px 28px rgba(225,29,46,.25);
+
+  transform: translateY(-1px);
+}
+.chip-active:hover{
+  filter: brightness(.95);
+}
+
+/* chip “Más” diferente */
+.chip-more{
+  background:#fff;
+  border:1px dashed rgba(249,115,22,.70); /* --brand-2 */
+  color: var(--brand-2);
+}
+.chip-more:hover{
+  background: var(--brand-2);
+  border-color: var(--brand-2);
+  color:#fff;
+}
 /* =========================
    Buttons / Tags / Shadows
    ========================= */
