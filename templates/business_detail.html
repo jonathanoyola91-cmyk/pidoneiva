@@ -179,10 +179,10 @@
           {% if cat.items.all|length %}
             <div class="mt-4">
               <h3 class="h6 fw-bold">{{ cat.name }}</h3>
-              <div class="row g-3">
+              <div class="products-row">
                 {% for item in cat.items.all %}
                   {% if item.is_available %}
-                  <div class="col-md-4">
+                  <div class="product-card">
                     <div class="card shadow-soft p-3 h-100">
                       {% if item.photo %}
                         <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">

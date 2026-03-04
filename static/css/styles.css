@@ -1093,3 +1093,32 @@ body{
   font-weight: 800;
   line-height: 1;
 }
+
+/* =========================
+   Scroll horizontal productos
+   ========================= */
+
+.products-row{
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+
+  scroll-snap-type: x mandatory;
+}
+
+/* ocultar barra fea */
+.products-row::-webkit-scrollbar{
+  display: none;
+}
+
+.products-row{
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* cada card */
+.product-card{
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
