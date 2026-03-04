@@ -85,7 +85,12 @@ def home(request):
     q = request.GET.get("q", "").strip()
     business_type = request.GET.get("type", "").strip()
     zone = request.GET.get("zone", "").strip()
-    only_open = request.GET.get("open", "1")
+
+    only_open = request.GET.get("open")
+    if only_open not in ("0", "1"):
+        only_open = "1"  # default: solo abiertos
+
+    zones = ["Centro", "Norte", "Sur", "Oriente"]
 
     qs = Business.objects.filter(is_active=True, is_approved=True)
 
@@ -95,26 +100,18 @@ def home(request):
     if zone:
         qs = qs.filter(zone__icontains=zone)
 
-    # ✅ Búsqueda híbrida: negocio + tags + categorías + items
     if q:
         qs = qs.filter(
             Q(name__icontains=q) |
             Q(description__icontains=q) |
             Q(address__icontains=q) |
             Q(zone__icontains=q) |
-
-            # ✅ Tags del negocio (sirve para BASIC/PDF)
             Q(tags__icontains=q) |
-
-            # ✅ Categorías del menú (Standard/Premium)
             Q(menu_categories__name__icontains=q) |
-
-            # ✅ Productos dentro de categorías (usa related_name="items")
             Q(menu_categories__items__name__icontains=q) |
             Q(menu_categories__items__description__icontains=q)
         ).distinct()
 
-    # Prioridad por plan (si existe plan)
     if hasattr(Business, "plan"):
         qs = qs.annotate(
             plan_rank=Case(
@@ -140,6 +137,7 @@ def home(request):
         "business_type": business_type,
         "zone": zone,
         "only_open": only_open,
+        "zones": zones,
     })
 
 

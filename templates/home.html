@@ -72,10 +72,13 @@
           </div>
 
           <!-- open: siempre envía 0 si no activas switch -->
-          <input type="hidden" name="open" value="0">
+         
 
           <label class="home-switch">
-            <input type="checkbox" name="open" value="1" {% if request.GET.open == "1" %}checked{% endif %}>
+            <input type="checkbox"
+                   name="open" 
+                   value="1" 
+                   {% if request.GET.open == "1" %}checked{% endif %}>
             <span class="home-slider"></span>
             <span class="home-switch-text">Solo Abiertos</span>
           </label>
