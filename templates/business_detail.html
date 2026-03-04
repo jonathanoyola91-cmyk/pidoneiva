@@ -453,4 +453,23 @@
       a.classList.add('menu-category-active');
     });
   });
+ // ==========================================
+  // 2) Evitar "mareo": guardar/restaurar scroll
+  // ==========================================
+  document.addEventListener("submit", function(e){
+    const form = e.target;
+    // Solo forms del carrito (update/remove/clear/etc) para no afectar otros
+    if (form.action && form.action.includes("cart_")) {
+      sessionStorage.setItem("pn_scrollY", String(window.scrollY));
+    }
+  }, true);
+
+  window.addEventListener("load", function(){
+    const y = sessionStorage.getItem("pn_scrollY");
+    if (y !== null) {
+      window.scrollTo(0, parseInt(y, 10) || 0);
+      sessionStorage.removeItem("pn_scrollY");
+    }
+  });
 </script>
+{% endblock %}
