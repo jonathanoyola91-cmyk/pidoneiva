@@ -225,12 +225,12 @@ def home(request):
     # agregar estado calculado
     for b in businesses:
         is_open, closes_at = _open_status(b, now)
-        b.is_open_now = is_open
-        b.closes_at = closes_at
+        b.open_now = is_open
+        b.closes_at_dt = closes_at
 
     # filtro solo abiertos
     if only_open == "1":
-        businesses = [b for b in businesses if b.is_open_now]
+        businesses = [b for b in businesses if getattr(b, "open_now", False)]
 
     # zonas desde choices del modelo
     zones = Business._meta.get_field("zone").choices

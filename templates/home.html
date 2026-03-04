@@ -170,11 +170,11 @@
 
                   <!-- Badge derecha -->
                   <div class="badge-absolute-right">
-                    {% if b.is_open_now %}
+                    {% if b.open_now %}
                       <span class="pill pill-success">
                         <span class="dot"></span> Abierto
-                        {% if b.closes_at %}
-                          · hasta {{ b.closes_at|date:"g:i a" }}
+                        {% if b.closes_at_dt %}
+                          · hasta {{ b.closes_at_dt|date:"g:i a" }}
                     {% endif %}
                       </span>
                     {% else %}
@@ -321,11 +321,11 @@
               </div>
 
               <div class="ranked-status">
-                {% if b.is_open_now %}
+                {% if b.open_now %}
                   <span class="pill pill-success">
                     <span class="dot"></span> Abierto
-                    {% if b.closes_at %}
-                      · hasta {{ b.closes_at|date:"g:i a" }}
+                    {% if b.closes_at_dt %}
+                      · hasta {{ b.closes_at_dt|date:"g:i a" }}
                     {% endif %}
                   </span>
                 {% else %}
