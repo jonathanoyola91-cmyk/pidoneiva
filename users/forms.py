@@ -26,6 +26,16 @@ class BusinessForm(forms.ModelForm):
     sun_start = forms.TimeField(required=False, label="Domingo (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
     sun_end = forms.TimeField(required=False, label="Domingo (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
 
+
+    # ✅ Campo personalizado
+    avg_prep_time = forms.IntegerField(
+        min_value=1,
+        max_value=240,
+        label="Tiempo promedio de preparación (min)",
+        help_text="Ej: 25",
+        required=False
+    )
+
     class Meta:
         model = Business
         fields = [
@@ -34,6 +44,7 @@ class BusinessForm(forms.ModelForm):
             "tags",          # ✅ NUEVO: para que el dueño lo diligencie
             "logo",
             "cover_image",
+            "avg_prep_time",
 
             # switch de pedidos
             "is_accepting_orders",

@@ -4,7 +4,29 @@
 {% block content %}
 <div class="bg-white rounded-4 shadow-soft p-4">
   <h1 class="h5 fw-bold">Tu panel</h1>
+  <div class="dashboard-business-meta mt-2">
 
+  {% if business.zone %}
+  <span class="dashboard-chip">
+    📍 {{ business.get_zone_display }}
+  </span>
+  {% endif %}
+
+  <span class="dashboard-chip
+    {% if business.is_open_now %}
+      chip-open
+    {% else %}
+      chip-closed
+    {% endif %}
+  ">
+    {{ business.open_status_label }}
+  </span>
+
+  <span class="dashboard-chip">
+    ⏱ {{ business.avg_prep_time }} min
+  </span>
+
+</div>
   {% if not business %}
     <p class="text-secondary">Aún no tienes un negocio asignado. Escríbenos para activarte.</p>
   {% else %}

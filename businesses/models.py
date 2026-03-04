@@ -112,6 +112,11 @@ class Business(models.Model):
     schedule_sun = models.CharField(max_length=20, blank=True, default="")
 
     description = models.TextField(blank=True)
+    # ✅ NUEVO: tiempo promedio de preparación (en minutos)
+    avg_prep_time = models.PositiveIntegerField(
+        default=25,
+        help_text="Tiempo promedio de preparación en minutos"
+    )    
 
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
     cover_image = models.ImageField(

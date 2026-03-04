@@ -211,8 +211,12 @@
                       {% if b.visits_count > 0 %}
                         👀 {{ b.visits_count }} visitas
                       {% endif %}
-                    </div>
 
+                      <div class="small text-secondary mt-1">
+                        ⏱ {{ b.avg_prep_time }} min
+                      </div>
+                    </div> 
+                   
                     <span class="tag">
                       {{ b.get_business_type_display }}
                     </span>
@@ -320,7 +324,7 @@
                   {% endif %}
                 </div>
                 <div class="ranked-sub">
-                  {{ b.zone }} · 👀 {{ b.visits_count|default:0 }}
+                  {{ b.zone }} · 👀 {{ b.visits_count|default:0 }} · ⏱ {{ b.avg_prep_time }} min
                 </div>
               </div>
 

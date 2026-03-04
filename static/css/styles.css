@@ -1069,3 +1069,27 @@ body{
 .panel-badge i{
   margin-right:6px;
 }
+
+/* =========================
+   Business meta (tiempo, visitas, etc.)
+   ========================= */
+.business-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top: 6px;
+}
+
+.meta-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #F1F5F9;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
