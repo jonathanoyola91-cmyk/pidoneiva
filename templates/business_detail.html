@@ -427,7 +427,7 @@
     <a href="#mi-pedido" class="btn btn-light cart-floatbar-btn" onclick="this.closest('.cart-floatbar').style.display='none'">
       Ver pedido
     </a>
-  </div>
+    </div>
 {% endif %}
 
 <script>
@@ -443,7 +443,6 @@
     }
   })();
 </script>
-{% endblock %}
 
 <script>
   // activar chip al hacer click
@@ -453,12 +452,10 @@
       a.classList.add('menu-category-active');
     });
   });
- // ==========================================
-  // 2) Evitar "mareo": guardar/restaurar scroll
-  // ==========================================
+
+  // guardar/restaurar scroll cuando se envía el carrito
   document.addEventListener("submit", function(e){
     const form = e.target;
-    // Solo forms del carrito (update/remove/clear/etc) para no afectar otros
     if (form.action && form.action.includes("cart_")) {
       sessionStorage.setItem("pn_scrollY", String(window.scrollY));
     }
@@ -472,4 +469,5 @@
     }
   });
 </script>
+
 {% endblock %}
