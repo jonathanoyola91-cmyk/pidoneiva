@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from datetime import datetime, time, timedelta
 
 from django.contrib import messages
 from django.db.models import Q, Case, When, IntegerField, Value
@@ -76,6 +77,98 @@ def _is_open_now(business: Business, now=None) -> bool:
             return bool(business.is_open_now())
     return True
 
+def _next_close_time(business, now):
+    """
+    Devuelve un datetime (timezone-aware) con la hora a la que CIERRA hoy
+    si está abierto en este momento. Si no puede calcular, devuelve None.
+
+    ⚠️ Debes adaptar la parte de "horarios" a cómo los tengas guardados.
+    """
+    # =========================
+    # EJEMPLO 1 (recomendado): business.hours_json
+    # hours_json tipo:
+    # {
+    #   "mon":[["08:00","22:00"]],
+    #   "tue":[["08:00","22:00"]],
+    #   ...
+    # }
+    # =========================
+    hours = getattr(business, "hours_json", None)
+    if not hours:
+        return None
+
+    key_map = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+    day_key = key_map[now.weekday()]
+    ranges = hours.get(day_key) or []
+
+    def parse_hhmm(s):
+        hh, mm = s.split(":")
+        return time(int(hh), int(mm))
+
+    # Busca el rango donde now cae adentro; si cruza medianoche también sirve
+    for start_s, end_s in ranges:
+        start_t = parse_hhmm(start_s)
+        end_t = parse_hhmm(end_s)
+
+        start_dt = now.replace(hour=start_t.hour, minute=start_t.minute, second=0, microsecond=0)
+        end_dt = now.replace(hour=end_t.hour, minute=end_t.minute, second=0, microsecond=0)
+
+        # Si el cierre es "menor" que apertura, cruza medianoche
+        if end_dt <= start_dt:
+            end_dt = end_dt + timedelta(days=1)
+
+        if start_dt <= now <= end_dt:
+            return end_dt
+
+    return None
+
+
+def _open_status(business, now):
+    """
+    Retorna (is_open, closes_at_datetime_or_none)
+    Usa schedule_mon..schedule_sun (formato "HH:MM-HH:MM")
+    y soporta rangos que cruzan medianoche (ej 18:00-02:00).
+    """
+    if not getattr(business, "is_accepting_orders", True):
+        return False, None
+
+    def _dt_for(t, base_dt):
+        return base_dt.replace(hour=t.hour, minute=t.minute, second=0, microsecond=0)
+
+    # 1) Caso: abierto por horario de AYER que cruza medianoche
+    yday = now - timedelta(days=1)
+    sch_y = business._get_schedule_for_weekday(yday.weekday())
+    parsed_y = business._parse_range(sch_y)
+
+    if parsed_y:
+        start_y, end_y = parsed_y
+        if start_y > end_y:  # cruza medianoche
+            if now.time() <= end_y:
+                closes_at = _dt_for(end_y, now)
+                return True, closes_at
+
+    # 2) Caso: horario de HOY
+    sch = business._get_schedule_for_weekday(now.weekday())
+    parsed = business._parse_range(sch)
+
+    if not parsed:
+        return False, None
+
+    start, end = parsed
+
+    # rango normal
+    if start < end:
+        if start <= now.time() <= end:
+            closes_at = _dt_for(end, now)
+            return True, closes_at
+        return False, None
+
+    # rango que cruza medianoche
+    if now.time() >= start:
+        closes_at = _dt_for(end, now) + timedelta(days=1)
+        return True, closes_at
+
+    return False, None
 
 # =====================================================
 # HOME
@@ -86,19 +179,19 @@ def home(request):
     business_type = request.GET.get("type", "").strip()
     zone = request.GET.get("zone", "").strip()
 
+    # default: solo abiertos
     only_open = request.GET.get("open")
     if only_open not in ("0", "1"):
-        only_open = "1"  # default: solo abiertos
-
-    zones = ["Centro", "Norte", "Sur", "Oriente"]
+        only_open = "1"
 
     qs = Business.objects.filter(is_active=True, is_approved=True)
 
     if business_type in ["RESTAURANT", "COMMERCE"]:
         qs = qs.filter(business_type=business_type)
 
+    # zone exacta (SUR/NORTE/ORIENTE/CENTRO)
     if zone:
-        qs = qs.filter(zone__icontains=zone)
+        qs = qs.filter(zone=zone)
 
     if q:
         qs = qs.filter(
@@ -127,9 +220,20 @@ def home(request):
 
     businesses = list(qs)
 
+    now = timezone.localtime()
+
+    # agregar estado calculado
+    for b in businesses:
+        is_open, closes_at = _open_status(b, now)
+        b._is_open_now = is_open
+        b._closes_at = closes_at
+
+    # filtro solo abiertos
     if only_open == "1":
-        now = timezone.localtime()
-        businesses = [b for b in businesses if _is_open_now(b, now)]
+        businesses = [b for b in businesses if b._is_open_now]
+
+    # zonas desde choices del modelo
+    zones = Business._meta.get_field("zone").choices
 
     return render(request, "home.html", {
         "businesses": businesses,
