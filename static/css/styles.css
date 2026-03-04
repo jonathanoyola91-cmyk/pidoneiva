@@ -748,12 +748,12 @@ body{
    ========================= */
 @media (max-width: 576px){
 
-  .hero-search{ padding: 16px !important; }
+  .hero-search{ padding: 14px !important; }
 
   /* cards más compactas */
-  .row.g-3{ row-gap: 16px !important; }
-  .business-hero{ height: 170px; }
-  .business-cover{ height: 170px; }
+  .row.g-3{ row-gap: 14px !important; }
+  .business-hero{ height: 120px; }
+  .business-cover{ height: 120px; }
   .hero-name{ font-size: 17px; }
 
   .cart-floatbar{
