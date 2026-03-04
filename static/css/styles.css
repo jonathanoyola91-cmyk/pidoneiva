@@ -928,3 +928,144 @@ body{
     font-size: 12px;
   }
 }
+
+/* =========================
+   DASHBOARD - BOTONES PANEL
+   ========================= */
+
+.panel-actions-wrap{
+  margin-top: 10px;
+}
+
+.panel-actions-scroll{
+  display:flex;
+  gap:10px;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+  padding: 6px 2px 10px;
+
+  scroll-snap-type: x mandatory;
+}
+
+/* scrollbar pequeño */
+.panel-actions-scroll::-webkit-scrollbar{
+  height:6px;
+}
+
+.panel-actions-scroll::-webkit-scrollbar-thumb{
+  background:rgba(2,6,23,.15);
+  border-radius:999px;
+}
+
+/* botones tipo app */
+.panel-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  white-space:nowrap;
+
+  flex:0 0 auto;
+
+  scroll-snap-align:start;
+
+  padding:10px 14px;
+
+  border-radius:999px;
+
+  border:1px solid #E5E7EB;
+
+  background:#fff;
+
+  color:#0F172A;
+
+  font-weight:700;
+
+  font-size:14px;
+
+  text-decoration:none;
+
+  box-shadow:0 6px 16px rgba(2,6,23,.06);
+
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+.panel-btn:active{
+  transform:scale(.97);
+}
+
+/* botón principal */
+.panel-btn-primary{
+  background:var(--brand);
+  border-color:var(--brand);
+  color:#fff;
+
+  box-shadow:0 10px 22px rgba(225,29,46,.18);
+}
+
+/* botón outline */
+.panel-btn-outline{
+  border:1px solid #3B82F6;
+  color:#1D4ED8;
+  background:#fff;
+  box-shadow:none;
+}
+
+/* botón grande "ver mi pagina" */
+.panel-btn-link{
+  border-radius:14px;
+
+  padding:12px 14px;
+
+  background:#fff;
+
+  border:2px solid #3B82F6;
+
+  color:#1D4ED8;
+
+  font-weight:800;
+
+  box-shadow:none;
+}
+
+/* badge estado */
+.panel-badge{
+  display:inline-flex;
+
+  align-items:center;
+
+  white-space:nowrap;
+
+  flex:0 0 auto;
+
+  padding:10px 14px;
+
+  border-radius:999px;
+
+  font-weight:800;
+
+  font-size:13px;
+
+  scroll-snap-align:start;
+}
+
+.panel-badge-warning{
+  background:#FEF3C7;
+
+  border:1px solid #F59E0B;
+
+  color:#92400E;
+}
+
+.panel-btn i{
+  font-size:14px;
+  margin-right:6px;
+}
+
+.panel-badge i{
+  margin-right:6px;
+}

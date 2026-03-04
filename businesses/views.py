@@ -179,10 +179,9 @@ def home(request):
     business_type = request.GET.get("type", "").strip()
     zone = request.GET.get("zone", "").strip()
 
-    # default: solo abiertos
-    only_open = request.GET.get("open")
-    if only_open not in ("0", "1"):
-        only_open = "1"
+    # ✅ default: mostrar TODOS
+    # (solo filtra cuando open=1)
+    only_open = "1" if request.GET.get("open") == "1" else "0"
 
     qs = Business.objects.filter(is_active=True, is_approved=True)
 
@@ -222,13 +221,17 @@ def home(request):
 
     now = timezone.localtime()
 
-    # agregar estado calculado
+    # agregar estado calculado (mantengo tu lógica)
     for b in businesses:
         is_open, closes_at = _open_status(b, now)
         b.open_now = is_open
         b.closes_at_dt = closes_at
 
-    # filtro solo abiertos
+        # ✅ por compatibilidad: si alguna parte usa _is_open_now
+        b._is_open_now = is_open
+        b._closes_at = closes_at
+
+    # ✅ filtro solo abiertos (mantengo tu lógica)
     if only_open == "1":
         businesses = [b for b in businesses if getattr(b, "open_now", False)]
 
@@ -243,7 +246,6 @@ def home(request):
         "only_open": only_open,
         "zones": zones,
     })
-
 
 # =====================================================
 # BUSINESS DETAIL  (tu URL es /negocio/<slug>/)
