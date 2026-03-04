@@ -6,93 +6,97 @@
   <div class="col-lg-8">
 
     <!-- =======================
-         HERO (HOME) - NUEVO UI
+         HERO (HOME) - NUEO UI
          ======================= -->
     <div class="p-4 bg-white rounded-4 shadow-soft hero-search">
 
-      <h1 class="h4 fw-bold mb-3">
+      <h1 class="h6 fw-bold mb-3 home-title">
         {% if request.GET.type == "RESTAURANT" %}
           Restaurantes en Neiva
         {% elif request.GET.type == "COMMERCE" %}
           Comercios en Neiva
         {% else %}
-          Directorio Comercial de Neiva
+          Neiva
         {% endif %}
       </h1>
 
-      <!-- =======================
-           Tabs (Tipo)
-           ======================= -->
-      <div class="home-tabs mb-3">
-        <a class="home-tab {% if request.GET.type != 'COMMERCE' %}active{% endif %}"
-           href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          Restaurantes
-        </a>
+<div class="home-sticky">
 
-        <a class="home-tab {% if request.GET.type == 'COMMERCE' %}active{% endif %}"
-           href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-          Comercios
-        </a>
+  <!-- =======================
+       Tabs (Tipo)
+       ======================= -->
+  <div class="home-tabs mb-3">
+    <a class="home-tab {% if request.GET.type != 'COMMERCE' %}active{% endif %}"
+       href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      Restaurantes
+    </a>
+
+    <a class="home-tab {% if request.GET.type == 'COMMERCE' %}active{% endif %}"
+       href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+      Comercios
+    </a>
+  </div>
+
+  <!-- =======================
+       Search + filtros
+       ======================= -->
+  <form method="get" class="home-search">
+
+    {% if request.GET.type %}
+      <input type="hidden" name="type" value="{{ request.GET.type }}">
+    {% endif %}
+
+    <!-- Search -->
+    <div class="home-searchbar mb-3">
+      <span class="home-search-icon">🔎</span>
+      <input class="home-search-input"
+             name="q"
+             placeholder="Buscar hamburguesa, café, droguería..."
+             value="{{ request.GET.q }}">
+    </div>
+
+    <!-- =======================
+         Filtros (Zona + Abiertos)
+         ======================= -->
+    <div class="home-filters mb-3">
+
+      <div class="home-filter-pill">
+        <span class="home-filter-ic">📍</span>
+        <span class="home-filter-label">Zona:</span>
+
+        <select class="home-filter-select" name="zone">
+          <option value="">Todas</option>
+          {% for code, label in zones %}
+            <option value="{{ code }}" {% if request.GET.zone == code %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
 
-      <!-- =======================
-           Search + filtros compactos
-           ======================= -->
-      <form method="get" class="home-search">
+      <label class="home-switch">
+        <input type="checkbox"
+               name="open"
+               value="1"
+               {% if request.GET.open == "1" %}checked{% endif %}>
+        <span class="home-slider"></span>
+        <span class="home-switch-text">Abiertos</span>
+      </label>
 
-        {# Mantener type si existe #}
-        {% if request.GET.type %}
-          <input type="hidden" name="type" value="{{ request.GET.type }}">
-        {% endif %}
+    </div>
 
-        <!-- Search -->
-        <div class="home-searchbar mb-3">
-          <span class="home-search-icon">🔎</span>
-          <input class="home-search-input"
-                 name="q"
-                 placeholder="Buscar hamburguesa, café, droguería..."
-                 value="{{ request.GET.q }}">
-        </div>
+    <!-- Botón (opcional, recomendado en móvil) -->
+    <div class="d-grid">
+      <button class="btn btn-brand" type="submit">Buscar</button>
+    </div>
 
-        <!-- Filtros -->
-        <div class="home-filters mb-3">
+  </form>
 
-          <div class="home-filter-pill">
-            <span class="home-filter-ic">📍</span>
-            <span class="home-filter-label">Zona:</span>
+</div>
 
-            <select class="home-filter-select" name="zone">
-              <option value="">Todas</option>
-              {% for code, label in zones %}              
-                <option value="{{ code }}" {% if zone == code %}selected{% endif %}>
-                  {{ label }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- open: siempre envía 0 si no activas switch -->
-         
-
-          <label class="home-switch">
-            <input type="checkbox"
-                   name="open" 
-                   value="1" 
-                   {% if request.GET.open == "1" %}checked{% endif %}>
-            <span class="home-slider"></span>
-            <span class="home-switch-text">Solo Abiertos</span>
-          </label>
-
-        </div>
-
-        <button class="btn btn-brand text-white w-100">
-          Buscar
-        </button>
-      </form>
-
-      <!-- =======================
-           Categorías (carrusel)
-           ======================= -->
+<!-- =======================
+     Categorías (carrusel)
+     ======================= -->
       <div class="chip-scroll mt-3">
         <div class="chips-row">
 
@@ -322,14 +326,9 @@
 
               <div class="ranked-status">
                 {% if b.open_now %}
-                  <span class="pill pill-success">
-                    <span class="dot"></span> Abierto
-                    {% if b.closes_at_dt %}
-                      · hasta {{ b.closes_at_dt|date:"g:i a" }}
-                    {% endif %}
-                  </span>
+                  <span class="mini-dot mini-dot-open"></span>
                 {% else %}
-                  <span class="pill pill-muted">Cerrado</span>
+                  <span class="mini-dot mini-dot-closed"></span>
                 {% endif %}
               </div>
             </a>

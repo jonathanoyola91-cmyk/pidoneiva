@@ -1,8 +1,8 @@
 /* =========================
    PidoNeiva — styles.css (LIMPIO)
    ✅ sin duplicados
-   ✅ sin conflictos de hover
-   ✅ home como el mockup (tabs + search + filtros + categorías tipo tarjeta)
+   ✅ sin llaves rotas en responsive
+   ✅ chips pastilla + chip-card (sin conflictos)
    ========================= */
 
 /* =========================
@@ -30,20 +30,18 @@ body{
   background: #fff !important;
   border-bottom: 1px solid var(--line) !important;
 }
-
 .brand-logo{
   height: 36px;
   width: auto;
   display: block;
 }
-
 .brand-name{
   font-weight: 900;
   letter-spacing: .2px;
 }
 
 /* =======================
-   Chips (Carrusel categorías)
+   Chips (Carrusel categorías) — PASTILLA (ACTIVO)
    ======================= */
 
 /* contenedor con scroll horizontal */
@@ -75,48 +73,42 @@ body{
   color: var(--text);
   font-size:14px;
   font-weight:700;
-  flex:0 0 auto; /* ← importante */
+  flex:0 0 auto;
   scroll-snap-align:start;
 
-  text-decoration:none;   /* ✅ que no parezca link */
+  text-decoration:none;
   cursor:pointer;
   user-select:none;
 
   transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
-/* efecto táctil cuando se presiona el chip */
-.chip:active{
-  transform: scale(.97);
-}
+/* efecto táctil */
+.chip:active{ transform: scale(.97); }
 
-/* hover con tinte del brand (rojo suave) */
+/* hover */
 .chip:hover{
   background: rgba(225,29,46,.10);
   border-color: rgba(225,29,46,.35);
   transform: translateY(-1px);
 }
 
-/* activo: rojo branding */
+/* activo */
 .chip-active{
   background: var(--brand);
   border-color: var(--brand);
   color: #fff;
-  
-  box-shadow: 
+  box-shadow:
     0 6px 14px rgba(0,0,0,.08),
     0 10px 28px rgba(225,29,46,.25);
-
   transform: translateY(-1px);
 }
-.chip-active:hover{
-  filter: brightness(.95);
-}
+.chip-active:hover{ filter: brightness(.95); }
 
-/* chip “Más” diferente */
+/* chip “Más” */
 .chip-more{
   background:#fff;
-  border:1px dashed rgba(249,115,22,.70); /* --brand-2 */
+  border:1px dashed rgba(249,115,22,.70);
   color: var(--brand-2);
 }
 .chip-more:hover{
@@ -124,6 +116,7 @@ body{
   border-color: var(--brand-2);
   color:#fff;
 }
+
 /* =========================
    Buttons / Tags / Shadows
    ========================= */
@@ -166,7 +159,7 @@ body{
   transition: box-shadow .25s ease;
 }
 
-/* ✅ NO mover todas las cards (solo business-card). Evita efectos raros */
+/* ✅ no mover todas las cards */
 .card:hover{
   transform: none !important;
   box-shadow: none !important;
@@ -184,17 +177,13 @@ body{
   box-shadow: 0 8px 24px rgba(2,6,23,.06);
   transition: transform .25s ease, box-shadow .25s ease;
 }
-
 .business-card:hover{
   transform: translateY(-4px);
   box-shadow: 0 18px 50px rgba(2,6,23,.12);
 }
 
 /* Portada */
-.business-hero{
-  position: relative;
-  height: 180px;
-}
+.business-hero{ position: relative; height: 180px; }
 
 .business-cover{
   width: 100%;
@@ -203,7 +192,6 @@ body{
   display: block;
   transition: transform .35s ease;
 }
-
 .business-card:hover .business-cover{ transform: scale(1.03); }
 
 .business-cover-fallback{
@@ -215,7 +203,7 @@ body{
   justify-content: center;
 }
 
-/* Gradiente de lectura */
+/* Gradiente */
 .hero-gradient{
   position: absolute;
   inset: 0;
@@ -223,7 +211,7 @@ body{
   z-index: 2;
 }
 
-/* Texto encima de la portada */
+/* Texto */
 .hero-title{
   position: absolute;
   left: 14px;
@@ -231,22 +219,17 @@ body{
   z-index: 4;
   color: #fff;
   max-width: calc(100% - 28px);
-  padding-left: 52px; /* deja espacio para el logo flotante */
+  padding-left: 52px;
 }
-
 .hero-name{
   font-weight: 900;
   font-size: 18px;
   line-height: 1.1;
   text-shadow: 0 12px 30px rgba(0,0,0,.45);
 }
+.hero-sub{ font-size: 12px; opacity: .92; }
 
-.hero-sub{
-  font-size: 12px;
-  opacity: .92;
-}
-
-/* Logo redondo flotante */
+/* Logo flotante */
 .hero-logo{
   position: absolute;
   left: 14px;
@@ -260,14 +243,13 @@ body{
   z-index: 6;
   box-shadow: 0 10px 26px rgba(2,6,23,.18);
 }
-
 .hero-logo img{
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Para que el body no choque con el logo flotante */
+/* para no chocar con logo */
 .business-card .p-3{ padding-top: 38px !important; }
 
 /* Badges */
@@ -280,7 +262,6 @@ body{
   gap: 8px;
   flex-wrap: wrap;
 }
-
 .badge-absolute-right{
   position: absolute;
   top: 14px;
@@ -304,23 +285,13 @@ body{
   background: rgba(0,0,0,.65);
   color: #fff;
 }
-
-.pill.featured{
-  background: rgba(249,115,22,.92);
-}
-
+.pill.featured{ background: rgba(249,115,22,.92); }
 .pill.popular{
   background: rgba(225,29,46,.92);
   animation: glowPopular 2s ease-in-out infinite;
 }
-
-.pill-success{
-  background: rgba(16,185,129,.92);
-}
-
-.pill-muted{
-  background: rgba(100,116,139,.88);
-}
+.pill-success{ background: rgba(16,185,129,.92); }
+.pill-muted{ background: rgba(100,116,139,.88); }
 
 .pill-success .dot{
   width: 8px;
@@ -337,14 +308,13 @@ body{
   70%  { box-shadow: 0 0 0 10px rgba(255,255,255,0); transform: scale(1.05); }
   100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: scale(1); }
 }
-
 @keyframes glowPopular{
   0%   { box-shadow: 0 0 0 rgba(239,68,68,0); }
   50%  { box-shadow: 0 0 14px rgba(239,68,68,.55); }
   100% { box-shadow: 0 0 0 rgba(239,68,68,0); }
 }
 
-/* Espaciado entre cards */
+/* Espaciado cards */
 .row.g-3{ row-gap: 28px !important; }
 
 /* =========================
@@ -356,12 +326,10 @@ body{
 }
 
 /* =========================
-   HOME — UI mockup (tabs + search + filtros)
+   HOME — UI (tabs + search + filtros)
    ========================= */
-.home-tabs{
-  display:flex;
-  gap:12px;
-}
+.home-tabs{ display:flex; gap:12px; }
+
 .home-tab{
   flex: 1 1 0;
   text-align:center;
@@ -374,12 +342,12 @@ body{
   color: var(--text);
 }
 .home-tab.active{
-  border-color: rgba(59,130,246,.35);
+  border-color: rgba(225,29,46,.35);
   box-shadow: 0 10px 26px rgba(2,6,23,.06);
-  color: #2563eb;
+  color: var(--brand);
 }
 
-/* Searchbar grande */
+/* Searchbar */
 .home-searchbar{
   display:flex;
   align-items:center;
@@ -399,14 +367,13 @@ body{
   background: transparent;
 }
 
-/* Filtros compactos */
+/* Filtros */
 .home-filters{
   display:flex;
   gap:12px;
   align-items:center;
   flex-wrap: wrap;
 }
-
 .home-filter-pill{
   display:flex;
   align-items:center;
@@ -417,14 +384,13 @@ body{
   background:#fff;
   box-shadow: 0 10px 26px rgba(2,6,23,.04);
 }
-
 .home-filter-ic{ opacity:.8; }
+
 .home-filter-label{
   font-weight:900;
   color: var(--text);
   font-size: 13px;
 }
-
 .home-filter-select{
   border:0;
   outline:0;
@@ -481,15 +447,18 @@ body{
 }
 
 /* =========================
-   HOME — Categorías tipo tarjeta (mockup)
-   (para tu HTML con chip-card / chip-emoji / chip-text)
+   Chip-cards (opcional) — SIN CONFLICTO
+   (Solo si algún día usas .chip-card)
    ========================= */
-.chip-scroll{
+.chipcard-scroll{
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 10px;
+  scrollbar-width: none;
 }
-.chips-row{
+.chipcard-scroll::-webkit-scrollbar{ display:none; }
+
+.chipcard-row{
   display:flex;
   gap:12px;
   flex-wrap: nowrap;
@@ -517,20 +486,17 @@ body{
   box-shadow: 0 16px 34px rgba(2,6,23,.10);
   border-color: #dbe6f2;
 }
-
 .chip-emoji{ font-size: 28px; line-height: 1; }
 .chip-text{
   font-weight: 950;
   font-size: 13px;
   color: var(--text);
 }
-
 .chip-card-active{
   background: rgba(225,29,46,.10);
   border-color: rgba(225,29,46,.22);
 }
 .chip-card-active .chip-text{ color: var(--brand); }
-
 .chip-card-more{
   background: rgba(249,115,22,.10);
   border-color: rgba(249,115,22,.22);
@@ -545,7 +511,6 @@ body{
   border: 1px solid var(--line);
   background: #fff;
 }
-
 .ranked-item{
   display: grid !important;
   grid-template-columns: 28px 40px 1fr 14px;
@@ -557,7 +522,6 @@ body{
   text-decoration: none !important;
   background: #fff !important;
 }
-
 .ranked-item:last-child{ border-bottom: 0 !important; }
 .ranked-item:hover{ background: #F8FAFC !important; }
 
@@ -572,7 +536,6 @@ body{
   color: #fff;
   background: rgba(249,115,22,.95);
 }
-
 .ranked-thumb{
   width: 40px;
   height: 40px;
@@ -582,14 +545,12 @@ body{
   box-shadow: 0 10px 24px rgba(2,6,23,.10);
   background: #fff;
 }
-
 .ranked-thumb img{
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-
 .ranked-thumb-fallback{
   width: 100%;
   height: 100%;
@@ -598,9 +559,7 @@ body{
   background: #EEF2FF;
   font-size: 18px;
 }
-
 .ranked-meta{ min-width: 0; }
-
 .ranked-name{
   font-weight: 900;
   font-size: 13px;
@@ -610,7 +569,6 @@ body{
   gap: 8px;
   line-height: 1.2;
 }
-
 .ranked-sub{
   font-size: 12px;
   color: var(--muted);
@@ -618,7 +576,6 @@ body{
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .mini-pill{
   display: inline-flex;
   align-items: center;
@@ -631,12 +588,11 @@ body{
   font-weight: 900;
   font-size: 12px;
 }
-
-.ranked-status{
-  display: flex;
-  justify-content: flex-end;
+.ranked-status{ 
+  display: flex; 
+  justify-content:center; 
+  align-items:center
 }
-
 .mini-dot{
   width: 10px;
   height: 10px;
@@ -647,10 +603,7 @@ body{
 .mini-dot-closed{ background: #94A3B8; }
 
 /* Sidebar sticky */
-.sidebar-sticky{
-  position: sticky;
-  top: 90px;
-}
+.sidebar-sticky{ position: sticky; top: 90px; }
 @media (max-width: 991px){
   .sidebar-sticky{ position: static; top: auto; }
 }
@@ -678,7 +631,6 @@ body{
   border-radius: 50%;
 }
 .premium-content{ position: relative; z-index: 2; }
-
 .premium-title{
   font-weight: 900;
   font-size: 18px;
@@ -700,7 +652,7 @@ body{
 .sidebar-card{ border: 1px solid var(--line); }
 
 /* =========================
-   Home metrics (contador)
+   Home metrics
    ========================= */
 .home-metrics{
   display: flex;
@@ -708,7 +660,6 @@ body{
   flex-wrap: wrap;
   margin: 10px 0 14px;
 }
-
 .metric-card{
   flex: 1 1 220px;
   background: #fff;
@@ -717,7 +668,6 @@ body{
   padding: 14px 16px;
   box-shadow: 0 12px 30px rgba(2,6,23,.05);
 }
-
 .metric-number{
   font-weight: 950;
   font-size: 28px;
@@ -725,7 +675,6 @@ body{
   color: var(--text);
   letter-spacing: -0.5px;
 }
-
 .metric-label{
   margin-top: 6px;
   font-size: 12px;
@@ -754,19 +703,16 @@ body{
   box-shadow: 0 22px 44px rgba(2,6,23,.22);
   animation: cartSlideUp .35s ease;
 }
-
 @keyframes cartSlideUp{
   from{ opacity: 0; transform: translate(-50%, 20px); }
   to{ opacity: 1; transform: translate(-50%, 0); }
 }
-
 .cart-floatbar-left{
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
-
 .cart-floatbar-icon{
   width: 38px;
   height: 38px;
@@ -778,13 +724,11 @@ body{
   font-size: 18px;
   flex: 0 0 auto;
 }
-
 .cart-floatbar-title{
   font-weight: 900;
   font-size: 14px;
   margin-bottom: 2px;
 }
-
 .cart-floatbar-sub{
   font-size: 12px;
   opacity: .95;
@@ -793,7 +737,6 @@ body{
   text-overflow: ellipsis;
   max-width: 52vw;
 }
-
 .cart-floatbar-btn{
   border-radius: 999px !important;
   font-weight: 900 !important;
@@ -801,14 +744,14 @@ body{
 }
 
 /* =========================
-   Responsive tweaks
+   Responsive tweaks (mobile)
    ========================= */
 @media (max-width: 576px){
+
   .hero-search{ padding: 16px !important; }
 
   /* cards más compactas */
   .row.g-3{ row-gap: 16px !important; }
-
   .business-hero{ height: 170px; }
   .business-cover{ height: 170px; }
   .hero-name{ font-size: 17px; }
@@ -824,7 +767,28 @@ body{
   .home-tabs{ gap:10px; }
   .home-tab{ padding: 10px 12px; }
 
-  .chip-card{ min-width: 92px; height: 84px; }
+  /* ✅ filtros en una sola fila */
+  .home-filters{
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+  .home-filter-pill{
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .home-filter-select{ max-width: 110px; }
+
+  .home-switch{
+    flex: 0 0 auto;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  /* ✅ versión compacta del texto del switch */
+  .home-switch-text{
+    display: none; /* si prefieres mostrarlo, cambia a: font-size:12px; */
+  }
 }
 
 /* =========================
@@ -838,31 +802,24 @@ body{
   margin-bottom: 16px;
 }
 
-.business-hero-bg{
-  position: relative;
-  height: 210px;
-}
-
+.business-hero-bg{ position: relative; height: 210px; }
 .business-hero-img{
   width: 100%;
   height: 210px;
   object-fit: cover;
   display: block;
 }
-
 .business-hero-gradient{
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.10));
 }
-
 .business-hero-status{
   position: absolute;
   top: 14px;
   right: 14px;
   z-index: 4;
 }
-
 .business-hero-content{
   position: absolute;
   left: 16px;
@@ -873,7 +830,6 @@ body{
   gap: 14px;
   align-items: flex-end;
 }
-
 .business-hero-logo{
   width: 64px;
   height: 64px;
@@ -884,18 +840,12 @@ body{
   box-shadow: 0 12px 26px rgba(2,6,23,.20);
   flex: 0 0 auto;
 }
-
 .business-hero-logo img{
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
-.business-hero-text{
-  color: #fff;
-  min-width: 0;
-}
-
+.business-hero-text{ color: #fff; min-width: 0; }
 .business-hero-name{
   margin: 0;
   font-weight: 900;
@@ -903,11 +853,7 @@ body{
   line-height: 1.1;
   text-shadow: 0 12px 30px rgba(0,0,0,.45);
 }
-
-.business-hero-sub{
-  font-size: 13px;
-  opacity: .92;
-}
+.business-hero-sub{ font-size: 13px; opacity: .92; }
 
 .business-hero-link{
   color: #dbeafe;
@@ -921,4 +867,64 @@ body{
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* =========================
+   HOME — Sticky + mobile compact (FINAL)
+   ========================= */
+
+/* Por defecto (desktop/tablet): no sticky */
+.home-sticky{
+  background: transparent;
+}
+
+/* Oculta título en móvil (solo si tu H1 tiene class="home-title") */
+@media (max-width: 576px){
+  .home-title{ display:none; }
+}
+
+/* Sticky SOLO en móvil */
+@media (max-width: 576px){
+
+  .home-sticky{
+    position: sticky;
+    top: 56px;                /* ✅ si tu navbar es más alta: 64px o 72px */
+    z-index: 60;
+    background: var(--bg);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(234,239,245,.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* evita margen extra debajo del sticky */
+  .home-search{ margin-bottom: 0; }
+
+  /* ✅ filtros en una sola fila */
+  .home-filters{
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .home-filter-pill{
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+
+  .home-filter-select{
+    max-width: 120px;
+  }
+
+  .home-switch{
+    flex: 0 0 auto;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  /* texto corto "Abiertos" */
+  .home-switch-text{
+    font-size: 12px;
+  }
 }
