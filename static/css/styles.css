@@ -1122,3 +1122,58 @@ body{
   flex: 0 0 220px;
   scroll-snap-align: start;
 }
+
+/* =========================
+   Scroll horizontal categorias
+   ========================= */
+
+.menu-categories{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding-bottom:8px;
+
+  scroll-snap-type:x mandatory;
+}
+
+/* ocultar scrollbar feo */
+.menu-categories::-webkit-scrollbar{
+  display:none;
+}
+
+.menu-categories{
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+}
+
+/* botones categoria */
+.menu-category{
+  flex:0 0 auto;
+  scroll-snap-align:start;
+
+  padding:8px 14px;
+  border-radius:999px;
+  background:#F1F5F9;
+  border:1px solid #E2E8F0;
+
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  white-space:nowrap;
+
+  transition:.15s;
+}
+
+.menu-category:hover{
+  background:#e2e8f0;
+}
+
+/* categoria activa */
+.menu-category-active{
+  background:var(--brand);
+  color:white;
+  border-color:var(--brand);
+}
+
+html{ scroll-behavior:smooth; }
+[id^="cat-"]{ scroll-margin-top: 90px; }
