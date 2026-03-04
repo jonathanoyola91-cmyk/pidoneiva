@@ -444,3 +444,13 @@
   })();
 </script>
 {% endblock %}
+
+<script>
+  // activar chip al hacer click
+  document.querySelectorAll('.menu-category').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      document.querySelectorAll('.menu-category').forEach(x=>x.classList.remove('menu-category-active'));
+      a.classList.add('menu-category-active');
+    });
+  });
+</script>

@@ -1123,30 +1123,20 @@ body{
   scroll-snap-align: start;
 }
 
-/* =========================
-   Scroll horizontal categorias
-   ========================= */
 
+/* ===== Categorías (chips) ===== */
 .menu-categories{
   display:flex;
-  gap:14px;
+  gap:10px;
   overflow-x:auto;
-  padding-bottom:8px;
-
+  flex-wrap:nowrap;            /* ✅ que NO salten de línea */
+  padding:8px 2px 10px;
   scroll-snap-type:x mandatory;
 }
 
-/* ocultar scrollbar feo */
-.menu-categories::-webkit-scrollbar{
-  display:none;
-}
+.menu-categories::-webkit-scrollbar{ display:none; }
+.menu-categories{ -ms-overflow-style:none; scrollbar-width:none; }
 
-.menu-categories{
-  -ms-overflow-style:none;
-  scrollbar-width:none;
-}
-
-/* botones categoria */
 .menu-category{
   flex:0 0 auto;
   scroll-snap-align:start;
@@ -1156,24 +1146,21 @@ body{
   background:#F1F5F9;
   border:1px solid #E2E8F0;
 
-  font-weight:600;
+  font-weight:700;
   font-size:14px;
-  cursor:pointer;
   white-space:nowrap;
 
-  transition:.15s;
+  text-decoration:none;        /* ✅ sin subrayado */
+  color:#0f172a !important;    /* ✅ quita azul bootstrap */
 }
 
 .menu-category:hover{
-  background:#e2e8f0;
+  background:#E2E8F0;
 }
 
-/* categoria activa */
+/* activa (roja) */
 .menu-category-active{
   background:var(--brand);
-  color:white;
   border-color:var(--brand);
+  color:#fff !important;
 }
-
-html{ scroll-behavior:smooth; }
-[id^="cat-"]{ scroll-margin-top: 90px; }
