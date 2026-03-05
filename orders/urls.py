@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("<slug:slug>/send-whatsapp/", views.send_whatsapp_order, name="send_whatsapp_order"),
+    path("negocio/<slug:slug>/cart/update-json/<int:item_id>/", views.cart_update_json, name="cart_update_json"),
+    
 ]

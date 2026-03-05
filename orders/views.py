@@ -1,11 +1,86 @@
 from urllib.parse import quote
 
 from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
+from django.http import JsonResponse
 
 from businesses.models import Business
 from menu.models import MenuItem
 from .models import Order, OrderItem
+
+
+# =========================
+# Carrito en sesión (FIX)
+# =========================
+def _cart_key(slug: str) -> str:
+    # ✅ importante: coincide con el resto de tu código (send_whatsapp_order)
+    return f"cart_{slug}"
+
+
+def _get_cart(request, slug: str) -> dict:
+    """
+    Retorna el carrito desde sesión.
+    Formato: {"12": 1, "15": 3}
+    """
+    return request.session.get(_cart_key(slug), {}) or {}
+
+
+def _save_cart(request, slug: str, cart: dict) -> None:
+    request.session[_cart_key(slug)] = cart
+    request.session.modified = True
+
+
+@require_POST
+def cart_update_json(request, slug, item_id):
+    business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
+
+    cart = _get_cart(request, business.slug)  # esperado: {"12": 1, "15": 3}
+    key = str(item_id)
+
+    # ✅ acepta qty (FormData) y también next (por si tus botones envían next)
+    try:
+        qty = int(request.POST.get("qty") or request.POST.get("next") or "1")
+    except (TypeError, ValueError):
+        qty = 1
+
+    if qty <= 0:
+        cart.pop(key, None)
+        qty = 0
+    else:
+        # ✅ tu estructura: id -> int
+        cart[key] = qty
+
+    _save_cart(request, business.slug, cart)
+
+    # ✅ calcular subtotal y total usando DB (más confiable)
+    item = MenuItem.objects.filter(id=item_id, business=business).first()
+    item_price = int(item.price or 0) if item else 0
+    item_subtotal = item_price * qty
+
+    # total del carrito
+    ids = [int(k) for k in cart.keys() if str(k).isdigit()]
+    items = MenuItem.objects.filter(business=business, id__in=ids).values("id", "price")
+    price_map = {str(x["id"]): int(x["price"] or 0) for x in items}
+
+    total = 0
+    cart_count = 0
+    for k, q in cart.items():
+        try:
+            q = int(q)
+        except Exception:
+            q = 0
+        cart_count += q
+        total += price_map.get(str(k), 0) * q
+
+    return JsonResponse({
+        "ok": True,
+        "item_id": item_id,
+        "qty": qty,
+        "item_subtotal": item_subtotal,
+        "cart_total": total,
+        "cart_count": cart_count,
+        "is_empty": (len(cart) == 0),
+    })
 
 
 @require_GET
