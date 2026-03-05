@@ -210,8 +210,11 @@
                       </div>
 
                       {% if item.description %}
-                        <div class="small text-secondary mt-1">{{ item.description }}</div>
-
+                        <div class="small text-secondary mt-1 clamp-2">
+                          {{ item.description }}
+                        </div>
+                      {% endif %}    
+ 
                         <!-- ✅ Trigger del modal + data-update-url -->
                         <button type="button"
                                 class="btn btn-outline-secondary w-100 mt-2 js-open-product"
@@ -225,7 +228,7 @@
                                 data-update-url="{% url 'cart_update_json' business.slug item.id %}">
                           Ver detalles
                         </button>
-                      {% endif %}
+                      
 
                       <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
                         {% csrf_token %}

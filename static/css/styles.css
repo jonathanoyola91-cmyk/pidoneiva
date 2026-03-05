@@ -1164,3 +1164,16 @@ body{
   border-color:var(--brand);
   color:#fff !important;
 }
+
+/* =========================
+   Clamp (limitar líneas)
+   ========================= */
+.clamp-2{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;        /* ✅ 2 líneas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25rem;         /* ajusta si quieres */
+  max-height: calc(1.25rem * 2);
+}
