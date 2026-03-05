@@ -422,7 +422,6 @@
 
 </div>
 
-
 {% if not is_pdf_only and cart_items %}
   <div class="cart-floatbar">
     <div class="cart-floatbar-left">
@@ -438,12 +437,52 @@
     <a href="#mi-pedido" class="btn btn-light cart-floatbar-btn" onclick="this.closest('.cart-floatbar').style.display='none'">
       Ver pedido
     </a>
-    </div>
+  </div>
 {% endif %}
 
 <script>
-  // Scroll suave al carrito cuando agregas y la página recarga con #cart
+  // ==========================================
+  // 1) Anti-salto al actualizar cantidades (POST)
+  // ==========================================
+  document.addEventListener("submit", function(e){
+    const form = e.target;
+    if (!form || !form.action) return;
+
+    // Solo formularios del carrito (update/remove/clear/add/buyer)
+    if (form.action.includes("cart_")) {
+      sessionStorage.setItem("pn_scrollY", String(window.scrollY));
+      sessionStorage.setItem("pn_posting", "1"); // flag robusto
+    }
+  }, true);
+
+  window.addEventListener("load", function(){
+    const shouldRestore = sessionStorage.getItem("pn_posting") === "1";
+    if (!shouldRestore) return;
+
+    const y = parseInt(sessionStorage.getItem("pn_scrollY") || "0", 10) || 0;
+
+    // limpiar flags
+    sessionStorage.removeItem("pn_posting");
+    sessionStorage.removeItem("pn_scrollY");
+
+    // Restaurar inmediatamente (evita parpadeo)
+    window.scrollTo(0, y);
+
+    // Re-asegurar por si el layout ajusta después
+    setTimeout(() => window.scrollTo(0, y), 50);
+    setTimeout(() => window.scrollTo(0, y), 200);
+  });
+</script>
+
+<script>
+  // ==========================================
+  // 2) Scroll suave al carrito solo si llegas por #cart "normal"
+  //    (pero NO si vienes de POST)
+  // ==========================================
   (function () {
+    const cameFromPost = sessionStorage.getItem("pn_posting") === "1";
+    if (cameFromPost) return;
+
     if (window.location.hash === "#cart") {
       const el = document.getElementById("cart");
       if (el) {
@@ -456,29 +495,15 @@
 </script>
 
 <script>
-  // activar chip al hacer click
+  // ==========================================
+  // 3) Activar chip al hacer click
+  // ==========================================
   document.querySelectorAll('.menu-category').forEach(a=>{
     a.addEventListener('click', ()=>{
       document.querySelectorAll('.menu-category').forEach(x=>x.classList.remove('menu-category-active'));
       a.classList.add('menu-category-active');
     });
   });
-
-  // guardar/restaurar scroll cuando se envía el carrito
-  document.addEventListener("submit", function(e){
-    const form = e.target;
-    if (form.action && form.action.includes("cart_")) {
-      sessionStorage.setItem("pn_scrollY", String(window.scrollY));
-    }
-  }, true);
-
-  window.addEventListener("load", function(){
-    const y = sessionStorage.getItem("pn_scrollY");
-    if (y !== null) {
-      window.scrollTo(0, parseInt(y, 10) || 0);
-      sessionStorage.removeItem("pn_scrollY");
-    }
-  });
 </script>
 
-{% endblock %}
+
