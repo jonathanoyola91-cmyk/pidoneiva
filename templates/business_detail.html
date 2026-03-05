@@ -181,18 +181,27 @@
             {% endif %}
           {% endfor %}
         </div>
+
         {% for cat in categories %}
           {% if cat.items.all|length %}
             <div class="mt-4" id="cat-{{ cat.id }}">
               <h3 class="h6 fw-bold">{{ cat.name }}</h3>
+
               <div class="products-row">
                 {% for item in cat.items.all %}
                   {% if item.is_available %}
+
                   <div class="product-card">
                     <div class="card shadow-soft p-3 h-100">
+
                       {% if item.photo %}
                         <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
                       {% endif %}
+
+                      <!-- ✅ NOMBRE DEL PRODUCTO -->
+                      <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
+                        {{ item.name }}
+                      </div>
 
                       <div class="d-flex justify-content-between align-items-center mt-2">
                         <div class="fw-bold fs-5 text-dark">
@@ -202,6 +211,20 @@
 
                       {% if item.description %}
                         <div class="small text-secondary mt-1">{{ item.description }}</div>
+
+                        <!-- ✅ Trigger del modal + data-update-url -->
+                        <button type="button"
+                                class="btn btn-outline-secondary w-100 mt-2 js-open-product"
+                                data-bs-toggle="modal"
+                                data-bs-target="#productModal"
+                                data-id="{{ item.id }}"
+                                data-name="{{ item.name|escapejs }}"
+                                data-price="{{ item.price|floatformat:0 }}"
+                                data-desc="{{ item.description|default:''|escapejs }}"
+                                {% if item.photo %}data-photo="{{ item.photo.url }}"{% else %}data-photo=""{% endif %}
+                                data-update-url="{% url 'cart_update_json' business.slug item.id %}">
+                          Ver detalles
+                        </button>
                       {% endif %}
 
                       <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
@@ -212,11 +235,14 @@
                           <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
                         {% endif %}
                       </form>
+
                     </div>
                   </div>
+
                   {% endif %}
                 {% endfor %}
               </div>
+
             </div>
           {% endif %}
         {% endfor %}
@@ -278,7 +304,7 @@
     <hr class="my-4">
     
     <h2 id="mi-pedido" class="h6 fw-bold mb-3">
-🧾 Mi pedido
+      🧾 Mi pedido
     </h2>
     
     <div id="cart"></div>
@@ -317,14 +343,15 @@
                             data-url="{% url 'cart_update_json' business.slug ci.id %}"
                             {% if ci.qty <= 1 %}disabled{% endif %}>-</button>
 
-                    <!-- ✅ Cantidad (mantengo tu div y agrego marcador data-qty-text) -->
-                    <div class="px-2 py-1 border rounded-3 js-qty-val"
+                    <div id="qty-{{ ci.id }}"
+                         class="px-2 py-1 border rounded-3 js-qty-val"
+                         data-cart-qty
                          data-id="{{ ci.id }}"
                          data-qty-text="{{ ci.id }}">{{ ci.qty }}</div>
 
                     <button type="button"
                             class="btn btn-outline-secondary btn-sm js-qty"
-                            data-action="plus"    
+                            data-action="plus"
                             data-id="{{ ci.id }}"
                             data-next="{{ ci.qty|add:'1' }}"
                             data-url="{% url 'cart_update_json' business.slug ci.id %}">+</button>
@@ -332,7 +359,6 @@
                   </div>
                 </td>
 
-                <!-- ✅ Subtotal (mantengo tu td y agrego marcador data-subtotal-text) -->
                 <td class="text-end fw-bold js-subtotal"
                     data-id="{{ ci.id }}"
                     data-subtotal-text="{{ ci.id }}">
@@ -352,12 +378,9 @@
           <tfoot>
             <tr>
               <td colspan="2" class="text-end fw-bold">Total aprox:</td>
-
-              <!-- ✅ Total (mantengo id y agrego data-cart-total) -->
               <td class="text-end fw-bold" id="js-cart-total" data-cart-total>
                 ${{ cart_total|floatformat:0 }}
               </td>
-
               <td></td>
             </tr>
           </tfoot>
@@ -411,12 +434,10 @@
         </div>
 
         <div class="d-flex gap-2 mt-3 flex-wrap">
- 
           <button class="btn btn-primary" type="submit">
             Guardar datos
           </button>
 
-  
           {% if business.whatsapp %}
             <button class="btn btn-success"
                     type="submit"
@@ -429,7 +450,6 @@
               ⚠️ Este negocio aún no tiene WhatsApp configurado.
             </span>
           {% endif %}
-
         </div>
 
       </form>
@@ -445,7 +465,6 @@
       <div class="cart-floatbar-text">
         <div class="cart-floatbar-title">Mi pedido</div>
 
-        <!-- ✅ Agrego marcadores para count/total en el floatbar (no rompe nada) -->
         <div class="cart-floatbar-sub">
           <span data-cart-count>{{ cart_items|length }}</span>
           item{{ cart_items|length|pluralize }} · $
@@ -469,14 +488,13 @@
     const form = e.target;
     if (!form || !form.action) return;
 
-    // ✅ Detecta endpoints reales del carrito/buyer (POST)
     if (
       form.action.includes("/cart/") ||
       form.action.includes("/orders/") ||
       form.action.includes("cart_")
     ) {
       sessionStorage.setItem("pn_scrollY", String(window.scrollY));
-      sessionStorage.setItem("pn_posting", "1"); // flag robusto
+      sessionStorage.setItem("pn_posting", "1");
     }
   }, true);
 
@@ -486,14 +504,10 @@
 
     const y = parseInt(sessionStorage.getItem("pn_scrollY") || "0", 10) || 0;
 
-    // limpiar flags
     sessionStorage.removeItem("pn_posting");
     sessionStorage.removeItem("pn_scrollY");
 
-    // Restaurar inmediatamente (evita parpadeo)
     window.scrollTo(0, y);
-
-    // Re-asegurar por si el layout ajusta después
     setTimeout(() => window.scrollTo(0, y), 50);
     setTimeout(() => window.scrollTo(0, y), 200);
   });
@@ -513,26 +527,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Delegación: sirve aunque el HTML cambie
   document.addEventListener("click", async (e) => {
-    console.log("CLICK en la página:", e.target);
-
     const btn = e.target.closest(".js-qty");
     if (!btn) return;
 
-    console.log("CLICK en js-qty ✅", btn.dataset);
     const itemId = btn.dataset.id;
     const nextQty = btn.dataset.next;
     const url = btn.dataset.url;
 
-    if (!url) {
-      console.error("Falta data-url en el botón", btn);
-      return;
-    }
+    if (!url) return;
 
     const csrf = csrfToken();
-    if (!csrf) {
-      console.error("No se encontró csrfmiddlewaretoken en la página. Verifica que exista un input hidden con name='csrfmiddlewaretoken' dentro de algún form.");
-      return;
-    }
+    if (!csrf) return;
 
     const fd = new FormData();
     fd.append("qty", nextQty);
@@ -550,39 +555,31 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (!data.ok) throw new Error("bad response");
 
-      // qty (tu selector original)
       const qtyEl = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
       if (qtyEl) qtyEl.textContent = data.qty;
 
-      // marcador paralelo
       const qtyEl2 = document.querySelector(`[data-qty-text="${itemId}"]`);
       if (qtyEl2) qtyEl2.textContent = data.qty;
 
-      // subtotal fila
       const subEl = document.querySelector(`.js-subtotal[data-id="${itemId}"]`);
       if (subEl) subEl.textContent = money(data.item_subtotal);
 
-      // marcador paralelo subtotal
       const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
       if (subEl2) subEl2.textContent = money(data.item_subtotal);
 
-      // total
       const totalEl = document.getElementById("js-cart-total");
       if (totalEl) totalEl.textContent = money(data.cart_total);
 
-      // marcadores total (tabla + floatbar)
       document.querySelectorAll(`[data-cart-total]`).forEach(el=>{
         el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
       });
 
-      // conteo
       if (typeof data.cart_count !== "undefined") {
         document.querySelectorAll(`[data-cart-count]`).forEach(el=>{
           el.textContent = String(data.cart_count);
         });
       }
 
-      // actualizar +/- data-next y disabled del minus
       document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b=>{
         const n = parseInt(data.qty || 0, 10);
         if (b.dataset.action === "minus") {
@@ -599,9 +596,247 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.reload();
     } finally {
       if (btn.textContent.trim() === "+") btn.disabled = false;
-      if (btn.textContent.trim() === "-") btn.disabled = false; // (opcional, para no dejarlo pegado)
+      if (btn.textContent.trim() === "-") btn.disabled = false;
     }
   });
 });
 </script>
+
+<!-- ==============================
+     MODAL GLOBAL (una sola vez)
+     ============================== -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-body p-0">
+        <img id="pmPhoto" src="" alt="" style="width:100%; height:220px; object-fit:cover; border-top-left-radius:16px; border-top-right-radius:16px; display:none;">
+        <div class="p-4">
+
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <h5 id="pmName" class="fw-bold mb-1"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div id="pmPrice" class="fw-bold fs-4 text-dark mb-2"></div>
+
+          <div id="pmDesc" class="text-secondary" style="white-space:pre-line;"></div>
+
+          <hr class="my-3">
+
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-bold">Cantidad</div>
+
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="pmMinus">–</button>
+              <!-- ✅ inicia en 0 para evitar “+1 fantasma” -->
+              <div class="fw-bold" id="pmQty" style="min-width:24px;text-align:center;">0</div>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="pmPlus">+</button>
+            </div>
+          </div>
+
+          <form id="pmAddForm" class="mt-3">
+            {% csrf_token %}
+            {% if business.is_open_now %}
+              <button class="btn btn-success w-100" type="submit">
+                Agregar al pedido
+              </button>
+            {% else %}
+              <button class="btn btn-secondary w-100" type="button" disabled>
+                Negocio cerrado
+              </button>
+            {% endif %}
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const modalEl = document.getElementById("productModal");
+  if (!modalEl) return;
+
+  const pmPhoto = document.getElementById("pmPhoto");
+  const pmName  = document.getElementById("pmName");
+  const pmPrice = document.getElementById("pmPrice");
+  const pmDesc  = document.getElementById("pmDesc");
+
+  const pmMinus = document.getElementById("pmMinus");
+  const pmPlus  = document.getElementById("pmPlus");
+  const pmQtyEl = document.getElementById("pmQty");
+  const pmAddForm = document.getElementById("pmAddForm");
+
+  window.pnCartQty = window.pnCartQty || {};
+
+  let currentQty = 0;
+  let currentItemId = null;
+  let updateUrl = null;
+
+  function money(n){
+    try { return "$" + Number(n).toLocaleString("es-CO"); }
+    catch(e){ return "$" + n; }
+  }
+
+  function getQtyFromCartDOM(itemId) {
+    if (typeof window.pnCartQty[itemId] !== "undefined") {
+      return parseInt(window.pnCartQty[itemId] || 0, 10) || 0;
+    }
+
+    const byId = document.getElementById("qty-" + itemId);
+    if (byId && byId.textContent) {
+      const n = parseInt(byId.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    const el = document.querySelector(`[data-cart-qty][data-id="${itemId}"]`);
+    if (el && el.textContent) {
+      const n = parseInt(el.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    const el2 = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
+    if (el2 && el2.textContent) {
+      const n = parseInt(el2.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    return 0;
+  }
+
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".js-open-product");
+    if (!btn) return;
+
+    currentItemId = String(btn.dataset.id || "");
+    updateUrl = btn.dataset.updateUrl || "";
+
+    currentQty = 0;
+    pmQtyEl.textContent = String(currentQty);
+
+    pmName.textContent = btn.dataset.name || "";
+    pmPrice.textContent = "$" + (btn.dataset.price || "");
+    pmDesc.textContent = btn.dataset.desc || "";
+
+    const photo = btn.dataset.photo || "";
+    if (photo) {
+      pmPhoto.src = photo;
+      pmPhoto.style.display = "block";
+    } else {
+      pmPhoto.style.display = "none";
+      pmPhoto.src = "";
+    }
+  });
+
+  pmPlus.addEventListener("click", function () {
+    currentQty += 1;
+    pmQtyEl.textContent = String(currentQty);
+  });
+
+  pmMinus.addEventListener("click", function () {
+    currentQty = Math.max(0, currentQty - 1);
+    pmQtyEl.textContent = String(currentQty);
+  });
+
+  pmAddForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!updateUrl || !currentItemId) return;
+
+    if (currentQty < 1) {
+      alert("Selecciona al menos 1 unidad.");
+      return;
+    }
+
+    const csrf = pmAddForm.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+    const existing = getQtyFromCartDOM(currentItemId);
+    const finalQty = existing + currentQty;
+
+    const fd = new FormData();
+    fd.append("csrfmiddlewaretoken", csrf);
+    fd.append("qty", String(finalQty));
+
+    try {
+      const res = await fetch(updateUrl, {
+        method: "POST",
+        body: fd,
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        credentials: "same-origin",
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        console.error(data);
+        alert(data.error || "No se pudo actualizar el carrito.");
+        return;
+      }
+
+      window.pnCartQty[currentItemId] = data.qty;
+
+      const hasRow = document.querySelector(`.js-qty-val[data-id="${currentItemId}"]`);
+      const cartAreaExists = document.getElementById("cart");
+
+      if (!hasRow || !cartAreaExists) {
+        sessionStorage.setItem("pn_scrollY", String(window.scrollY));
+        sessionStorage.setItem("pn_posting", "1");
+        location.hash = "#cart";
+        location.reload();
+        return;
+      }
+
+      const itemId = String(currentItemId);
+
+      const qtyEl = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
+      if (qtyEl) qtyEl.textContent = data.qty;
+
+      const qtyEl2 = document.querySelector(`[data-qty-text="${itemId}"]`);
+      if (qtyEl2) qtyEl2.textContent = data.qty;
+
+      const byId = document.getElementById("qty-" + itemId);
+      if (byId) byId.textContent = data.qty;
+
+      const subEl = document.querySelector(`.js-subtotal[data-id="${itemId}"]`);
+      if (subEl) subEl.textContent = money(data.item_subtotal);
+
+      const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
+      if (subEl2) subEl2.textContent = money(data.item_subtotal);
+
+      const totalEl = document.getElementById("js-cart-total");
+      if (totalEl) totalEl.textContent = money(data.cart_total);
+
+      document.querySelectorAll(`[data-cart-total]`).forEach(el=>{
+        el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
+      });
+
+      if (typeof data.cart_count !== "undefined") {
+        document.querySelectorAll(`[data-cart-count]`).forEach(el=>{
+          el.textContent = String(data.cart_count);
+        });
+      }
+
+      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b=>{
+        const n = parseInt(data.qty || 0, 10);
+        if (b.dataset.action === "minus") {
+          b.disabled = (n <= 1);
+          b.dataset.next = String(n - 1);
+        } else if (b.dataset.action === "plus") {
+          b.disabled = false;
+          b.dataset.next = String(n + 1);
+        }
+      });
+
+      const bsModal = bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+
+    } catch (err) {
+      console.error(err);
+      alert("Error de red actualizando el carrito.");
+    }
+  });
+})();
+</script>
+
 {% endblock %}
