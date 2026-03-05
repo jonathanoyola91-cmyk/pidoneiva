@@ -81,9 +81,7 @@
         {% else %}
 
           {% if business.whatsapp %}
-            <a class="btn btn-success" target="_blank" href="{% url 'whatsapp_redirect' business.slug %}">
-              💬 Pedir por WhatsApp
-            </a>
+            
           {% endif %}
 
           {% if business.phone %}
@@ -367,6 +365,10 @@
 
       <h3 class="h6 fw-bold mb-3">👤 Datos para el envío</h3>
 
+      <div class="alert alert-light border mb-3">
+        📦 Completa tus datos y envía el pedido directamente por WhatsApp.
+      </div>
+
       <form method="post" action="{% url 'cart_set_buyer' business.slug %}">
         {% csrf_token %}
 
@@ -393,18 +395,27 @@
         </div>
 
         <div class="d-flex gap-2 mt-3 flex-wrap">
-          <button class="btn btn-primary">Guardar datos</button>
+ 
+          <button class="btn btn-primary" type="submit">
+            Guardar datos
+          </button>
 
+  
           {% if business.whatsapp %}
-            <a class="btn btn-success" target="_blank" href="{% url 'cart_whatsapp' business.slug %}">
+            <button class="btn btn-success"
+                    type="submit"
+                    name="go_whatsapp"
+                    value="1">
               Enviar pedido por WhatsApp
-            </a>
+            </button>
           {% else %}
             <span class="text-danger small align-self-center">
               ⚠️ Este negocio aún no tiene WhatsApp configurado.
             </span>
           {% endif %}
+
         </div>
+
       </form>
     {% endif %}
   {% endif %}

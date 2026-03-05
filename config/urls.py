@@ -7,7 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("businesses.urls")),
     path("", include("users.urls")),
-
+    path("orders/", include("orders.urls")),
     # Login/Logout built-in
     path("accounts/", include("django.contrib.auth.urls")),
 ]

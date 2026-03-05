@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Order(models.Model):
     business = models.ForeignKey("businesses.Business", on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
@@ -17,7 +18,6 @@ class Order(models.Model):
     def __str__(self):
         return self.number or f"Order {self.id}"
 
-    # ✅ AQUÍ VA EL CÓDIGO
     def save(self, *args, **kwargs):
         creating = self.pk is None
         super().save(*args, **kwargs)
@@ -25,3 +25,20 @@ class Order(models.Model):
         if creating and not self.number:
             self.number = f"PN-NEI-{self.pk:06d}"
             super().save(update_fields=["number"])
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
+
+    # snapshot del producto al comprar
+    name = models.CharField(max_length=200)
+    qty = models.PositiveIntegerField(default=1)
+    price = models.IntegerField(default=0)  # pesos
+    subtotal = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = int(self.qty) * int(self.price)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.qty}x {self.name}"

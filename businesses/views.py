@@ -408,7 +408,7 @@ def whatsapp_redirect(request, slug):
             lines.append(f"Notas: {buyer['notes']}")
 
     text = "\n".join(lines).strip()
-    return redirect(f"https://wa.me/{whatsapp}?text={quote(text)}")
+    return redirect(f"https://wa.me/{whatsapp}?text={quote(text, safe='', encoding='utf-8')}")
 
 
 # =====================================================
@@ -510,6 +510,10 @@ def cart_clear(request, slug):
     return redirect(f"/negocio/{business.slug}/#cart")
 
 
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+from .models import Business
+
 @require_POST
 def cart_set_buyer(request, slug):
     business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
@@ -521,6 +525,12 @@ def cart_set_buyer(request, slug):
         "notes": (request.POST.get("notes") or "").strip(),
     }
     _save_buyer(request, business.slug, buyer)
+
+    # ✅ si le dio al botón "Enviar por WhatsApp", redirigir al flujo nuevo
+    if request.POST.get("go_whatsapp") == "1":
+        return redirect("send_whatsapp_order", slug=business.slug)
+
+    # ✅ si solo guardó datos
     return redirect(f"/negocio/{business.slug}/#cart")
 
 
@@ -528,6 +538,6 @@ def cart_whatsapp(request, slug):
     """
     Tu url:
       cart/<slug>/whatsapp/
-    Redirige al WhatsApp del negocio con el pedido completo (o PDF si aplica).
+    Ahora redirige al sistema nuevo de pedidos (orders app).
     """
-    return whatsapp_redirect(request, slug)
+    return redirect("send_whatsapp_order", slug=slug)
