@@ -13,7 +13,6 @@ from .models import Order, OrderItem
 # Carrito en sesión (FIX)
 # =========================
 def _cart_key(slug: str) -> str:
-    # ✅ importante: coincide con el resto de tu código (send_whatsapp_order)
     return f"cart_{slug}"
 
 
@@ -30,14 +29,37 @@ def _save_cart(request, slug: str, cart: dict) -> None:
     request.session.modified = True
 
 
+def _set_active_cart_business(request, business) -> None:
+    request.session["active_cart_business"] = business.slug
+    request.session["active_cart_business_slug"] = business.slug
+    request.session["active_cart_business_name"] = business.name
+    request.session.modified = True
+
+
+def _clear_active_cart_business(request, slug: str | None = None) -> None:
+    active_slug = request.session.get("active_cart_business_slug") or request.session.get("active_cart_business")
+
+    if slug is None or active_slug == slug:
+        request.session.pop("active_cart_business", None)
+        request.session.pop("active_cart_business_slug", None)
+        request.session.pop("active_cart_business_name", None)
+        request.session.modified = True
+
+
+def _get_active_cart_info(request) -> dict:
+    return {
+        "slug": request.session.get("active_cart_business_slug") or request.session.get("active_cart_business"),
+        "name": request.session.get("active_cart_business_name", ""),
+    }
+
+
 @require_POST
 def cart_update_json(request, slug, item_id):
     business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
 
-    cart = _get_cart(request, business.slug)  # esperado: {"12": 1, "15": 3}
+    cart = _get_cart(request, business.slug)
     key = str(item_id)
 
-    # ✅ acepta qty (FormData) y también next (por si tus botones envían next)
     try:
         qty = int(request.POST.get("qty") or request.POST.get("next") or "1")
     except (TypeError, ValueError):
@@ -47,12 +69,17 @@ def cart_update_json(request, slug, item_id):
         cart.pop(key, None)
         qty = 0
     else:
-        # ✅ tu estructura: id -> int
         cart[key] = qty
 
     _save_cart(request, business.slug, cart)
 
-    # ✅ calcular subtotal y total usando DB (más confiable)
+    # marcar / limpiar carrito activo
+    if cart:
+        _set_active_cart_business(request, business)
+    else:
+        _clear_active_cart_business(request, business.slug)
+
+    # subtotal del item
     item = MenuItem.objects.filter(id=item_id, business=business).first()
     item_price = int(item.price or 0) if item else 0
     item_subtotal = item_price * qty
@@ -72,6 +99,8 @@ def cart_update_json(request, slug, item_id):
         cart_count += q
         total += price_map.get(str(k), 0) * q
 
+    active_info = _get_active_cart_info(request)
+
     return JsonResponse({
         "ok": True,
         "item_id": item_id,
@@ -80,7 +109,36 @@ def cart_update_json(request, slug, item_id):
         "cart_total": total,
         "cart_count": cart_count,
         "is_empty": (len(cart) == 0),
+        "active_cart_business_slug": active_info["slug"],
+        "active_cart_business_name": active_info["name"],
     })
+
+
+@require_GET
+def go_to_active_cart(request):
+    active_slug = request.session.get("active_cart_business_slug") or request.session.get("active_cart_business")
+
+    if not active_slug:
+        return redirect("/")
+
+    return redirect(f"/negocio/{active_slug}/#cart")
+
+
+@require_POST
+def cart_clear_and_switch(request, slug):
+    new_business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
+
+    active_slug = request.session.get("active_cart_business_slug") or request.session.get("active_cart_business")
+
+    if active_slug:
+        request.session.pop(f"cart_{active_slug}", None)
+        request.session.pop(f"buyer_{active_slug}", None)
+
+    _clear_active_cart_business(request)
+    _set_active_cart_business(request, new_business)
+
+    request.session.modified = True
+    return redirect(f"/negocio/{new_business.slug}/")
 
 
 @require_GET
@@ -93,7 +151,6 @@ def send_whatsapp_order(request, slug):
     if not cart:
         return redirect("business_detail", slug=slug)
 
-    # 1) crear Order
     order = Order.objects.create(
         business=business,
         buyer_name=buyer.get("name", ""),
@@ -106,7 +163,6 @@ def send_whatsapp_order(request, slug):
     total = 0
     lines = []
 
-    # 2) crear OrderItems
     for item_id, qty in cart.items():
         try:
             qty = int(qty)
@@ -128,16 +184,13 @@ def send_whatsapp_order(request, slug):
             price=price,
         )
 
-        # agregar item al mensaje (con puntos)
         lines.append(
             f"• {qty} x {item.name} (${price:,}) = ${subtotal:,}".replace(",", ".")
         )
 
-    # 3) guardar total FINAL una sola vez
     order.total = total
     order.save(update_fields=["total"])
 
-    # 4) construir mensaje FINAL una sola vez
     total_str = f"${total:,}".replace(",", ".")
 
     msg = (
@@ -153,11 +206,11 @@ def send_whatsapp_order(request, slug):
         + f"\n\n*Total:* {total_str}"
     )
 
-    # limpiar carrito (recomendado)
+    # limpiar carrito y referencia activa
     request.session[f"cart_{slug}"] = {}
+    _clear_active_cart_business(request, slug)
     request.session.modified = True
 
-    # WhatsApp del negocio
     phone = getattr(business, "whatsapp", "") or getattr(business, "phone", "") or ""
     phone = "".join(c for c in str(phone) if c.isdigit())
 

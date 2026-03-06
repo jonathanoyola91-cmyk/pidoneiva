@@ -50,9 +50,8 @@
       </div>
     </div>
 
-    <!-- Botones debajo del hero (los mismos que ya tienes) -->
+    <!-- Botones debajo del hero -->
     <div class="business-hero-actions">
-      <!-- Acciones rápidas -->
       <div class="d-flex flex-wrap gap-2 mt-3">
 
         {% if not is_pdf_only %}
@@ -79,10 +78,6 @@
           {% endif %}
 
         {% else %}
-
-          {% if business.whatsapp %}
-            
-          {% endif %}
 
           {% if business.phone %}
             <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
@@ -135,8 +130,27 @@
 
   <!-- Aviso carrito activo en otro negocio -->
   {% if cart_warning %}
-    <div class="alert alert-warning mt-3">
-      ⚠️ Tienes un carrito activo en otro negocio. Aquí se guardará un pedido separado.
+    <div class="alert alert-warning mt-3 rounded-4 shadow-soft">
+      <div class="fw-bold mb-1">⚠️ Ya tienes un carrito activo</div>
+
+      <div class="small mb-3">
+        Tu pedido actual está en
+        <strong>{{ request.session.active_cart_business_name|default:"otro negocio" }}</strong>.
+        Puedes volver a ese carrito o vaciarlo para empezar aquí.
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'go_to_active_cart' %}" class="btn btn-brand text-white">
+          🛒 Ver mi carrito actual
+        </a>
+
+        <form method="post" action="{% url 'cart_clear_and_switch' business.slug %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger">
+            Vaciar carrito y comprar aquí
+          </button>
+        </form>
+      </div>
     </div>
   {% endif %}
 
@@ -172,11 +186,12 @@
            ======================= -->
       <div class="tab-pane fade show active" id="tab-products">
         <div id="menu"></div>
+
         <div class="menu-categories mt-3 mb-2">
           {% for cat in categories %}
             {% if cat.items.all|length %}
               <a class="menu-category" href="#cat-{{ cat.id }}">
-                {{ cat.name }} 
+                {{ cat.name }}
               </a>
             {% endif %}
           {% endfor %}
@@ -190,32 +205,29 @@
               <div class="products-row">
                 {% for item in cat.items.all %}
                   {% if item.is_available %}
+                    <div class="product-card">
+                      <div class="card shadow-soft p-3 h-100">
 
-                  <div class="product-card">
-                    <div class="card shadow-soft p-3 h-100">
+                        {% if item.photo %}
+                          <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
+                        {% endif %}
 
-                      {% if item.photo %}
-                        <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
-                      {% endif %}
-
-                      <!-- ✅ NOMBRE DEL PRODUCTO -->
-                      <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
-                        {{ item.name }}
-                      </div>
-
-                      <div class="d-flex justify-content-between align-items-center mt-2">
-                        <div class="fw-bold fs-5 text-dark">
-                          ${{ item.price|floatformat:0 }}
+                        <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
+                          {{ item.name }}
                         </div>
-                      </div>
 
-                      {% if item.description %}
-                        <div class="small text-secondary mt-1 clamp-2">
-                          {{ item.description }}
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="fw-bold fs-5 text-dark">
+                            ${{ item.price|floatformat:0 }}
+                          </div>
                         </div>
-                      {% endif %}    
- 
-                        <!-- ✅ Trigger del modal + data-update-url -->
+
+                        {% if item.description %}
+                          <div class="small text-secondary mt-1 clamp-2">
+                            {{ item.description }}
+                          </div>
+                        {% endif %}
+
                         <button type="button"
                                 class="btn btn-outline-secondary w-100 mt-2 js-open-product"
                                 data-bs-toggle="modal"
@@ -228,24 +240,21 @@
                                 data-update-url="{% url 'cart_update_json' business.slug item.id %}">
                           Ver detalles
                         </button>
-                      
 
-                      <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
-                        {% csrf_token %}
-                        {% if business.is_open_now %}
-                          <button class="btn btn-success w-100">Agregar al pedido</button>
-                        {% else %}
-                          <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
-                        {% endif %}
-                      </form>
+                        <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
+                          {% csrf_token %}
+                          {% if business.is_open_now %}
+                            <button class="btn btn-success w-100">Agregar al pedido</button>
+                          {% else %}
+                            <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
+                          {% endif %}
+                        </form>
 
+                      </div>
                     </div>
-                  </div>
-
                   {% endif %}
                 {% endfor %}
               </div>
-
             </div>
           {% endif %}
         {% endfor %}
@@ -305,11 +314,11 @@
          CARRITO + FORM (ABAJO)
          ======================= -->
     <hr class="my-4">
-    
+
     <h2 id="mi-pedido" class="h6 fw-bold mb-3">
       🧾 Mi pedido
     </h2>
-    
+
     <div id="cart"></div>
 
     {% if not cart_items %}
@@ -528,7 +537,6 @@ document.addEventListener("DOMContentLoaded", () => {
     catch(e){ return "$" + n; }
   }
 
-  // Delegación: sirve aunque el HTML cambie
   document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".js-qty");
     if (!btn) return;
@@ -573,17 +581,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalEl = document.getElementById("js-cart-total");
       if (totalEl) totalEl.textContent = money(data.cart_total);
 
-      document.querySelectorAll(`[data-cart-total]`).forEach(el=>{
+      document.querySelectorAll(`[data-cart-total]`).forEach(el => {
         el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
       });
 
       if (typeof data.cart_count !== "undefined") {
-        document.querySelectorAll(`[data-cart-count]`).forEach(el=>{
+        document.querySelectorAll(`[data-cart-count]`).forEach(el => {
           el.textContent = String(data.cart_count);
         });
       }
 
-      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b=>{
+      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b => {
         const n = parseInt(data.qty || 0, 10);
         if (b.dataset.action === "minus") {
           b.disabled = (n <= 1);
@@ -632,7 +640,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="d-flex align-items-center gap-2">
               <button type="button" class="btn btn-outline-secondary btn-sm" id="pmMinus">–</button>
-              <!-- ✅ inicia en 0 para evitar “+1 fantasma” -->
               <div class="fw-bold" id="pmQty" style="min-width:24px;text-align:center;">0</div>
               <button type="button" class="btn btn-outline-secondary btn-sm" id="pmPlus">+</button>
             </div>
@@ -810,17 +817,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalEl = document.getElementById("js-cart-total");
       if (totalEl) totalEl.textContent = money(data.cart_total);
 
-      document.querySelectorAll(`[data-cart-total]`).forEach(el=>{
+      document.querySelectorAll(`[data-cart-total]`).forEach(el => {
         el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
       });
 
       if (typeof data.cart_count !== "undefined") {
-        document.querySelectorAll(`[data-cart-count]`).forEach(el=>{
+        document.querySelectorAll(`[data-cart-count]`).forEach(el => {
           el.textContent = String(data.cart_count);
         });
       }
 
-      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b=>{
+      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b => {
         const n = parseInt(data.qty || 0, 10);
         if (b.dataset.action === "minus") {
           b.disabled = (n <= 1);

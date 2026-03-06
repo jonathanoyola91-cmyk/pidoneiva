@@ -178,6 +178,7 @@ def home(request):
     q = request.GET.get("q", "").strip()
     business_type = request.GET.get("type", "").strip()
     zone = request.GET.get("zone", "").strip()
+    cat = request.GET.get("cat", "").strip().lower()
 
     # ✅ default: mostrar TODOS
     # (solo filtra cuando open=1)
@@ -204,6 +205,95 @@ def home(request):
             Q(menu_categories__items__description__icontains=q)
         ).distinct()
 
+    # ✅ filtro por chip/categoría
+    if cat == "pizza":
+        qs = qs.filter(
+            Q(name__icontains="pizza") |
+            Q(name__icontains="pizzer") |
+            Q(description__icontains="pizza") |
+            Q(tags__icontains="pizza") |
+            Q(menu_categories__name__icontains="pizza") |
+            Q(menu_categories__items__name__icontains="pizza") |
+            Q(menu_categories__items__description__icontains="pizza")
+        ).distinct()
+
+    elif cat == "hamburguesa":
+        qs = qs.filter(
+            Q(name__icontains="hamburgues") |
+            Q(description__icontains="hamburgues") |
+            Q(tags__icontains="hamburgues") |
+            Q(menu_categories__name__icontains="hamburgues") |
+            Q(menu_categories__items__name__icontains="hamburgues") |
+            Q(menu_categories__items__description__icontains="hamburgues")
+        ).distinct()
+
+    elif cat == "pollo":
+        qs = qs.filter(
+            Q(name__icontains="pollo") |
+            Q(description__icontains="pollo") |
+            Q(tags__icontains="pollo") |
+            Q(menu_categories__name__icontains="pollo") |
+            Q(menu_categories__items__name__icontains="pollo") |
+            Q(menu_categories__items__description__icontains="pollo")
+        ).distinct()
+
+    elif cat == "sushi":
+        qs = qs.filter(
+            Q(name__icontains="sushi") |
+            Q(description__icontains="sushi") |
+            Q(tags__icontains="sushi") |
+            Q(menu_categories__name__icontains="sushi") |
+            Q(menu_categories__items__name__icontains="sushi") |
+            Q(menu_categories__items__description__icontains="sushi")
+        ).distinct()
+
+    elif cat == "drogueria":
+        qs = qs.filter(
+            Q(name__icontains="droguer") |
+            Q(description__icontains="droguer") |
+            Q(tags__icontains="droguer") |
+            Q(menu_categories__name__icontains="droguer") |
+            Q(menu_categories__items__name__icontains="droguer") |
+            Q(menu_categories__items__description__icontains="droguer")
+        ).distinct()
+
+    elif cat == "ferreteria":
+        qs = qs.filter(
+            Q(name__icontains="ferreter") |
+            Q(description__icontains="ferreter") |
+            Q(tags__icontains="ferreter") |
+            Q(menu_categories__name__icontains="ferreter") |
+            Q(menu_categories__items__name__icontains="ferreter") |
+            Q(menu_categories__items__description__icontains="ferreter")
+        ).distinct()
+
+    elif cat == "market":
+        qs = qs.filter(
+            Q(name__icontains="market") |
+            Q(name__icontains="supermerc") |
+            Q(description__icontains="market") |
+            Q(description__icontains="supermerc") |
+            Q(tags__icontains="market") |
+            Q(tags__icontains="supermerc") |
+            Q(menu_categories__name__icontains="market") |
+            Q(menu_categories__name__icontains="supermerc") |
+            Q(menu_categories__items__name__icontains="market") |
+            Q(menu_categories__items__name__icontains="supermerc") |
+            Q(menu_categories__items__description__icontains="market") |
+            Q(menu_categories__items__description__icontains="supermerc")
+        ).distinct()
+
+    elif cat == "licores":
+        qs = qs.filter(
+            Q(name__icontains="licor") |
+            Q(name__icontains="licores") |
+            Q(description__icontains="licor") |
+            Q(tags__icontains="licor") |
+            Q(menu_categories__name__icontains="licor") |
+            Q(menu_categories__items__name__icontains="licor") |
+            Q(menu_categories__items__description__icontains="licor")
+        ).distinct()
+
     if hasattr(Business, "plan"):
         qs = qs.annotate(
             plan_rank=Case(
@@ -221,26 +311,62 @@ def home(request):
 
     now = timezone.localtime()
 
-    # agregar estado calculado (mantengo tu lógica)
+    # agregar estado calculado
     for b in businesses:
         is_open, closes_at = _open_status(b, now)
         b.open_now = is_open
         b.closes_at_dt = closes_at
-
-        # ✅ por compatibilidad: si alguna parte usa _is_open_now
         b._is_open_now = is_open
         b._closes_at = closes_at
 
-    # ✅ filtro solo abiertos (mantengo tu lógica)
+    # ✅ filtro solo abiertos
     if only_open == "1":
         businesses = [b for b in businesses if getattr(b, "open_now", False)]
+
+    # ✅ destacados para carrusel horizontal
+    featured_qs = Business.objects.filter(
+        is_active=True,
+        is_approved=True
+    ).filter(
+        Q(plan="PREMIUM") | Q(visits_count__gt=100)
+    )
+
+    if business_type in ["RESTAURANT", "COMMERCE"]:
+        featured_qs = featured_qs.filter(business_type=business_type)
+
+    if zone:
+        featured_qs = featured_qs.filter(zone=zone)
+
+    if hasattr(Business, "plan"):
+        featured_qs = featured_qs.annotate(
+            plan_rank=Case(
+                When(plan="PREMIUM", then=Value(3)),
+                When(plan="STANDARD", then=Value(2)),
+                When(plan="BASIC", then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField()
+            )
+        ).order_by("-plan_rank", "?")
+    else:
+        featured_qs = featured_qs.order_by("?")
+
+    featured_businesses = list(featured_qs[:10])
+
+    for b in featured_businesses:
+        is_open, closes_at = _open_status(b, now)
+        b.open_now = is_open
+        b.closes_at_dt = closes_at
+        b._is_open_now = is_open
+        b._closes_at = closes_at
 
     # zonas desde choices del modelo
     zones = Business._meta.get_field("zone").choices
 
     return render(request, "home.html", {
         "businesses": businesses,
+        "featured_businesses": featured_businesses,
         "q": q,
+        "cat": cat,
         "business_type": business_type,
         "zone": zone,
         "only_open": only_open,
