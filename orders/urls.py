@@ -17,4 +17,9 @@ urlpatterns = [
         views.cart_clear_and_switch,
         name="cart_clear_and_switch"
     ),
+    path(
+        "cart/<slug:slug>/send-whatsapp/",
+        views.send_whatsapp_order,
+        name="send_whatsapp_order"
+    ),
 ]
