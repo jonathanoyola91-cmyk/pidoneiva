@@ -1,14 +1,17 @@
 from urllib.parse import quote
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
+import re
 
 from django.contrib import messages
 from django.db.models import Q, Case, When, IntegerField, Value
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .models import Business
 from menu.models import MenuCategory, MenuFile, MenuItem
+from orders.models import CustomerProfile
 
 
 # =====================================================
@@ -26,6 +29,12 @@ def _get_buyer(request, slug: str) -> dict:
 def _save_buyer(request, slug: str, buyer: dict):
     request.session[_buyer_key(slug)] = buyer
     request.session.modified = True
+
+
+def _normalize_phone(phone: str) -> str:
+    if not phone:
+        return ""
+    return re.sub(r"\D", "", phone)
 
 
 # =====================================================
@@ -77,6 +86,7 @@ def _is_open_now(business: Business, now=None) -> bool:
             return bool(business.is_open_now())
     return True
 
+
 def _next_close_time(business, now):
     """
     Devuelve un datetime (timezone-aware) con la hora a la que CIERRA hoy
@@ -84,15 +94,6 @@ def _next_close_time(business, now):
 
     ⚠️ Debes adaptar la parte de "horarios" a cómo los tengas guardados.
     """
-    # =========================
-    # EJEMPLO 1 (recomendado): business.hours_json
-    # hours_json tipo:
-    # {
-    #   "mon":[["08:00","22:00"]],
-    #   "tue":[["08:00","22:00"]],
-    #   ...
-    # }
-    # =========================
     hours = getattr(business, "hours_json", None)
     if not hours:
         return None
@@ -105,7 +106,6 @@ def _next_close_time(business, now):
         hh, mm = s.split(":")
         return time(int(hh), int(mm))
 
-    # Busca el rango donde now cae adentro; si cruza medianoche también sirve
     for start_s, end_s in ranges:
         start_t = parse_hhmm(start_s)
         end_t = parse_hhmm(end_s)
@@ -113,7 +113,6 @@ def _next_close_time(business, now):
         start_dt = now.replace(hour=start_t.hour, minute=start_t.minute, second=0, microsecond=0)
         end_dt = now.replace(hour=end_t.hour, minute=end_t.minute, second=0, microsecond=0)
 
-        # Si el cierre es "menor" que apertura, cruza medianoche
         if end_dt <= start_dt:
             end_dt = end_dt + timedelta(days=1)
 
@@ -135,19 +134,17 @@ def _open_status(business, now):
     def _dt_for(t, base_dt):
         return base_dt.replace(hour=t.hour, minute=t.minute, second=0, microsecond=0)
 
-    # 1) Caso: abierto por horario de AYER que cruza medianoche
     yday = now - timedelta(days=1)
     sch_y = business._get_schedule_for_weekday(yday.weekday())
     parsed_y = business._parse_range(sch_y)
 
     if parsed_y:
         start_y, end_y = parsed_y
-        if start_y > end_y:  # cruza medianoche
+        if start_y > end_y:
             if now.time() <= end_y:
                 closes_at = _dt_for(end_y, now)
                 return True, closes_at
 
-    # 2) Caso: horario de HOY
     sch = business._get_schedule_for_weekday(now.weekday())
     parsed = business._parse_range(sch)
 
@@ -156,19 +153,18 @@ def _open_status(business, now):
 
     start, end = parsed
 
-    # rango normal
     if start < end:
         if start <= now.time() <= end:
             closes_at = _dt_for(end, now)
             return True, closes_at
         return False, None
 
-    # rango que cruza medianoche
     if now.time() >= start:
         closes_at = _dt_for(end, now) + timedelta(days=1)
         return True, closes_at
 
     return False, None
+
 
 # =====================================================
 # HOME
@@ -180,8 +176,6 @@ def home(request):
     zone = request.GET.get("zone", "").strip()
     cat = request.GET.get("cat", "").strip().lower()
 
-    # ✅ default: mostrar TODOS
-    # (solo filtra cuando open=1)
     only_open = "1" if request.GET.get("open") == "1" else "0"
 
     qs = Business.objects.filter(is_active=True, is_approved=True)
@@ -189,7 +183,6 @@ def home(request):
     if business_type in ["RESTAURANT", "COMMERCE"]:
         qs = qs.filter(business_type=business_type)
 
-    # zone exacta (SUR/NORTE/ORIENTE/CENTRO)
     if zone:
         qs = qs.filter(zone=zone)
 
@@ -205,7 +198,6 @@ def home(request):
             Q(menu_categories__items__description__icontains=q)
         ).distinct()
 
-    # ✅ filtro por chip/categoría
     if cat == "pizza":
         qs = qs.filter(
             Q(name__icontains="pizza") |
@@ -311,7 +303,6 @@ def home(request):
 
     now = timezone.localtime()
 
-    # agregar estado calculado
     for b in businesses:
         is_open, closes_at = _open_status(b, now)
         b.open_now = is_open
@@ -319,11 +310,9 @@ def home(request):
         b._is_open_now = is_open
         b._closes_at = closes_at
 
-    # ✅ filtro solo abiertos
     if only_open == "1":
         businesses = [b for b in businesses if getattr(b, "open_now", False)]
 
-    # ✅ destacados para carrusel horizontal
     featured_qs = Business.objects.filter(
         is_active=True,
         is_approved=True
@@ -359,7 +348,6 @@ def home(request):
         b._is_open_now = is_open
         b._closes_at = closes_at
 
-    # zonas desde choices del modelo
     zones = Business._meta.get_field("zone").choices
 
     return render(request, "home.html", {
@@ -372,6 +360,7 @@ def home(request):
         "only_open": only_open,
         "zones": zones,
     })
+
 
 # =====================================================
 # BUSINESS DETAIL  (tu URL es /negocio/<slug>/)
@@ -395,10 +384,17 @@ def business_detail(request, slug):
     buyer = _get_buyer(request, business.slug)
     cart = _get_cart(request, business.slug)
 
+    buyer_phone = _normalize_phone(buyer.get("phone", ""))
+    is_first_order = True
+
+    if buyer_phone:
+        customer = CustomerProfile.objects.filter(phone=buyer_phone).first()
+        if customer and customer.can_pay_cash():
+            is_first_order = False
+
     if not pdf_only:
         categories = MenuCategory.objects.filter(business=business).order_by("name")
 
-        # ✅ MenuItem usa is_available, no is_active
         items = MenuItem.objects.filter(
             business=business,
             is_available=True
@@ -407,7 +403,6 @@ def business_detail(request, slug):
         for c in categories:
             items_by_category[c.id] = [it for it in items if it.category_id == c.id]
 
-        # construir carrito
         if cart:
             item_ids = []
             for k in cart.keys():
@@ -416,7 +411,6 @@ def business_detail(request, slug):
                 except ValueError:
                     pass
 
-            # ✅ solo disponibles
             db_items = MenuItem.objects.filter(
                 id__in=item_ids,
                 business=business,
@@ -456,6 +450,32 @@ def business_detail(request, slug):
         "cart_total": cart_total,
         "buyer": buyer,
         "active_slug": active_slug,
+        "is_first_order": is_first_order,
+    })
+
+
+# =====================================================
+# AJAX: revisar celular y habilitar método de pago
+# =====================================================
+
+def check_customer_phone(request, slug):
+    business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
+
+    phone = _normalize_phone(request.GET.get("phone", ""))
+    is_first_order = True
+    can_pay_cash = False
+
+    if phone:
+        customer = CustomerProfile.objects.filter(phone=phone).first()
+        if customer and customer.can_pay_cash():
+            is_first_order = False
+            can_pay_cash = True
+
+    return JsonResponse({
+        "ok": True,
+        "phone": phone,
+        "is_first_order": is_first_order,
+        "can_pay_cash": can_pay_cash,
     })
 
 
@@ -491,7 +511,6 @@ def whatsapp_redirect(request, slug):
                 except ValueError:
                     pass
 
-            # ✅ solo disponibles
             items = MenuItem.objects.filter(
                 id__in=item_ids,
                 business=business,
@@ -520,7 +539,6 @@ def whatsapp_redirect(request, slug):
             lines.append("")
             lines.append(f"💰 *Total aprox:* ${total:,}".replace(",", "."))
 
-    # buyer
     if any(buyer.get(k) for k in ["name", "phone", "address", "notes"]):
         lines.append("")
         lines.append("👤 *Datos del comprador:*")
@@ -532,6 +550,9 @@ def whatsapp_redirect(request, slug):
             lines.append(f"Dirección: {buyer['address']}")
         if buyer.get("notes"):
             lines.append(f"Notas: {buyer['notes']}")
+        if buyer.get("payment_method"):
+            metodo = "Efectivo" if buyer.get("payment_method") == "cash" else "Transferencia"
+            lines.append(f"Pago: {metodo}")
 
     text = "\n".join(lines).strip()
     return redirect(f"https://wa.me/{whatsapp}?text={quote(text, safe='', encoding='utf-8')}")
@@ -542,7 +563,6 @@ def whatsapp_redirect(request, slug):
 # =====================================================
 
 def whatsapp_item_redirect(request, item_id):
-    # ✅ MenuItem usa is_available
     item = get_object_or_404(MenuItem, id=item_id, is_available=True)
     business = item.business
 
@@ -571,7 +591,6 @@ def cart_add(request, slug, item_id):
         messages.warning(request, "Este negocio usa menú PDF. Contáctalo por WhatsApp.")
         return redirect("business_detail", slug=business.slug)
 
-    # ✅ MenuItem usa is_available
     item = get_object_or_404(MenuItem, id=item_id, business=business, is_available=True)
 
     cart = _get_cart(request, business.slug)
@@ -636,27 +655,36 @@ def cart_clear(request, slug):
     return redirect(f"/negocio/{business.slug}/#cart")
 
 
-from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.http import require_POST
-from .models import Business
-
 @require_POST
 def cart_set_buyer(request, slug):
     business = get_object_or_404(Business, slug=slug, is_active=True, is_approved=True)
+
+    phone_clean = _normalize_phone(request.POST.get("phone", ""))
+    customer = CustomerProfile.objects.filter(phone=phone_clean).first()
+    is_first_order = True
+
+    if customer and customer.can_pay_cash():
+        is_first_order = False
+
+    posted_payment_method = (request.POST.get("payment_method") or "transfer").strip()
+
+    if is_first_order:
+        posted_payment_method = "transfer"
+    elif posted_payment_method not in ["transfer", "cash"]:
+        posted_payment_method = "transfer"
 
     buyer = {
         "name": (request.POST.get("name") or "").strip(),
         "phone": (request.POST.get("phone") or "").strip(),
         "address": (request.POST.get("address") or "").strip(),
         "notes": (request.POST.get("notes") or "").strip(),
+        "payment_method": posted_payment_method,
     }
     _save_buyer(request, business.slug, buyer)
 
-    # ✅ si le dio al botón "Enviar por WhatsApp", redirigir al flujo nuevo
     if request.POST.get("go_whatsapp") == "1":
         return redirect("send_whatsapp_order", slug=business.slug)
 
-    # ✅ si solo guardó datos
     return redirect(f"/negocio/{business.slug}/#cart")
 
 

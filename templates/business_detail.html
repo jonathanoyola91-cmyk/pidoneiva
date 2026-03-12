@@ -431,7 +431,14 @@
 
           <div class="col-12 col-md-6">
             <label class="form-label">Teléfono</label>
-            <input class="form-control" name="phone" value="{{ buyer.phone|default:'' }}" placeholder="Ej: 3xx xxx xxxx" required>
+            <input
+              class="form-control"
+              id="buyer-phone"
+              name="phone"
+              value="{{ buyer.phone|default:'' }}"
+              placeholder="Ej: 3xx xxx xxxx"
+              required
+            >
           </div>
 
           <div class="col-12">
@@ -442,6 +449,54 @@
           <div class="col-12">
             <label class="form-label">Notas</label>
             <textarea class="form-control" rows="3" name="notes" placeholder="Ej: sin cebolla, tocar timbre...">{{ buyer.notes|default:'' }}</textarea>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Método de pago</label>
+
+            <div id="payment-warning"
+                 class="alert alert-warning mb-3 {% if not is_first_order %}d-none{% endif %}">
+              Por seguridad, en tu primer pedido el pago disponible es únicamente por
+              <strong>transferencia</strong>. Después de tu primera compra se habilitará
+              también el pago en efectivo.
+            </div>
+
+            <div class="border rounded-4 p-3 bg-light">
+              <div class="form-check mb-2">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  id="pay_transfer"
+                  value="transfer"
+                  {% if buyer.payment_method == "cash" and not is_first_order %}{% else %}checked{% endif %}
+                >
+                <label class="form-check-label" for="pay_transfer">
+                  Transferencia
+                </label>
+              </div>
+
+              <div id="cash-option" class="{% if is_first_order %}d-none{% endif %}">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="payment_method"
+                    id="pay_cash"
+                    value="cash"
+                    {% if buyer.payment_method == "cash" and not is_first_order %}checked{% endif %}
+                  >
+                  <label class="form-check-label" for="pay_cash">
+                    Efectivo
+                  </label>
+                </div>
+              </div>
+
+              <div id="cash-locked-text"
+                   class="small text-secondary {% if not is_first_order %}d-none{% endif %}">
+                El pago en efectivo se habilita a partir de tu segundo pedido.
+              </div>
+            </div>
           </div>
         </div>
 
@@ -846,6 +901,81 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Error de red actualizando el carrito.");
     }
   });
+})();
+</script>
+
+<script>
+(function () {
+  const phoneInput = document.getElementById("buyer-phone");
+  const warningBox = document.getElementById("payment-warning");
+  const cashOption = document.getElementById("cash-option");
+  const cashLockedText = document.getElementById("cash-locked-text");
+  const payTransfer = document.getElementById("pay_transfer");
+  const payCash = document.getElementById("pay_cash");
+
+  if (!phoneInput) return;
+
+  let lastValue = "";
+  let timer = null;
+
+  function normalizePhone(value) {
+    return (value || "").replace(/\D/g, "");
+  }
+
+  function setFirstOrderUI(isFirstOrder) {
+    if (isFirstOrder) {
+      if (warningBox) warningBox.classList.remove("d-none");
+      if (cashOption) cashOption.classList.add("d-none");
+      if (cashLockedText) cashLockedText.classList.remove("d-none");
+
+      if (payTransfer) payTransfer.checked = true;
+      if (payCash) payCash.checked = false;
+    } else {
+      if (warningBox) warningBox.classList.add("d-none");
+      if (cashOption) cashOption.classList.remove("d-none");
+      if (cashLockedText) cashLockedText.classList.add("d-none");
+    }
+  }
+
+  async function checkPhone() {
+    const phone = normalizePhone(phoneInput.value);
+
+    if (phone.length < 10) {
+      setFirstOrderUI(true);
+      return;
+    }
+
+    if (phone === lastValue) return;
+    lastValue = phone;
+
+    const url = "{% url 'check_customer_phone' business.slug %}?phone=" + encodeURIComponent(phone);
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      });
+
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      const data = await res.json();
+      if (!data.ok) throw new Error("Respuesta inválida");
+
+      setFirstOrderUI(Boolean(data.is_first_order));
+    } catch (err) {
+      console.error("Error validando teléfono:", err);
+      setFirstOrderUI(true);
+    }
+  }
+
+  phoneInput.addEventListener("input", function () {
+    clearTimeout(timer);
+    timer = setTimeout(checkPhone, 400);
+  });
+
+  phoneInput.addEventListener("blur", checkPhone);
 })();
 </script>
 
