@@ -31,8 +31,8 @@ class AccessRequestAdmin(admin.ModelAdmin):
         if not obj.is_processed or not obj.created_username:
             return "Aún no se ha aprobado esta solicitud."
 
-        login_url = "http://127.0.0.1:8001/accounts/login/"  # en local
-        dashboard_url = "http://127.0.0.1:8001/dashboard/"
+        login_url = "https://pidoneiva.com/accounts/login/"
+        dashboard_url = "https://pidoneiva.com/dashboard/"
 
         msg = (
             f"✅ *PidoNeiva* - Acceso activado\n\n"
@@ -41,12 +41,12 @@ class AccessRequestAdmin(admin.ModelAdmin):
         )
 
         if obj.temp_password:
-            msg += f"🔑 Contraseña temporal: {obj.temp_password}\n"
+            msg += f"🔑 Contraseña de ingreso: {obj.temp_password}\n"
 
         msg += (
             f"\n🔗 Ingreso: {login_url}\n"
             f"📌 Panel: {dashboard_url}\n\n"
-            f"⚠️ Recomendación: cambia tu contraseña al ingresar."
+            f"📌 Conserva estos datos para ingresar a tu panel administrativo."
         )
         return msg
 
