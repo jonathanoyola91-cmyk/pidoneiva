@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class AccessRequest(models.Model):
@@ -8,13 +9,13 @@ class AccessRequest(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    name = models.CharField(max_length=120)  # nombre del negocio
+    name = models.CharField(max_length=120)
     request_type = models.CharField(max_length=20, choices=RequestType.choices)
     zone = models.CharField(max_length=80, blank=True)
     address = models.CharField(max_length=160, blank=True)
 
     contact_name = models.CharField(max_length=120, blank=True)
-    whatsapp = models.CharField(max_length=30)  # 573001112233
+    whatsapp = models.CharField(max_length=30)
     email = models.EmailField(blank=True)
 
     notes = models.TextField(blank=True)
@@ -27,3 +28,19 @@ class AccessRequest(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_request_type_display()})"
+
+
+class AppCustomer(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="app_customer",
+    )
+    phone = models.CharField("Celular", max_length=20, unique=True)
+    full_name = models.CharField("Nombre completo", max_length=120)
+    default_address = models.CharField("Dirección principal", max_length=220, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.full_name

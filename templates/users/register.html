@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="bg-white rounded-4 shadow-soft p-4">
+      <h1 class="h4 fw-bold mb-2">Crea tu cuenta</h1>
+      <p class="text-secondary mb-4">
+        Guarda tu historial de pedidos y compra más rápido en PidoNeiva.
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next|default:'/' }}">
+
+        <div class="mb-3">
+          <label class="form-label">Nombre completo</label>
+          <input class="form-control" name="full_name" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Correo</label>
+          <input class="form-control" type="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Teléfono</label>
+          <input class="form-control" name="phone" placeholder="Ej: 3173315060" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Contraseña</label>
+          <input class="form-control" type="password" name="password" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Confirmar contraseña</label>
+          <input class="form-control" type="password" name="confirm_password" required>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button class="btn btn-brand text-white" type="submit">
+            Crear cuenta
+          </button>
+          <a class="btn btn-outline-secondary" href="/clientes/ingresar/?next={{ next|default:'/' }}">
+            Ya tengo cuenta
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

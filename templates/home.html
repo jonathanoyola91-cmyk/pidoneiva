@@ -5,10 +5,20 @@
 <div class="row g-4">
   <div class="col-lg-8">
 
-    <!-- =======================
-         HOME NUEVA
-         ======================= -->
     <div class="p-4 bg-white rounded-4 shadow-soft hero-search">
+
+      {% if not request.session.customer_auth and not user.is_authenticated %}
+        <div class="alert alert-light border mb-3">
+          👋 Compra sin registrarte o
+          <a href="{% url 'customer_login' %}" class="fw-bold">inicia sesión como cliente</a>
+          para guardar tus pedidos y comprar más rápido.
+        </div>
+      {% elif request.session.customer_auth %}
+        <div class="alert alert-success mb-3">
+          👤 Has iniciado sesión como cliente. Ya puedes ver tu historial en
+          <a href="{% url 'customer_my_orders' %}" class="fw-bold">Mis pedidos</a>.
+        </div>
+      {% endif %}
 
       <h1 class="h6 fw-bold mb-3 home-title">
         {% if request.GET.type == "RESTAURANT" %}
@@ -22,9 +32,6 @@
 
       <div class="home-sticky">
 
-        <!-- =======================
-             Tabs (Tipo)
-             ======================= -->
         <div class="home-tabs mb-3">
           <a class="home-tab {% if request.GET.type != 'COMMERCE' %}active{% endif %}"
              href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
@@ -37,9 +44,6 @@
           </a>
         </div>
 
-        <!-- =======================
-             Search + filtros
-             ======================= -->
         <form method="get" class="home-search" id="homeSearchForm">
 
           {% if request.GET.type %}
@@ -49,7 +53,6 @@
           <div class="pn-home-search-card mb-3">
             <div class="pn-home-search-form">
 
-              <!-- Search -->
               <div class="pn-home-search-box">
                 <button class="pn-home-search-btn" type="submit" aria-label="Buscar">
                   🔎
@@ -61,7 +64,6 @@
                        value="{{ request.GET.q }}">
               </div>
 
-              <!-- Filtros -->
               <div class="pn-home-filters-row">
                 <div class="pn-home-zone-pill">
                   <span>📍</span>
@@ -91,19 +93,10 @@
             </div>
           </div>
 
-          <!-- 
-          <div class="d-grid hide-home-search-btn">
-            <button class="btn btn-brand" type="submit">Buscar</button>
-          </div>
-          -->   
-
         </form>
 
       </div>
 
-      <!-- =======================
-           DESTACADOS HORIZONTALES
-           ======================= -->
       <div class="pn-home-section mt-4">
         <div class="pn-home-section-title-row">
           <h2 class="pn-home-section-title">⭐ Destacados cerca de ti</h2>
@@ -120,29 +113,26 @@
                 {% else %}
                   <div class="pn-home-featured-card-placeholder">🏪</div>
                 {% endif %}
-                </div>
+              </div>
 
-                <div class="pn-home-featured-card-body">
-                  <div class="pn-home-featured-card-name">{{ b.name }}</div>
+              <div class="pn-home-featured-card-body">
+                <div class="pn-home-featured-card-name">{{ b.name }}</div>
 
-                  <div class="pn-home-featured-card-meta">
-                    {% if b.open_now %}
-                      <span class="pn-home-dot-open"></span> Abierto
-                    {% else %}
-                      <span class="pn-home-dot-closed"></span> Cerrado
-                    {% endif %}
-                  </div>
+                <div class="pn-home-featured-card-meta">
+                  {% if b.open_now %}
+                    <span class="pn-home-dot-open"></span> Abierto
+                  {% else %}
+                    <span class="pn-home-dot-closed"></span> Cerrado
+                  {% endif %}
                 </div>
-              </a>
-            {% empty %}
-              <div class="small text-secondary">Aún no hay destacados publicados.</div>
+              </div>
+            </a>
+          {% empty %}
+            <div class="small text-secondary">Aún no hay destacados publicados.</div>
           {% endfor %}
         </div>
       </div>
 
-      <!-- =======================
-           CHIPS
-           ======================= -->
       <div class="chip-scroll mt-3">
         <div class="pn-home-chips-row">
 
@@ -200,8 +190,6 @@
               🍽 Todos
             </a>
 
-  
-
           {% endif %}
 
         </div>
@@ -209,10 +197,6 @@
 
     </div>
 
-    <!-- =======================
-         LISTADO NUEVO
-         logo izquierda + info derecha
-         ======================= -->
     <div class="mt-4">
       <div class="pn-home-business-list">
 
@@ -280,13 +264,9 @@
 
   </div>
 
-  <!-- =======================
-       SIDEBAR
-       ======================= -->
   <div class="col-lg-4">
     <div class="sidebar-sticky">
 
-      <!-- Banner Premium -->
       <div class="premium-banner mb-4">
         <div class="premium-content">
           <div class="premium-title">🚀 Destaca tu negocio</div>
@@ -300,7 +280,6 @@
         </div>
       </div>
 
-      <!-- CTA registrar negocio -->
       <div class="p-4 bg-white rounded-4 shadow-soft sidebar-card">
         <h3 class="h6 fw-bold">¿Tienes un negocio?</h3>
 
@@ -318,17 +297,14 @@
             🏪 Registrar mi negocio (Prueba gratis)
           </a>
 
-          <a class="btn btn-outline-secondary"
-             href="https://wa.me/57XXXXXXXXXX"
-             target="_blank">
-            Soporte por WhatsApp
+          <a class="btn btn-outline-dark" href="/accounts/login/">
+            Ingresar al panel de negocio
           </a>
         </div>
       </div>
 
       <hr>
 
-      <!-- Negocios Destacados -->
       <div class="mt-3">
         <div class="d-flex align-items-center justify-content-between">
           <h3 class="h6 fw-bold mb-2">🏆 Negocios Destacados</h3>
@@ -385,9 +361,6 @@
 
 </div>
 
-<!-- =======================
-     Auto-submit filtros
-     ======================= -->
 <script>
 (function () {
   const form = document.getElementById("homeSearchForm");

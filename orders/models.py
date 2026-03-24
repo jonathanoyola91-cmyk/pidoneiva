@@ -9,7 +9,6 @@ class CustomerProfile(models.Model):
     successful_orders = models.PositiveIntegerField(default=0)
     failed_orders = models.PositiveIntegerField(default=0)
 
-    # Si quieres bloquear efectivo manualmente a un cliente
     is_blocked_cash = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -46,8 +45,17 @@ class Order(models.Model):
     ]
 
     business = models.ForeignKey("businesses.Business", on_delete=models.CASCADE)
+
     customer = models.ForeignKey(
         CustomerProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
+
+    app_customer = models.ForeignKey(
+        "users.AppCustomer",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -97,10 +105,9 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
 
-    # snapshot del producto al comprar
     name = models.CharField(max_length=200)
     qty = models.PositiveIntegerField(default=1)
-    price = models.IntegerField(default=0)  # pesos
+    price = models.IntegerField(default=0)
     subtotal = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):

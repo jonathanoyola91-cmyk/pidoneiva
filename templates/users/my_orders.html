@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Mis pedidos · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-4 shadow-soft p-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-1">Mis pedidos</h1>
+      <div class="text-secondary">
+        {{ app_customer.full_name }} · {{ app_customer.phone }}
+      </div>
+    </div>
+
+    <a class="btn btn-outline-secondary" href="/">
+      Seguir comprando
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="d-flex flex-column gap-3">
+      {% for order in orders %}
+        <div class="border rounded-4 p-3">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+              <div class="fw-bold">{{ order.business.name }}</div>
+              <div class="small text-secondary">
+                Pedido {{ order.number }} · {{ order.created_at|date:"d/m/Y h:i A" }}
+              </div>
+            </div>
+
+            <div class="text-end">
+              <div class="fw-bold">${{ order.total|floatformat:0 }}</div>
+              <div class="small">
+                {% if order.status == "pending" %}
+                  <span class="badge text-bg-warning">Pendiente</span>
+                {% elif order.status == "confirmed" %}
+                  <span class="badge text-bg-primary">Confirmado</span>
+                {% elif order.status == "delivered" %}
+                  <span class="badge text-bg-success">Entregado</span>
+                {% elif order.status == "cancelled" %}
+                  <span class="badge text-bg-danger">Cancelado</span>
+                {% elif order.status == "fake" %}
+                  <span class="badge text-bg-dark">Falso</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">{{ order.status }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="row g-3">
+            <div class="col-lg-7">
+              <div class="small text-secondary mb-2">Productos</div>
+              <div class="d-flex flex-column gap-2">
+                {% for item in order.items.all %}
+                  <div class="d-flex justify-content-between">
+                    <div>{{ item.qty }} x {{ item.name }}</div>
+                    <div class="fw-semibold">${{ item.subtotal|floatformat:0 }}</div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="small text-secondary mb-2">Entrega</div>
+              <div><strong>Dirección:</strong> {{ order.buyer_address }}</div>
+              {% if order.buyer_notes %}
+                <div class="mt-1"><strong>Notas:</strong> {{ order.buyer_notes }}</div>
+              {% endif %}
+              <div class="mt-1">
+                <strong>Pago:</strong>
+                {% if order.payment_method == "cash" %}
+                  Efectivo
+                {% else %}
+                  Transferencia
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-light border mb-0">
+      Aún no tienes pedidos asociados a esta cuenta.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

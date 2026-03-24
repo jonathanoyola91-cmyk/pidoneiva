@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Ingresar · PidoNeiva{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-5">
+    <div class="bg-white rounded-4 shadow-soft p-4">
+      <h1 class="h4 fw-bold mb-2">Iniciar sesión</h1>
+      <p class="text-secondary mb-4">
+        Entra para ver tus pedidos y comprar más rápido.
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next|default:'/' }}">
+
+        <div class="mb-3">
+          <label class="form-label">Correo</label>
+          <input class="form-control" type="email" name="email" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Contraseña</label>
+          <input class="form-control" type="password" name="password" required>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button class="btn btn-brand text-white" type="submit">
+            Ingresar
+          </button>
+          <a class="btn btn-outline-secondary" href="/clientes/registro/?next={{ next|default:'/' }}">
+            Crear cuenta
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

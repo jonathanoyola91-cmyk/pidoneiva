@@ -70,6 +70,9 @@ INSTALLED_APPS = [
     "orders",
 
     "storages",  # R2 / S3
+    "rest_framework",
+    "api",
+    "corsheaders",
 ]
 
 
@@ -85,6 +88,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 
@@ -268,3 +273,10 @@ LOGGING = {
         },
     },
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# =========================
+# Email (para recuperación de contraseña)
+# =========================
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

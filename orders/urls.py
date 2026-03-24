@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .views import payment_options
+
 
 urlpatterns = [
     path(
@@ -21,5 +23,12 @@ urlpatterns = [
         "cart/<slug:slug>/send-whatsapp/",
         views.send_whatsapp_order,
         name="send_whatsapp_order"
+    ),
+
+    # API Flutter
+    path(
+        "payment-options/",
+        payment_options,
+        name="payment_options"
     ),
 ]

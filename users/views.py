@@ -1,17 +1,41 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
 
 from businesses.models import Business
 from menu.models import MenuCategory, MenuItem, MenuFile
+from orders.models import Order
+from orders.utils import normalize_phone
+
 from .forms import BusinessForm, MenuCategoryForm, MenuItemForm, MenuFileForm
 from .forms_access import AccessRequestForm
+from .models import AppCustomer
 
 
 def _get_user_business(user):
     # MVP: 1 usuario = 1 negocio
     return Business.objects.filter(owner=user).first()
+
+
+def _is_customer_session(request):
+    return bool(request.session.get("customer_auth") is True)
+
+
+def _customer_login(request, user):
+    login(request, user)
+    request.session["customer_auth"] = True
+    request.session.modified = True
+
+
+def _customer_logout(request):
+    request.session.pop("customer_auth", None)
+    request.session.modified = True
+    logout(request)
 
 
 @login_required
@@ -20,7 +44,6 @@ def dashboard(request):
     return render(request, "dashboard/dashboard.html", {"business": business})
 
 
-# ✅ NUEVA VISTA: Estadísticas
 @login_required
 def stats(request):
     business = _get_user_business(request.user)
@@ -43,7 +66,6 @@ def stats(request):
     )
 
 
-# ✅ NUEVA VISTA: Cambiar plan
 @login_required
 def change_plan(request):
     business = _get_user_business(request.user)
@@ -75,9 +97,6 @@ def business_edit(request):
         return HttpResponseForbidden("No tienes un negocio asignado. Contacta al admin.")
 
     if request.method == "POST":
-        # =========================
-        # DEBUG temporal (subida de imágenes)
-        # =========================
         print("DEBUG POST keys:", list(request.POST.keys()))
         print("DEBUG FILES keys:", list(request.FILES.keys()))
         print("DEBUG logo in FILES?:", "logo" in request.FILES)
@@ -175,13 +194,11 @@ def item_create(request):
     if not business:
         return HttpResponseForbidden("No tienes un negocio asignado.")
 
-    # 🔒 Bloqueo para plan BASIC o modo PDF
     if business.plan == "BASIC" or business.menu_mode == "PDF":
         return HttpResponseForbidden("Tu plan actual solo permite menú PDF.")
 
     if request.method == "POST":
         form = MenuItemForm(request.POST, request.FILES)
-        # ✅ igual que en edit: limitar categorías también en POST
         form.fields["category"].queryset = MenuCategory.objects.filter(business=business)
 
         if form.is_valid():
@@ -212,7 +229,6 @@ def item_edit(request, pk):
     if not business or item.business_id != business.id:
         return HttpResponseForbidden("No autorizado")
 
-    # 🔒 Bloqueo para plan BASIC o modo PDF
     if business.plan == "BASIC" or business.menu_mode == "PDF":
         return HttpResponseForbidden("Tu plan actual solo permite menú PDF.")
 
@@ -246,7 +262,6 @@ def item_delete(request, pk):
     if not business or item.business_id != business.id:
         return HttpResponseForbidden("No autorizado")
 
-    # 🔒 Bloqueo para plan BASIC o modo PDF  ✅ (ajuste recomendado)
     if business.plan == "BASIC" or business.menu_mode == "PDF":
         return HttpResponseForbidden("Tu plan actual solo permite menú PDF.")
 
@@ -309,3 +324,136 @@ def request_access(request):
         form = AccessRequestForm()
 
     return render(request, "request_access.html", {"form": form})
+
+
+@require_http_methods(["GET", "POST"])
+def customer_register(request):
+    if request.user.is_authenticated and _is_customer_session(request) and hasattr(request.user, "app_customer"):
+        return redirect("customer_my_orders")
+
+    next_url = request.GET.get("next") or request.POST.get("next") or "/"
+
+    if request.method == "POST":
+        full_name = (request.POST.get("full_name") or "").strip()
+        email = (request.POST.get("email") or "").strip().lower()
+        phone = normalize_phone(request.POST.get("phone"))
+        password = request.POST.get("password") or ""
+        confirm_password = request.POST.get("confirm_password") or ""
+
+        if not full_name or not email or not phone or not password or not confirm_password:
+            messages.error(request, "Todos los campos son obligatorios.")
+            return render(request, "users/register.html", {"next": next_url})
+
+        if len(password) < 6:
+            messages.error(request, "La contraseña debe tener al menos 6 caracteres.")
+            return render(request, "users/register.html", {"next": next_url})
+
+        if password != confirm_password:
+            messages.error(request, "Las contraseñas no coinciden.")
+            return render(request, "users/register.html", {"next": next_url})
+
+        if User.objects.filter(email__iexact=email).exists():
+            messages.error(request, "Ya existe una cuenta con ese correo.")
+            return render(request, "users/register.html", {"next": next_url})
+
+        if AppCustomer.objects.filter(phone=phone).exists():
+            messages.error(request, "Ya existe una cuenta con ese teléfono.")
+            return render(request, "users/register.html", {"next": next_url})
+
+        username_base = email.split("@")[0]
+        username = username_base
+        suffix = 1
+
+        while User.objects.filter(username=username).exists():
+            username = f"{username_base}{suffix}"
+            suffix += 1
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=full_name,
+        )
+
+        AppCustomer.objects.create(
+            user=user,
+            phone=phone,
+            full_name=full_name,
+        )
+
+        auth_user = authenticate(request, username=username, password=password)
+        if auth_user:
+            _customer_login(request, auth_user)
+
+        messages.success(request, "Tu cuenta fue creada correctamente.")
+        return redirect(next_url)
+
+    return render(request, "users/register.html", {"next": next_url})
+
+
+@require_http_methods(["GET", "POST"])
+def customer_login(request):
+    if request.user.is_authenticated and _is_customer_session(request) and hasattr(request.user, "app_customer"):
+        return redirect("customer_my_orders")
+
+    next_url = request.GET.get("next") or request.POST.get("next") or "/"
+
+    if request.method == "POST":
+        email = (request.POST.get("email") or "").strip().lower()
+        password = request.POST.get("password") or ""
+
+        if not email or not password:
+            messages.error(request, "Debes ingresar correo y contraseña.")
+            return render(request, "users/login.html", {"next": next_url})
+
+        user = User.objects.filter(email__iexact=email).first()
+        if not user:
+            messages.error(request, "Credenciales inválidas.")
+            return render(request, "users/login.html", {"next": next_url})
+
+        auth_user = authenticate(request, username=user.username, password=password)
+        if not auth_user:
+            messages.error(request, "Credenciales inválidas.")
+            return render(request, "users/login.html", {"next": next_url})
+
+        if not hasattr(auth_user, "app_customer"):
+            messages.error(request, "Esta cuenta no está habilitada como cliente.")
+            return render(request, "users/login.html", {"next": next_url})
+
+        _customer_login(request, auth_user)
+        messages.success(request, "Has iniciado sesión correctamente.")
+        return redirect(next_url)
+
+    return render(request, "users/login.html", {"next": next_url})
+
+
+def customer_logout(request):
+    _customer_logout(request)
+    messages.success(request, "Has cerrado sesión.")
+    return redirect("/")
+
+
+@login_required
+def customer_my_orders(request):
+    if not _is_customer_session(request) or not hasattr(request.user, "app_customer"):
+        messages.error(request, "Debes iniciar sesión como cliente para ver tus pedidos.")
+        return redirect(f"/clientes/ingresar/?next={request.path}")
+
+    app_customer = request.user.app_customer
+
+    orders = (
+        Order.objects
+        .filter(app_customer=app_customer)
+        .select_related("business")
+        .prefetch_related("items")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "users/my_orders.html",
+        {
+            "orders": orders,
+            "app_customer": app_customer,
+        },
+    )

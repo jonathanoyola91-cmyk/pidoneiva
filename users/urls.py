@@ -22,6 +22,12 @@ urlpatterns = [
     path("dashboard/menus/", views.pdf_list, name="pdf_list"),
     path("dashboard/menus/subir/", views.pdf_upload, name="pdf_upload"),
     path("dashboard/menus/<int:pk>/eliminar/", views.pdf_delete, name="pdf_delete"),
+
     path("solicitar/", views.request_access, name="request_access"),
-    
-    ]
+
+    # CLIENTES WEB
+    path("clientes/registro/", views.customer_register, name="customer_register"),
+    path("clientes/ingresar/", views.customer_login, name="customer_login"),
+    path("clientes/salir/", views.customer_logout, name="customer_logout"),
+    path("mis-pedidos/", views.customer_my_orders, name="customer_my_orders"),
+]

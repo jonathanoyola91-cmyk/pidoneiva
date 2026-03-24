@@ -7,15 +7,18 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # Apps
+    # APIs
+    path("api/", include("api.urls")),
+    path("api/orders/", include("orders.urls")),
+
+    # Web pública / apps
     path("", include("businesses.urls")),
     path("", include("users.urls")),
     path("orders/", include("orders.urls")),
 
-    # Login / Logout Django
+    # Login / Logout Django (negocios/admin)
     path("accounts/", include("django.contrib.auth.urls")),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,24 +1,23 @@
 from urllib.parse import quote
-import re
 
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
 from businesses.models import Business
 from menu.models import MenuItem
+from users.models import AppCustomer
 from .models import Order, OrderItem, CustomerProfile
+from .utils import normalize_phone
 
 
 # =========================
 # Helpers
 # =========================
-def normalize_phone(phone: str) -> str:
-    if not phone:
-        return ""
-    return re.sub(r"\D", "", phone)
-
-
 def _cart_key(slug: str) -> str:
     return f"cart_{slug}"
 
@@ -54,14 +53,64 @@ def get_available_payment_methods(customer):
     return methods
 
 
+def get_logged_app_customer(request):
+    if (
+        request.user.is_authenticated
+        and request.session.get("customer_auth")
+        and hasattr(request.user, "app_customer")
+    ):
+        return request.user.app_customer
+    return None
+
+
+# =========================
+# API - métodos de pago
+# =========================
+@api_view(["POST"])
+def payment_options(request):
+    phone = normalize_phone(request.data.get("phone"))
+    business_slug = request.data.get("business_slug")
+
+    if not phone or not business_slug:
+        return Response(
+            {"ok": False, "error": "phone and business_slug are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        Business.objects.get(
+            slug=business_slug,
+            is_active=True,
+            is_approved=True
+        )
+    except Business.DoesNotExist:
+        return Response(
+            {"ok": False, "error": "business not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    profile, created = CustomerProfile.objects.get_or_create(phone=phone)
+
+    is_first_order = profile.successful_orders == 0
+    can_pay_cash = profile.can_pay_cash()
+
+    allowed_methods = [Order.PAYMENT_TRANSFER]
+
+    if can_pay_cash:
+        allowed_methods.append(Order.PAYMENT_CASH)
+
+    return Response({
+        "ok": True,
+        "is_first_order": is_first_order,
+        "can_pay_cash": can_pay_cash,
+        "allowed_payment_methods": allowed_methods
+    })
+
+
 # =========================
 # Carrito en sesión
 # =========================
 def _get_cart(request, slug: str) -> dict:
-    """
-    Retorna el carrito desde sesión.
-    Formato: {"12": 1, "15": 3}
-    """
     return request.session.get(_cart_key(slug), {}) or {}
 
 
@@ -204,13 +253,15 @@ def send_whatsapp_order(request, slug):
     customer = get_or_create_customer(buyer_name, buyer_phone)
     allowed_methods = get_available_payment_methods(customer)
 
-    # Si es primer pedido, solo transferencia
     if payment_method not in allowed_methods:
         payment_method = Order.PAYMENT_TRANSFER
+
+    app_customer = get_logged_app_customer(request)
 
     order = Order.objects.create(
         business=business,
         customer=customer,
+        app_customer=app_customer,
         buyer_name=buyer_name,
         buyer_phone=buyer_phone,
         buyer_address=buyer_address,
@@ -250,7 +301,6 @@ def send_whatsapp_order(request, slug):
     order.total = total
     order.save(update_fields=["total"])
 
-    # incrementar historial del cliente
     if customer:
         customer.successful_orders += 1
         if buyer_name and not customer.name:
@@ -258,6 +308,26 @@ def send_whatsapp_order(request, slug):
             customer.save(update_fields=["successful_orders", "name"])
         else:
             customer.save(update_fields=["successful_orders"])
+
+    if app_customer:
+        changed = False
+
+        if buyer_name and app_customer.full_name != buyer_name:
+            app_customer.full_name = buyer_name
+            changed = True
+
+        if buyer_phone and app_customer.phone != buyer_phone:
+            existing = AppCustomer.objects.filter(phone=buyer_phone).exclude(pk=app_customer.pk).exists()
+            if not existing:
+                app_customer.phone = buyer_phone
+                changed = True
+
+        if buyer_address and not app_customer.default_address:
+            app_customer.default_address = buyer_address
+            changed = True
+
+        if changed:
+            app_customer.save()
 
     total_str = f"${total:,}".replace(",", ".")
 
