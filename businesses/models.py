@@ -1,4 +1,5 @@
 from datetime import time, timedelta
+from decimal import Decimal
 import calendar
 
 from django.conf import settings
@@ -112,27 +113,42 @@ class Business(models.Model):
     schedule_sun = models.CharField(max_length=20, blank=True, default="")
 
     description = models.TextField(blank=True)
-    # ✅ NUEVO: tiempo promedio de preparación (en minutos)
+
+    # ✅ tiempo promedio de preparación (en minutos)
     avg_prep_time = models.PositiveIntegerField(
         default=25,
         help_text="Tiempo promedio de preparación en minutos"
-    )    
+    )
+
+    # ✅ NUEVOS CAMPOS: domicilio y Nequi
+    delivery_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Costo fijo del domicilio para este negocio"
+    )
+    nequi_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        help_text="Número Nequi donde el cliente debe transferir"
+    )
 
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
     cover_image = models.ImageField(
-    upload_to="covers/",
-    blank=True,
-    null=True,
-    help_text="Foto de portada para el directorio (recomendado 1200x600)."
-) 
+        upload_to="covers/",
+        blank=True,
+        null=True,
+        help_text="Foto de portada para el directorio (recomendado 1200x600)."
+    )
 
-    tags = models.CharField( 
-    "Etiquetas (tags)",
-    max_length=250,
-    blank=True,
-    default="",
-    help_text="Separa por coma. Ej: pizza, hamburguesa, café, droguería, mercado",
-)
+    tags = models.CharField(
+        "Etiquetas (tags)",
+        max_length=250,
+        blank=True,
+        default="",
+        help_text="Separa por coma. Ej: pizza, hamburguesa, café, droguería, mercado",
+    )
     is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     review_requested = models.BooleanField(default=False)
@@ -146,22 +162,22 @@ class Business(models.Model):
 
     trial_ends_at = models.DateTimeField(blank=True, null=True)
 
-    # ✅ NUEVO: 5 días hábiles de gracia (después de vencer prueba o pago)
+    # ✅ 5 días hábiles de gracia (después de vencer prueba o pago)
     grace_ends_at = models.DateTimeField(blank=True, null=True)
 
-    # ✅ NUEVO: hasta cuándo está pagado (renovación mensual)
+    # ✅ hasta cuándo está pagado (renovación mensual)
     paid_until = models.DateTimeField(blank=True, null=True)
 
     # switch manual por si quieres “pausar”
     plan_active = models.BooleanField(default=True)
 
-    # ✅ NUEVO: métricas
+    # ✅ métricas
     visits_count = models.PositiveIntegerField(default=0)
     whatsapp_clicks = models.PositiveIntegerField(default=0)
     last_visited_at = models.DateTimeField(blank=True, null=True)
     last_whatsapp_click_at = models.DateTimeField(blank=True, null=True)
 
-    # ✅ NUEVO: PROMOCIÓN (solo UI; no afecta carrito/menú/lógica existente)
+    # ✅ PROMOCIÓN (solo UI; no afecta carrito/menú/lógica existente)
     promo_active = models.BooleanField(
         default=False,
         help_text="Activa/desactiva la promoción que se mostrará en el detalle del negocio."

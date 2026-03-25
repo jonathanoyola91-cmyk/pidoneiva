@@ -389,9 +389,25 @@
 
           <tfoot>
             <tr>
-              <td colspan="2" class="text-end fw-bold">Total aprox:</td>
-              <td class="text-end fw-bold" id="js-cart-total" data-cart-total>
+              <td colspan="2" class="text-end">Subtotal productos:</td>
+              <td class="text-end fw-bold" id="js-cart-subtotal">
                 ${{ cart_total|floatformat:0 }}
+              </td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="text-end">Domicilio:</td>
+              <td class="text-end fw-bold" id="js-delivery-fee">
+                ${{ business.delivery_fee|floatformat:0 }}
+              </td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="text-end fw-bold">Total a pagar:</td>
+              <td class="text-end fw-bold" id="js-cart-total" data-cart-total>
+                ${{ cart_total|add:business.delivery_fee|floatformat:0 }}
               </td>
               <td></td>
             </tr>
@@ -399,7 +415,30 @@
         </table>
       </div>
 
-      <div class="d-flex gap-2 flex-wrap">
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h5 class="mb-3">Resumen del pedido</h5>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal productos</span>
+            <strong id="js-summary-subtotal">$ {{ cart_total|floatformat:0 }}</strong>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Domicilio</span>
+            <strong id="js-summary-delivery">$ {{ business.delivery_fee|floatformat:0 }}</strong>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between">
+            <span>Total a pagar</span>
+            <strong id="js-summary-total">$ {{ cart_total|add:business.delivery_fee|floatformat:0 }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap mt-3">
         <form method="post" action="{% url 'cart_clear' business.slug %}">
           {% csrf_token %}
           <button class="btn btn-outline-danger">Vaciar pedido</button>
@@ -512,6 +551,14 @@
                 El pago en efectivo se habilita a partir de tu segundo pedido.
               </div>
             </div>
+
+            {% if business.nequi_number %}
+              <div id="nequi-box" class="alert alert-success mt-3" style="display:none;">
+                <strong>Pago por transferencia / Nequi</strong><br>
+                Puedes realizar el pago al número:
+                <strong>{{ business.nequi_number }}</strong>
+              </div>
+            {% endif %}
           </div>
         </div>
 
@@ -550,7 +597,7 @@
         <div class="cart-floatbar-sub">
           <span data-cart-count>{{ cart_items|length }}</span>
           item{{ cart_items|length|pluralize }} · $
-          <span data-cart-total>{{ cart_total|floatformat:0 }}</span>
+          <span data-cart-total>{{ cart_total|add:business.delivery_fee|floatformat:0 }}</span>
         </div>
 
       </div>
@@ -648,8 +695,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
       if (subEl2) subEl2.textContent = money(data.item_subtotal);
 
+      const subtotalEl = document.getElementById("js-cart-subtotal");
+      if (subtotalEl) subtotalEl.textContent = money(data.cart_subtotal);
+
+      const deliveryEl = document.getElementById("js-delivery-fee");
+      if (deliveryEl) deliveryEl.textContent = money(data.delivery_fee);
+
       const totalEl = document.getElementById("js-cart-total");
       if (totalEl) totalEl.textContent = money(data.cart_total);
+
+      const summarySubtotalEl = document.getElementById("js-summary-subtotal");
+      if (summarySubtotalEl) summarySubtotalEl.textContent = money(data.cart_subtotal);
+
+      const summaryDeliveryEl = document.getElementById("js-summary-delivery");
+      if (summaryDeliveryEl) summaryDeliveryEl.textContent = money(data.delivery_fee);
+
+      const summaryTotalEl = document.getElementById("js-summary-total");
+      if (summaryTotalEl) summaryTotalEl.textContent = money(data.cart_total);
 
       document.querySelectorAll(`[data-cart-total]`).forEach(el => {
         el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
@@ -884,8 +946,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
       if (subEl2) subEl2.textContent = money(data.item_subtotal);
 
+      const subtotalEl = document.getElementById("js-cart-subtotal");
+      if (subtotalEl) subtotalEl.textContent = money(data.cart_subtotal);
+
+      const deliveryEl = document.getElementById("js-delivery-fee");
+      if (deliveryEl) deliveryEl.textContent = money(data.delivery_fee);
+
       const totalEl = document.getElementById("js-cart-total");
       if (totalEl) totalEl.textContent = money(data.cart_total);
+
+      const summarySubtotalEl = document.getElementById("js-summary-subtotal");
+      if (summarySubtotalEl) summarySubtotalEl.textContent = money(data.cart_subtotal);
+
+      const summaryDeliveryEl = document.getElementById("js-summary-delivery");
+      if (summaryDeliveryEl) summaryDeliveryEl.textContent = money(data.delivery_fee);
+
+      const summaryTotalEl = document.getElementById("js-summary-total");
+      if (summaryTotalEl) summaryTotalEl.textContent = money(data.cart_total);
 
       document.querySelectorAll(`[data-cart-total]`).forEach(el => {
         el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
@@ -927,6 +1004,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cashLockedText = document.getElementById("cash-locked-text");
   const payTransfer = document.getElementById("pay_transfer");
   const payCash = document.getElementById("pay_cash");
+  const nequiBox = document.getElementById("nequi-box");
 
   if (!phoneInput) return;
 
@@ -935,6 +1013,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function normalizePhone(value) {
     return (value || "").replace(/\D/g, "");
+  }
+
+  function toggleNequi() {
+    if (!nequiBox) return;
+
+    if (payTransfer && payTransfer.checked) {
+      nequiBox.style.display = "block";
+    } else {
+      nequiBox.style.display = "none";
+    }
   }
 
   function setFirstOrderUI(isFirstOrder) {
@@ -950,6 +1038,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cashOption) cashOption.classList.remove("d-none");
       if (cashLockedText) cashLockedText.classList.add("d-none");
     }
+
+    toggleNequi();
   }
 
   async function checkPhone() {
@@ -984,6 +1074,11 @@ document.addEventListener("DOMContentLoaded", () => {
       setFirstOrderUI(true);
     }
   }
+
+  if (payTransfer) payTransfer.addEventListener("change", toggleNequi);
+  if (payCash) payCash.addEventListener("change", toggleNequi);
+
+  toggleNequi();
 
   phoneInput.addEventListener("input", function () {
     clearTimeout(timer);

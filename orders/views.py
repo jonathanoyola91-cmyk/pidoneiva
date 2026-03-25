@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from decimal import Decimal
 
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_GET, require_POST
@@ -179,7 +180,7 @@ def cart_update_json(request, slug, item_id):
     items = MenuItem.objects.filter(business=business, id__in=ids).values("id", "price")
     price_map = {str(x["id"]): int(x["price"] or 0) for x in items}
 
-    total = 0
+    subtotal = 0
     cart_count = 0
     for k, q in cart.items():
         try:
@@ -187,7 +188,10 @@ def cart_update_json(request, slug, item_id):
         except Exception:
             q = 0
         cart_count += q
-        total += price_map.get(str(k), 0) * q
+        subtotal += price_map.get(str(k), 0) * q
+
+    delivery_fee = int(Decimal(str(business.delivery_fee or 0)))
+    total = subtotal + delivery_fee
 
     active_info = _get_active_cart_info(request)
 
@@ -196,6 +200,8 @@ def cart_update_json(request, slug, item_id):
         "item_id": item_id,
         "qty": qty,
         "item_subtotal": item_subtotal,
+        "cart_subtotal": subtotal,
+        "delivery_fee": delivery_fee,
         "cart_total": total,
         "cart_count": cart_count,
         "is_empty": (len(cart) == 0),
@@ -270,7 +276,7 @@ def send_whatsapp_order(request, slug):
         total=0,
     )
 
-    total = 0
+    subtotal = 0
     lines = []
 
     for item_id, qty in cart.items():
@@ -284,8 +290,8 @@ def send_whatsapp_order(request, slug):
             continue
 
         price = int(item.price or 0)
-        subtotal = qty * price
-        total += subtotal
+        line_subtotal = qty * price
+        subtotal += line_subtotal
 
         OrderItem.objects.create(
             order=order,
@@ -295,8 +301,11 @@ def send_whatsapp_order(request, slug):
         )
 
         lines.append(
-            f"• {qty} x {item.name} (${price:,}) = ${subtotal:,}".replace(",", ".")
+            f"• {qty} x {item.name} (${price:,}) = ${line_subtotal:,}".replace(",", ".")
         )
+
+    delivery_fee = int(Decimal(str(business.delivery_fee or 0)))
+    total = subtotal + delivery_fee
 
     order.total = total
     order.save(update_fields=["total"])
@@ -329,6 +338,8 @@ def send_whatsapp_order(request, slug):
         if changed:
             app_customer.save()
 
+    subtotal_str = f"${subtotal:,}".replace(",", ".")
+    delivery_fee_str = f"${delivery_fee:,}".replace(",", ".")
     total_str = f"${total:,}".replace(",", ".")
 
     if payment_method == Order.PAYMENT_CASH:
@@ -352,7 +363,9 @@ def send_whatsapp_order(request, slug):
         f"*Estado del cliente:* {client_status}\n\n"
         f"*Detalle:*\n"
         + ("\n".join(lines) if lines else "- (sin items)")
-        + f"\n\n*Total:* {total_str}"
+        + f"\n\n*Subtotal productos:* {subtotal_str}"
+        + f"\n*Domicilio:* {delivery_fee_str}"
+        + f"\n*Total:* {total_str}"
     )
 
     request.session[_cart_key(slug)] = {}

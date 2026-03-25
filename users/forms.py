@@ -26,7 +26,6 @@ class BusinessForm(forms.ModelForm):
     sun_start = forms.TimeField(required=False, label="Domingo (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
     sun_end = forms.TimeField(required=False, label="Domingo (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
 
-
     # ✅ Campo personalizado
     avg_prep_time = forms.IntegerField(
         min_value=1,
@@ -41,25 +40,36 @@ class BusinessForm(forms.ModelForm):
         fields = [
             "name", "business_type", "menu_mode", "zone", "address",
             "phone", "whatsapp", "instagram", "description",
-            "tags",          # ✅ NUEVO: para que el dueño lo diligencie
+            "tags",
             "logo",
             "cover_image",
             "avg_prep_time",
 
+            # ✅ NUEVOS CAMPOS
+            "delivery_fee",
+            "nequi_number",
+
             # switch de pedidos
             "is_accepting_orders",
-
-            # OJO: NO incluimos schedule_* aquí porque NO se escribirán manualmente
-            # Se llenan desde los campos mon_start/mon_end etc. en save().
         ]
 
         labels = {
             "is_accepting_orders": "Estoy recibiendo pedidos",
             "tags": "Etiquetas (tags)",
+            "delivery_fee": "Costo de domicilio",
+            "nequi_number": "Número Nequi",
         }
 
         help_texts = {
             "tags": "Separa por coma. Ej: pizza, hamburguesa, café, droguería, mercado",
+            "delivery_fee": "Costo fijo del domicilio para este negocio",
+            "nequi_number": "Número Nequi donde el cliente debe transferir",
+        }
+
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "delivery_fee": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+            "nequi_number": forms.TextInput(attrs={"placeholder": "Ej: 3001234567"}),
         }
 
     # ---------- Helpers ----------
@@ -86,7 +96,6 @@ class BusinessForm(forms.ModelForm):
         try:
             sh, sm = [int(x) for x in a.split(":")]
             eh, em = [int(x) for x in b.split(":")]
-            # no usamos datetime.time import aquí; Django devuelve time objects en TimeField igual
             from datetime import time as dt_time
             return dt_time(sh, sm), dt_time(eh, em)
         except Exception:
@@ -99,15 +108,26 @@ class BusinessForm(forms.ModelForm):
         if "cover_image" in self.fields:
             self.fields["cover_image"].required = False
 
-        # ✅ UI del campo tags (placeholder + clase)
+        # ✅ UI del campo tags
         if "tags" in self.fields:
             self.fields["tags"].required = False
             self.fields["tags"].widget.attrs.update({
                 "placeholder": "Ej: pizza, hamburguesa, café, droguería, mercado",
             })
-            # si usas Bootstrap en dashboard, ayuda a que se vea bien:
             existing_class = self.fields["tags"].widget.attrs.get("class", "")
             self.fields["tags"].widget.attrs["class"] = (existing_class + " form-control").strip()
+
+        # ✅ UI de delivery_fee
+        if "delivery_fee" in self.fields:
+            self.fields["delivery_fee"].required = False
+            existing_class = self.fields["delivery_fee"].widget.attrs.get("class", "")
+            self.fields["delivery_fee"].widget.attrs["class"] = (existing_class + " form-control").strip()
+
+        # ✅ UI de nequi_number
+        if "nequi_number" in self.fields:
+            self.fields["nequi_number"].required = False
+            existing_class = self.fields["nequi_number"].widget.attrs.get("class", "")
+            self.fields["nequi_number"].widget.attrs["class"] = (existing_class + " form-control").strip()
 
         # Pre-cargar el form desde el modelo (editar negocio)
         instance = getattr(self, "instance", None)
@@ -150,7 +170,6 @@ class BusinessForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
 
-        # Validar y construir rangos (permitimos cruce de medianoche: start > end)
         day_map = [
             ("Lunes", "mon_start", "mon_end"),
             ("Martes", "tue_start", "tue_end"),
@@ -167,7 +186,6 @@ class BusinessForm(forms.ModelForm):
             try:
                 self._format_range(start, end)
             except forms.ValidationError as e:
-                # asignamos error al campo de fin (se ve claro)
                 self.add_error(f_end, f"{day_label}: {e.messages[0]}")
 
         return cleaned
