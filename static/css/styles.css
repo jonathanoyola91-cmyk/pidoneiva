@@ -591,7 +591,7 @@ body{
 .ranked-status{
   display: flex;
   justify-content:center;
-  align-items:center
+  align-items:center;
 }
 .mini-dot{
   width: 10px;
@@ -767,7 +767,6 @@ body{
   .home-tabs{ gap:10px; }
   .home-tab{ padding: 10px 12px; }
 
-  /* ✅ filtros en una sola fila */
   .home-filters{
     flex-wrap: nowrap;
     gap: 10px;
@@ -785,7 +784,6 @@ body{
     white-space: nowrap;
   }
 
-  /* ✅ versión compacta del texto del switch */
   .home-switch-text{
     display: none;
   }
@@ -929,7 +927,6 @@ body{
 /* =========================
    DASHBOARD - BOTONES PANEL
    ========================= */
-
 .panel-actions-wrap{
   margin-top: 10px;
 }
@@ -1054,7 +1051,6 @@ body{
 /* =========================
    Scroll horizontal productos
    ========================= */
-
 .products-row{
   display: flex;
   gap: 16px;
@@ -1075,6 +1071,28 @@ body{
 .product-card{
   flex: 0 0 220px;
   scroll-snap-align: start;
+}
+
+/* ✅ NUEVO: cuando solo hay una categoría visible, llenar con grilla */
+.products-row.products-grid-fill{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  overflow: visible;
+  padding-bottom: 0;
+  scroll-snap-type: none;
+}
+
+.products-row.products-grid-fill .product-card{
+  flex: unset;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px){
+  .products-row.products-grid-fill{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* ===== Categorías (chips) ===== */
@@ -1114,7 +1132,7 @@ body{
   color:#fff !important;
 }
 
-/* ✅ NUEVO: cuando hay pocas categorías, llenar mejor el ancho */
+/* ✅ cuando hay pocas categorías, llenar mejor el ancho */
 .menu-categories.menu-categories-fill{
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -1154,7 +1172,6 @@ body{
    ✅ bloque aislado
    ✅ sin conflicto con estilos actuales
    ========================= */
-
 .pn-home-page{
   padding: 16px;
 }

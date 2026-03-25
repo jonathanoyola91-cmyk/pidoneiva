@@ -240,7 +240,7 @@
             <div class="mt-4" id="cat-{{ cat.id }}">
               <h3 class="h6 fw-bold">{{ cat.name }}</h3>
 
-              <div class="products-row">
+              <div class="products-row {% if visible_categories_count == 1 %}products-grid-fill{% endif %}">
                 {% for item in cat.items.all %}
                   {% if item.is_available %}
                     <div class="product-card">
