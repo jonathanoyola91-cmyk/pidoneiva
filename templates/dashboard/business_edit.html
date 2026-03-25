@@ -1,13 +1,393 @@
 {% extends "base.html" %}
 {% block title %}Editar negocio{% endblock %}
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<style>
+  #business-map {
+    height: 420px;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+  }
+
+  .section-card {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #0f172a;
+  }
+
+  .image-preview-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 12px;
+    background: #fafafa;
+    height: 100%;
+  }
+
+  .image-preview-box img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+  }
+
+  .mini-help {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .current-file-link {
+    word-break: break-word;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="bg-white rounded-4 shadow-soft p-4">
   {% include "dashboard/_back_to_dashboard.html" %}
-  <h1 class="h5 fw-bold">Editar perfil</h1>
-  <form method="post" enctype="multipart/form-data" class="mt-3">
+  <h1 class="h4 fw-bold mb-4">Editar perfil</h1>
+
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-brand text-white">Guardar</button>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="section-card mb-4">
+      <div class="section-title">Información general</div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">{{ form.name.label }}</label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{ form.business_type.label }}</label>
+          {{ form.business_type }}
+          {% if form.business_type.errors %}<div class="text-danger small mt-1">{{ form.business_type.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{ form.menu_mode.label }}</label>
+          {{ form.menu_mode }}
+          {% if form.menu_mode.errors %}<div class="text-danger small mt-1">{{ form.menu_mode.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">{{ form.zone.label }}</label>
+          {{ form.zone }}
+          {% if form.zone.errors %}<div class="text-danger small mt-1">{{ form.zone.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-8">
+          <label class="form-label">{{ form.address.label }}</label>
+          {{ form.address }}
+          {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">{{ form.whatsapp.label }}</label>
+          {{ form.whatsapp }}
+          {% if form.whatsapp.errors %}<div class="text-danger small mt-1">{{ form.whatsapp.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">{{ form.instagram.label }}</label>
+          {{ form.instagram }}
+          {% if form.instagram.errors %}<div class="text-danger small mt-1">{{ form.instagram.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">{{ form.description.label }}</label>
+          {{ form.description }}
+          {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">{{ form.tags.label }}</label>
+          {{ form.tags }}
+          {% if form.tags.help_text %}<div class="form-text">{{ form.tags.help_text }}</div>{% endif %}
+          {% if form.tags.errors %}<div class="text-danger small mt-1">{{ form.tags.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{ form.avg_prep_time.label }}</label>
+          {{ form.avg_prep_time }}
+          {% if form.avg_prep_time.help_text %}<div class="form-text">{{ form.avg_prep_time.help_text }}</div>{% endif %}
+          {% if form.avg_prep_time.errors %}<div class="text-danger small mt-1">{{ form.avg_prep_time.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{ form.delivery_fee.label }}</label>
+          {{ form.delivery_fee }}
+          {% if form.delivery_fee.help_text %}<div class="form-text">{{ form.delivery_fee.help_text }}</div>{% endif %}
+          {% if form.delivery_fee.errors %}<div class="text-danger small mt-1">{{ form.delivery_fee.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">{{ form.nequi_number.label }}</label>
+          {{ form.nequi_number }}
+          {% if form.nequi_number.help_text %}<div class="form-text">{{ form.nequi_number.help_text }}</div>{% endif %}
+          {% if form.nequi_number.errors %}<div class="text-danger small mt-1">{{ form.nequi_number.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-12">
+          <div class="form-check form-switch mt-2">
+            {{ form.is_accepting_orders }}
+            <label class="form-check-label" for="{{ form.is_accepting_orders.id_for_label }}">
+              {{ form.is_accepting_orders.label }}
+            </label>
+          </div>
+          {% if form.is_accepting_orders.errors %}<div class="text-danger small mt-1">{{ form.is_accepting_orders.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card mb-4">
+      <div class="section-title">Imágenes del negocio</div>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="image-preview-box">
+            <div class="fw-semibold mb-2">Logo actual</div>
+
+            {% if business.logo %}
+              <a href="{{ business.logo.url }}" target="_blank" class="current-file-link">{{ business.logo.name }}</a>
+              <img src="{{ business.logo.url }}" alt="Logo del negocio" class="mb-3">
+            {% else %}
+              <div class="mini-help mb-3">No hay logo cargado actualmente.</div>
+            {% endif %}
+
+            <label class="form-label">{{ form.logo.label|default:"Modificar logo" }}</label>
+            {{ form.logo }}
+            {% if form.logo.errors %}<div class="text-danger small mt-1">{{ form.logo.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="image-preview-box">
+            <div class="fw-semibold mb-2">Imagen de portada actual</div>
+
+            {% if business.cover_image %}
+              <a href="{{ business.cover_image.url }}" target="_blank" class="current-file-link">{{ business.cover_image.name }}</a>
+              <img src="{{ business.cover_image.url }}" alt="Portada del negocio" class="mb-3">
+            {% else %}
+              <div class="mini-help mb-3">No hay portada cargada actualmente.</div>
+            {% endif %}
+
+            <label class="form-label">{{ form.cover_image.label|default:"Modificar portada" }}</label>
+            {{ form.cover_image }}
+            {% if form.cover_image.errors %}<div class="text-danger small mt-1">{{ form.cover_image.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card mb-4">
+      <div class="section-title">Horario del negocio</div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Lunes apertura</label>
+          {{ form.mon_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Lunes cierre</label>
+          {{ form.mon_end }}
+          {% if form.mon_end.errors %}<div class="text-danger small mt-1">{{ form.mon_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Martes apertura</label>
+          {{ form.tue_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Martes cierre</label>
+          {{ form.tue_end }}
+          {% if form.tue_end.errors %}<div class="text-danger small mt-1">{{ form.tue_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Miércoles apertura</label>
+          {{ form.wed_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Miércoles cierre</label>
+          {{ form.wed_end }}
+          {% if form.wed_end.errors %}<div class="text-danger small mt-1">{{ form.wed_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Jueves apertura</label>
+          {{ form.thu_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Jueves cierre</label>
+          {{ form.thu_end }}
+          {% if form.thu_end.errors %}<div class="text-danger small mt-1">{{ form.thu_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Viernes apertura</label>
+          {{ form.fri_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Viernes cierre</label>
+          {{ form.fri_end }}
+          {% if form.fri_end.errors %}<div class="text-danger small mt-1">{{ form.fri_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Sábado apertura</label>
+          {{ form.sat_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Sábado cierre</label>
+          {{ form.sat_end }}
+          {% if form.sat_end.errors %}<div class="text-danger small mt-1">{{ form.sat_end.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Domingo apertura</label>
+          {{ form.sun_start }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Domingo cierre</label>
+          {{ form.sun_end }}
+          {% if form.sun_end.errors %}<div class="text-danger small mt-1">{{ form.sun_end.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card mb-4">
+      <div class="section-title">Ubicación del negocio</div>
+      <p class="text-muted mb-3">
+        Haz clic en el mapa para seleccionar la ubicación exacta del negocio. También puedes arrastrar el marcador.
+      </p>
+
+      {{ form.latitude }}
+      {{ form.longitude }}
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Latitud</label>
+          <input type="text" id="lat_preview" class="form-control" readonly>
+          {% if form.latitude.errors %}<div class="text-danger small mt-1">{{ form.latitude.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Longitud</label>
+          <input type="text" id="lng_preview" class="form-control" readonly>
+          {% if form.longitude.errors %}<div class="text-danger small mt-1">{{ form.longitude.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div id="business-map"></div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-brand text-white px-4">Guardar cambios</button>
+    </div>
   </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const mapElement = document.getElementById("business-map");
+    const latInput = document.getElementById("id_latitude");
+    const lngInput = document.getElementById("id_longitude");
+    const latPreview = document.getElementById("lat_preview");
+    const lngPreview = document.getElementById("lng_preview");
+
+    if (!mapElement || !latInput || !lngInput) {
+      console.log("No se encontró el contenedor del mapa o los inputs ocultos.");
+      return;
+    }
+
+    let defaultLat = 2.9273;
+    let defaultLng = -75.2819;
+    let zoomLevel = 13;
+
+    if (latInput.value && lngInput.value) {
+      const parsedLat = parseFloat(latInput.value);
+      const parsedLng = parseFloat(lngInput.value);
+
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        defaultLat = parsedLat;
+        defaultLng = parsedLng;
+        zoomLevel = 17;
+      }
+    }
+
+    const map = L.map("business-map").setView([defaultLat, defaultLng], zoomLevel);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+      maxZoom: 19
+    }).addTo(map);
+
+    const marker = L.marker([defaultLat, defaultLng], {
+      draggable: true
+    }).addTo(map);
+
+    function updateFields(lat, lng) {
+      const fixedLat = Number(lat).toFixed(6);
+      const fixedLng = Number(lng).toFixed(6);
+
+      latInput.value = fixedLat;
+      lngInput.value = fixedLng;
+
+      if (latPreview) latPreview.value = fixedLat;
+      if (lngPreview) lngPreview.value = fixedLng;
+    }
+
+    updateFields(defaultLat, defaultLng);
+
+    map.on("click", function (e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      marker.setLatLng([lat, lng]);
+      updateFields(lat, lng);
+    });
+
+    marker.on("dragend", function () {
+      const pos = marker.getLatLng();
+      updateFields(pos.lat, pos.lng);
+    });
+
+    setTimeout(function () {
+      map.invalidateSize();
+    }, 500);
+  });
+</script>
 {% endblock %}

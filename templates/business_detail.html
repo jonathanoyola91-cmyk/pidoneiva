@@ -39,7 +39,18 @@
             {{ business.zone }}{% if business.address %} · {{ business.address }}{% endif %}
           </div>
 
-          {% if business.maps_url %}
+          {% if business.latitude and business.longitude %}
+            <div class="mt-1">
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+                target="_blank"
+                rel="noopener"
+                class="business-hero-link"
+              >
+                📍 Cómo llegar
+              </a>
+            </div>
+          {% elif business.maps_url %}
             <div class="mt-1">
               <a href="{{ business.maps_url }}" target="_blank" rel="noopener" class="business-hero-link">
                 📍 Ver ubicación en Google Maps
@@ -66,6 +77,26 @@
             </a>
           {% endif %}
 
+          {% if business.latitude and business.longitude %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+            >
+              Cómo llegar
+            </a>
+          {% elif business.maps_url %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="{{ business.maps_url }}"
+            >
+              Ubicación
+            </a>
+          {% endif %}
+
           {% if business.phone %}
             <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
           {% endif %}
@@ -78,6 +109,26 @@
           {% endif %}
 
         {% else %}
+
+          {% if business.latitude and business.longitude %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+            >
+              Cómo llegar
+            </a>
+          {% elif business.maps_url %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="{{ business.maps_url }}"
+            >
+              Ubicación
+            </a>
+          {% endif %}
 
           {% if business.phone %}
             <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
@@ -304,6 +355,30 @@
         {% if business.zone %}<div><strong>Zona:</strong> {{ business.zone }}</div>{% endif %}
         {% if business.phone %}<div><strong>Teléfono:</strong> {{ business.phone }}</div>{% endif %}
         {% if business.whatsapp %}<div><strong>WhatsApp:</strong> {{ business.whatsapp }}</div>{% endif %}
+
+        {% if business.latitude and business.longitude %}
+          <div class="mt-2">
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline-primary btn-sm"
+            >
+              📍 Cómo llegar
+            </a>
+          </div>
+        {% elif business.maps_url %}
+          <div class="mt-2">
+            <a
+              href="{{ business.maps_url }}"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline-primary btn-sm"
+            >
+              📍 Ver ubicación
+            </a>
+          </div>
+        {% endif %}
       </div>
     </div>
 

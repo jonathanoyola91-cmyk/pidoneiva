@@ -5,51 +5,104 @@ from menu.models import MenuCategory, MenuItem, MenuFile
 
 class BusinessForm(forms.ModelForm):
     # Campos "bonitos" (no existen en el modelo; son del form)
-    mon_start = forms.TimeField(required=False, label="Lunes (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    mon_end = forms.TimeField(required=False, label="Lunes (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    mon_start = forms.TimeField(
+        required=False,
+        label="Lunes (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    mon_end = forms.TimeField(
+        required=False,
+        label="Lunes (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    tue_start = forms.TimeField(required=False, label="Martes (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    tue_end = forms.TimeField(required=False, label="Martes (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    tue_start = forms.TimeField(
+        required=False,
+        label="Martes (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    tue_end = forms.TimeField(
+        required=False,
+        label="Martes (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    wed_start = forms.TimeField(required=False, label="Miércoles (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    wed_end = forms.TimeField(required=False, label="Miércoles (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    wed_start = forms.TimeField(
+        required=False,
+        label="Miércoles (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    wed_end = forms.TimeField(
+        required=False,
+        label="Miércoles (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    thu_start = forms.TimeField(required=False, label="Jueves (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    thu_end = forms.TimeField(required=False, label="Jueves (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    thu_start = forms.TimeField(
+        required=False,
+        label="Jueves (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    thu_end = forms.TimeField(
+        required=False,
+        label="Jueves (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    fri_start = forms.TimeField(required=False, label="Viernes (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    fri_end = forms.TimeField(required=False, label="Viernes (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    fri_start = forms.TimeField(
+        required=False,
+        label="Viernes (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    fri_end = forms.TimeField(
+        required=False,
+        label="Viernes (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    sat_start = forms.TimeField(required=False, label="Sábado (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    sat_end = forms.TimeField(required=False, label="Sábado (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    sat_start = forms.TimeField(
+        required=False,
+        label="Sábado (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    sat_end = forms.TimeField(
+        required=False,
+        label="Sábado (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    sun_start = forms.TimeField(required=False, label="Domingo (inicio)", widget=forms.TimeInput(attrs={"type": "time"}))
-    sun_end = forms.TimeField(required=False, label="Domingo (fin)", widget=forms.TimeInput(attrs={"type": "time"}))
+    sun_start = forms.TimeField(
+        required=False,
+        label="Domingo (inicio)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
+    sun_end = forms.TimeField(
+        required=False,
+        label="Domingo (fin)",
+        widget=forms.TimeInput(attrs={"type": "time", "class": "form-control"})
+    )
 
-    # ✅ Campo personalizado
     avg_prep_time = forms.IntegerField(
         min_value=1,
         max_value=240,
         label="Tiempo promedio de preparación (min)",
         help_text="Ej: 25",
-        required=False
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": "1", "max": "240"})
     )
 
     class Meta:
         model = Business
         fields = [
             "name", "business_type", "menu_mode", "zone", "address",
+            "latitude", "longitude",
             "phone", "whatsapp", "instagram", "description",
             "tags",
             "logo",
             "cover_image",
             "avg_prep_time",
-
-            # ✅ NUEVOS CAMPOS
             "delivery_fee",
             "nequi_number",
-
-            # switch de pedidos
             "is_accepting_orders",
         ]
 
@@ -58,23 +111,49 @@ class BusinessForm(forms.ModelForm):
             "tags": "Etiquetas (tags)",
             "delivery_fee": "Costo de domicilio",
             "nequi_number": "Número Nequi",
+            "latitude": "Latitud",
+            "longitude": "Longitud",
         }
 
         help_texts = {
             "tags": "Separa por coma. Ej: pizza, hamburguesa, café, droguería, mercado",
             "delivery_fee": "Costo fijo del domicilio para este negocio",
             "nequi_number": "Número Nequi donde el cliente debe transferir",
+            "latitude": "Latitud del negocio",
+            "longitude": "Longitud del negocio",
         }
 
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 4}),
-            "delivery_fee": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
-            "nequi_number": forms.TextInput(attrs={"placeholder": "Ej: 3001234567"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "business_type": forms.Select(attrs={"class": "form-select"}),
+            "menu_mode": forms.Select(attrs={"class": "form-select"}),
+            "zone": forms.Select(attrs={"class": "form-select"}),
+            "address": forms.TextInput(attrs={"class": "form-control"}),
+            "phone": forms.TextInput(attrs={"class": "form-control"}),
+            "whatsapp": forms.TextInput(attrs={"class": "form-control"}),
+            "instagram": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "tags": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: pizza, hamburguesa, café, droguería, mercado"
+            }),
+            "delivery_fee": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0"
+            }),
+            "nequi_number": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 3001234567"
+            }),
+            "logo": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "cover_image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "is_accepting_orders": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "latitude": forms.HiddenInput(),
+            "longitude": forms.HiddenInput(),
         }
 
-    # ---------- Helpers ----------
     def _format_range(self, start, end) -> str:
-        """Convierte dos datetime.time a 'HH:MM-HH:MM'. Si ambos vacíos -> ''."""
         if not start and not end:
             return ""
         if start and not end:
@@ -86,7 +165,6 @@ class BusinessForm(forms.ModelForm):
         return f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}"
 
     def _parse_range_str(self, s: str):
-        """Lee 'HH:MM-HH:MM' y devuelve (time_start, time_end) o (None, None)."""
         s = (s or "").strip()
         if not s or "-" not in s:
             return None, None
@@ -103,66 +181,52 @@ class BusinessForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         if "logo" in self.fields:
             self.fields["logo"].required = False
         if "cover_image" in self.fields:
             self.fields["cover_image"].required = False
 
-        # ✅ UI del campo tags
-        if "tags" in self.fields:
-            self.fields["tags"].required = False
-            self.fields["tags"].widget.attrs.update({
-                "placeholder": "Ej: pizza, hamburguesa, café, droguería, mercado",
-            })
-            existing_class = self.fields["tags"].widget.attrs.get("class", "")
-            self.fields["tags"].widget.attrs["class"] = (existing_class + " form-control").strip()
-
-        # ✅ UI de delivery_fee
         if "delivery_fee" in self.fields:
             self.fields["delivery_fee"].required = False
-            existing_class = self.fields["delivery_fee"].widget.attrs.get("class", "")
-            self.fields["delivery_fee"].widget.attrs["class"] = (existing_class + " form-control").strip()
 
-        # ✅ UI de nequi_number
         if "nequi_number" in self.fields:
             self.fields["nequi_number"].required = False
-            existing_class = self.fields["nequi_number"].widget.attrs.get("class", "")
-            self.fields["nequi_number"].widget.attrs["class"] = (existing_class + " form-control").strip()
 
-        # Pre-cargar el form desde el modelo (editar negocio)
+        if "tags" in self.fields:
+            self.fields["tags"].required = False
+
+        if "latitude" in self.fields:
+            self.fields["latitude"].required = False
+        if "longitude" in self.fields:
+            self.fields["longitude"].required = False
+
         instance = getattr(self, "instance", None)
         if instance and instance.pk:
-            # Lunes
             s, e = self._parse_range_str(instance.schedule_mon)
             self.fields["mon_start"].initial = s
             self.fields["mon_end"].initial = e
 
-            # Martes
             s, e = self._parse_range_str(instance.schedule_tue)
             self.fields["tue_start"].initial = s
             self.fields["tue_end"].initial = e
 
-            # Miércoles
             s, e = self._parse_range_str(instance.schedule_wed)
             self.fields["wed_start"].initial = s
             self.fields["wed_end"].initial = e
 
-            # Jueves
             s, e = self._parse_range_str(instance.schedule_thu)
             self.fields["thu_start"].initial = s
             self.fields["thu_end"].initial = e
 
-            # Viernes
             s, e = self._parse_range_str(instance.schedule_fri)
             self.fields["fri_start"].initial = s
             self.fields["fri_end"].initial = e
 
-            # Sábado
             s, e = self._parse_range_str(instance.schedule_sat)
             self.fields["sat_start"].initial = s
             self.fields["sat_end"].initial = e
 
-            # Domingo
             s, e = self._parse_range_str(instance.schedule_sun)
             self.fields["sun_start"].initial = s
             self.fields["sun_end"].initial = e
@@ -193,7 +257,6 @@ class BusinessForm(forms.ModelForm):
     def save(self, commit=True):
         instance: Business = super().save(commit=False)
 
-        # Construir strings schedule_* desde los time inputs
         instance.schedule_mon = self._format_range(self.cleaned_data.get("mon_start"), self.cleaned_data.get("mon_end"))
         instance.schedule_tue = self._format_range(self.cleaned_data.get("tue_start"), self.cleaned_data.get("tue_end"))
         instance.schedule_wed = self._format_range(self.cleaned_data.get("wed_start"), self.cleaned_data.get("wed_end"))
@@ -213,15 +276,32 @@ class MenuCategoryForm(forms.ModelForm):
     class Meta:
         model = MenuCategory
         fields = ["name", "order"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "order": forms.NumberInput(attrs={"class": "form-control"}),
+        }
 
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
         fields = ["category", "name", "description", "price", "photo", "is_available", "order"]
+        widgets = {
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "price": forms.NumberInput(attrs={"class": "form-control"}),
+            "photo": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "is_available": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "order": forms.NumberInput(attrs={"class": "form-control"}),
+        }
 
 
 class MenuFileForm(forms.ModelForm):
     class Meta:
         model = MenuFile
         fields = ["file", "is_active"]
+        widgets = {
+            "file": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }

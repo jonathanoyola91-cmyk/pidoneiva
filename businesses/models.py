@@ -94,6 +94,23 @@ class Business(models.Model):
         help_text="Opcional: enlace de insertar mapa (Compartir → Insertar un mapa)"
     )
 
+    # ✅ NUEVOS CAMPOS: coordenadas del negocio
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        help_text="Latitud del negocio"
+    )
+
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        help_text="Longitud del negocio"
+    )
+
     phone = models.CharField(max_length=30, blank=True)
     whatsapp = models.CharField(max_length=30, blank=True)
     instagram = models.CharField(max_length=80, blank=True)

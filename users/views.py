@@ -112,11 +112,14 @@ def business_edit(request):
             obj = form.save()
             print("DEBUG saved logo:", obj.logo.name if obj.logo else None)
             print("DEBUG saved cover:", obj.cover_image.name if obj.cover_image else None)
+            print("DEBUG saved latitude:", obj.latitude)
+            print("DEBUG saved longitude:", obj.longitude)
+            messages.success(request, "Negocio actualizado correctamente.")
             return redirect("dashboard")
     else:
         form = BusinessForm(instance=business)
 
-    return render(request, "dashboard/business_edit.html", {"form": form})
+    return render(request, "dashboard/business_edit.html", {"form": form, "business": business})
 
 
 @login_required
