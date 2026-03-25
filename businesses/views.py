@@ -374,10 +374,15 @@ def business_detail(request, slug):
 
     pdf_only = _is_pdf_only(business)
 
-    menu_files = MenuFile.objects.filter(business=business, is_active=True).order_by("-uploaded_at")
+    menu_files = MenuFile.objects.filter(
+        business=business,
+        is_active=True
+    ).order_by("-uploaded_at")
 
     categories = []
     items_by_category = {}
+    uncategorized_items = []
+    visible_categories_count = 0
     cart_items = []
     cart_total = 0
 
@@ -393,15 +398,30 @@ def business_detail(request, slug):
             is_first_order = False
 
     if not pdf_only:
-        categories = MenuCategory.objects.filter(business=business).order_by("name")
-
         items = MenuItem.objects.filter(
             business=business,
             is_available=True
-        ).select_related("category").order_by("category__name", "order", "name")
+        ).select_related("category").order_by(
+            "category__order",
+            "category__name",
+            "order",
+            "name"
+        )
+
+        categories = list(
+            MenuCategory.objects.filter(
+                business=business,
+                items__business=business,
+                items__is_available=True
+            ).distinct().order_by("order", "name")
+        )
 
         for c in categories:
-            items_by_category[c.id] = [it for it in items if it.category_id == c.id]
+            cat_items = [it for it in items if it.category_id == c.id]
+            items_by_category[c.id] = cat_items
+
+        uncategorized_items = [it for it in items if it.category_id is None]
+        visible_categories_count = len(categories)
 
         if cart:
             item_ids = []
@@ -445,6 +465,8 @@ def business_detail(request, slug):
         "menu_files": menu_files,
         "categories": categories,
         "items_by_category": items_by_category,
+        "uncategorized_items": uncategorized_items,
+        "visible_categories_count": visible_categories_count,
         "cart_warning": cart_warning,
         "cart_items": cart_items,
         "cart_total": cart_total,

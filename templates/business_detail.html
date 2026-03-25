@@ -225,20 +225,24 @@
       <div class="tab-pane fade show active" id="tab-products">
         <div id="menu"></div>
 
-        <div class="menu-categories mt-3 mb-2 {% if visible_categories_count <= 4 %}menu-categories-fill{% endif %}">
-          {% for cat in categories %}
-            {% if cat.items.all|length %}
-              <a class="menu-category" href="#cat-{{ cat.id }}">
-                {{ cat.name }}
-              </a>
-            {% endif %}
-          {% endfor %}
-        </div>
+        {% if visible_categories_count > 1 %}
+          <div class="menu-categories mt-3 mb-2 {% if visible_categories_count <= 4 %}menu-categories-fill{% endif %}">
+            {% for cat in categories %}
+              {% if cat.items.all|length %}
+                <a class="menu-category" href="#cat-{{ cat.id }}">
+                  {{ cat.name }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
 
         {% for cat in categories %}
           {% if cat.items.all|length %}
             <div class="mt-4" id="cat-{{ cat.id }}">
-              <h3 class="h6 fw-bold">{{ cat.name }}</h3>
+              {% if visible_categories_count > 1 %}
+                <h3 class="h6 fw-bold">{{ cat.name }}</h3>
+              {% endif %}
 
               <div class="products-row {% if visible_categories_count == 1 %}products-grid-fill{% endif %}">
                 {% for item in cat.items.all %}
@@ -296,6 +300,66 @@
             </div>
           {% endif %}
         {% endfor %}
+
+        {% if uncategorized_items %}
+          <div class="mt-4" id="cat-uncategorized">
+            <h3 class="h6 fw-bold">Productos</h3>
+
+            <div class="products-row {% if visible_categories_count == 0 %}products-grid-fill{% endif %}">
+              {% for item in uncategorized_items %}
+                {% if item.is_available %}
+                  <div class="product-card">
+                    <div class="card shadow-soft p-3 h-100">
+
+                      {% if item.photo %}
+                        <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
+                      {% endif %}
+
+                      <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
+                        {{ item.name }}
+                      </div>
+
+                      <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="fw-bold fs-5 text-dark">
+                          ${{ item.price|floatformat:0 }}
+                        </div>
+                      </div>
+
+                      {% if item.description %}
+                        <div class="small text-secondary mt-1 clamp-2">
+                          {{ item.description }}
+                        </div>
+                      {% endif %}
+
+                      <button type="button"
+                              class="btn btn-outline-secondary w-100 mt-2 js-open-product"
+                              data-bs-toggle="modal"
+                              data-bs-target="#productModal"
+                              data-id="{{ item.id }}"
+                              data-name="{{ item.name|escapejs }}"
+                              data-price="{{ item.price|floatformat:0 }}"
+                              data-desc="{{ item.description|default:''|escapejs }}"
+                              {% if item.photo %}data-photo="{{ item.photo.url }}"{% else %}data-photo=""{% endif %}
+                              data-update-url="{% url 'cart_update_json' business.slug item.id %}">
+                        Ver detalles
+                      </button>
+
+                      <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
+                        {% csrf_token %}
+                        {% if business.is_open_now %}
+                          <button class="btn btn-success w-100">Agregar al pedido</button>
+                        {% else %}
+                          <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
+                        {% endif %}
+                      </form>
+
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
       </div>
     {% endif %}
 
