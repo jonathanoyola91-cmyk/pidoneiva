@@ -4,6 +4,47 @@
 {% block content %}
 <div class="bg-white rounded-4 shadow-soft p-4">
 
+  <style>
+    .product-search-wrap .form-control:focus{
+      box-shadow:none;
+      border-color:#dee2e6;
+    }
+
+    .product-search-wrap .input-group{
+      border:1px solid #e9ecef;
+      background:#fff;
+      border-radius:16px;
+    }
+
+    .product-search-wrap .input-group-text,
+    .product-search-wrap .form-control,
+    .product-search-wrap .btn{
+      background:#fff;
+    }
+
+    .product-card.hidden-by-search{
+      display:none !important;
+    }
+
+    .menu-category.hidden-by-search{
+      display:none !important;
+    }
+
+    .category-block.hidden-by-search{
+      display:none !important;
+    }
+
+    .no-products-found{
+      display:none;
+      text-align:center;
+      padding:24px 16px;
+      border-radius:16px;
+      background:#f8f9fa;
+      color:#6c757d;
+      margin-top:12px;
+    }
+  </style>
+
   <div class="business-hero-card">
     <div class="business-hero-bg">
       {% if business.cover_image %}
@@ -225,11 +266,37 @@
       <div class="tab-pane fade show active" id="tab-products">
         <div id="menu"></div>
 
+        <div class="product-search-wrap mt-3 mb-3">
+          <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
+            <span class="input-group-text bg-white border-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              id="productSearchInput"
+              class="form-control border-0"
+              placeholder="Buscar productos en este negocio..."
+              autocomplete="off"
+            >
+            <button
+              class="btn btn-light border-0"
+              type="button"
+              id="clearProductSearch"
+              style="display:none;"
+            >
+              Limpiar
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            Busca por nombre o descripción del producto
+          </small>
+        </div>
+
         {% if visible_categories_count > 1 %}
           <div class="menu-categories mt-3 mb-2 {% if visible_categories_count <= 4 %}menu-categories-fill{% endif %}">
             {% for cat in categories %}
               {% if cat.items.all|length %}
-                <a class="menu-category" href="#cat-{{ cat.id }}">
+                <a class="menu-category js-menu-category" data-category-id="cat-{{ cat.id }}" href="#cat-{{ cat.id }}">
                   {{ cat.name }}
                 </a>
               {% endif %}
@@ -237,9 +304,13 @@
           </div>
         {% endif %}
 
+        <div id="noProductsFoundMessage" class="no-products-found">
+          No encontramos productos con esa búsqueda en este negocio.
+        </div>
+
         {% for cat in categories %}
           {% if cat.items.all|length %}
-            <div class="mt-4" id="cat-{{ cat.id }}">
+            <div class="mt-4 category-block js-category-section" id="cat-{{ cat.id }}">
               {% if visible_categories_count > 1 %}
                 <h3 class="h6 fw-bold">{{ cat.name }}</h3>
               {% endif %}
@@ -247,7 +318,12 @@
               <div class="products-row {% if visible_categories_count == 1 %}products-grid-fill{% endif %}">
                 {% for item in cat.items.all %}
                   {% if item.is_available %}
-                    <div class="product-card">
+                    <div
+                      class="product-card js-product-card"
+                      data-category-id="cat-{{ cat.id }}"
+                      data-name="{{ item.name|default:''|lower }}"
+                      data-description="{{ item.description|default:''|striptags|lower }}"
+                    >
                       <div class="card shadow-soft p-3 h-100">
 
                         {% if item.photo %}
@@ -302,13 +378,18 @@
         {% endfor %}
 
         {% if uncategorized_items %}
-          <div class="mt-4" id="cat-uncategorized">
+          <div class="mt-4 category-block js-category-section" id="cat-uncategorized">
             <h3 class="h6 fw-bold">Productos</h3>
 
             <div class="products-row {% if visible_categories_count == 0 %}products-grid-fill{% endif %}">
               {% for item in uncategorized_items %}
                 {% if item.is_available %}
-                  <div class="product-card">
+                  <div
+                    class="product-card js-product-card"
+                    data-category-id="cat-uncategorized"
+                    data-name="{{ item.name|default:''|lower }}"
+                    data-description="{{ item.description|default:''|striptags|lower }}"
+                  >
                     <div class="card shadow-soft p-3 h-100">
 
                       {% if item.photo %}
@@ -754,6 +835,85 @@
     setTimeout(() => window.scrollTo(0, y), 50);
     setTimeout(() => window.scrollTo(0, y), 200);
   });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("productSearchInput");
+  const clearBtn = document.getElementById("clearProductSearch");
+  const productCards = document.querySelectorAll(".js-product-card");
+  const categorySections = document.querySelectorAll(".js-category-section");
+  const categoryLinks = document.querySelectorAll(".js-menu-category");
+  const noProductsMessage = document.getElementById("noProductsFoundMessage");
+
+  if (!searchInput || !productCards.length) return;
+
+  function normalizeText(text) {
+    return (text || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function filterProducts() {
+    const query = normalizeText(searchInput.value);
+    let visibleCount = 0;
+
+    productCards.forEach((card) => {
+      const name = normalizeText(card.dataset.name || "");
+      const description = normalizeText(card.dataset.description || "");
+      const matches = !query || name.includes(query) || description.includes(query);
+
+      if (matches) {
+        card.classList.remove("hidden-by-search");
+        visibleCount++;
+      } else {
+        card.classList.add("hidden-by-search");
+      }
+    });
+
+    categorySections.forEach((section) => {
+      const visibleProducts = section.querySelectorAll(".js-product-card:not(.hidden-by-search)");
+      if (visibleProducts.length) {
+        section.classList.remove("hidden-by-search");
+      } else {
+        section.classList.add("hidden-by-search");
+      }
+    });
+
+    categoryLinks.forEach((link) => {
+      const categoryId = link.dataset.categoryId;
+      const section = document.getElementById(categoryId);
+      if (!section) return;
+
+      if (section.classList.contains("hidden-by-search")) {
+        link.classList.add("hidden-by-search");
+      } else {
+        link.classList.remove("hidden-by-search");
+      }
+    });
+
+    if (noProductsMessage) {
+      noProductsMessage.style.display = visibleCount ? "none" : "block";
+    }
+
+    if (clearBtn) {
+      clearBtn.style.display = query ? "inline-block" : "none";
+    }
+  }
+
+  searchInput.addEventListener("input", filterProducts);
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      searchInput.value = "";
+      filterProducts();
+      searchInput.focus();
+    });
+  }
+});
 </script>
 
 <script>
