@@ -290,7 +290,7 @@
     <div class="section-card mb-4">
       <div class="section-title">Ubicación del negocio</div>
       <p class="text-muted mb-3">
-        Haz clic en el mapa para seleccionar la ubicación exacta del negocio. También puedes arrastrar el marcador.
+        Usa tu ubicación actual, busca una dirección o ajusta el pin manualmente en el mapa.
       </p>
 
       {{ form.latitude }}
@@ -307,6 +307,28 @@
           <input type="text" id="lng_preview" class="form-control" readonly>
           {% if form.longitude.errors %}<div class="text-danger small mt-1">{{ form.longitude.errors }}</div>{% endif %}
         </div>
+      </div>
+
+      <div class="row g-2 mb-3">
+        <div class="col-md-8">
+          <input
+            type="text"
+            id="addressSearch"
+            class="form-control"
+            placeholder="Buscar dirección o lugar..."
+          >
+        </div>
+        <div class="col-md-4 d-grid">
+          <button type="button" class="btn btn-outline-primary" id="searchAddressBtn">
+            Buscar
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap mb-3">
+        <button type="button" class="btn btn-success" id="useCurrentLocationBtn">
+          📍 Usar mi ubicación actual
+        </button>
       </div>
 
       <div id="business-map"></div>
@@ -328,6 +350,9 @@
     const lngInput = document.getElementById("id_longitude");
     const latPreview = document.getElementById("lat_preview");
     const lngPreview = document.getElementById("lng_preview");
+    const addressInput = document.getElementById("addressSearch");
+    const searchBtn = document.getElementById("searchAddressBtn");
+    const gpsBtn = document.getElementById("useCurrentLocationBtn");
 
     if (!mapElement || !latInput || !lngInput) {
       console.log("No se encontró el contenedor del mapa o los inputs ocultos.");
@@ -371,19 +396,121 @@
       if (lngPreview) lngPreview.value = fixedLng;
     }
 
+    function moveMarker(lat, lng, zoom = 17) {
+      const parsedLat = parseFloat(lat);
+      const parsedLng = parseFloat(lng);
+
+      if (isNaN(parsedLat) || isNaN(parsedLng)) return;
+
+      marker.setLatLng([parsedLat, parsedLng]);
+      map.setView([parsedLat, parsedLng], zoom);
+      updateFields(parsedLat, parsedLng);
+    }
+
     updateFields(defaultLat, defaultLng);
 
     map.on("click", function (e) {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
-      marker.setLatLng([lat, lng]);
-      updateFields(lat, lng);
+      moveMarker(lat, lng);
     });
 
     marker.on("dragend", function () {
       const pos = marker.getLatLng();
       updateFields(pos.lat, pos.lng);
     });
+
+    if (gpsBtn) {
+      gpsBtn.addEventListener("click", function () {
+        if (!navigator.geolocation) {
+          alert("Tu navegador no permite obtener la ubicación.");
+          return;
+        }
+
+        gpsBtn.disabled = true;
+        gpsBtn.textContent = "Obteniendo ubicación...";
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            moveMarker(lat, lng, 18);
+
+            gpsBtn.disabled = false;
+            gpsBtn.textContent = "📍 Usar mi ubicación actual";
+          },
+          function (error) {
+            console.error("Error obteniendo ubicación:", error);
+            alert("No se pudo obtener tu ubicación actual. Revisa permisos de ubicación o GPS.");
+
+            gpsBtn.disabled = false;
+            gpsBtn.textContent = "📍 Usar mi ubicación actual";
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      });
+    }
+
+    async function searchAddress() {
+      const query = (addressInput?.value || "").trim();
+      if (!query) {
+        alert("Escribe una dirección o lugar.");
+        return;
+      }
+
+      if (searchBtn) {
+        searchBtn.disabled = true;
+        searchBtn.textContent = "Buscando...";
+      }
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+        const response = await fetch(url, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Error consultando dirección");
+        }
+
+        const results = await response.json();
+
+        if (!results.length) {
+          alert("No encontramos esa dirección.");
+          return;
+        }
+
+        const place = results[0];
+        moveMarker(place.lat, place.lon, 17);
+      } catch (err) {
+        console.error("Error buscando dirección:", err);
+        alert("Ocurrió un error buscando la dirección.");
+      } finally {
+        if (searchBtn) {
+          searchBtn.disabled = false;
+          searchBtn.textContent = "Buscar";
+        }
+      }
+    }
+
+    if (searchBtn) {
+      searchBtn.addEventListener("click", searchAddress);
+    }
+
+    if (addressInput) {
+      addressInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          searchAddress();
+        }
+      });
+    }
 
     setTimeout(function () {
       map.invalidateSize();
