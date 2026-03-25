@@ -588,9 +588,9 @@ body{
   font-weight: 900;
   font-size: 12px;
 }
-.ranked-status{ 
-  display: flex; 
-  justify-content:center; 
+.ranked-status{
+  display: flex;
+  justify-content:center;
   align-items:center
 }
 .mini-dot{
@@ -787,7 +787,7 @@ body{
 
   /* ✅ versión compacta del texto del switch */
   .home-switch-text{
-    display: none; /* si prefieres mostrarlo, cambia a: font-size:12px; */
+    display: none;
   }
 }
 
@@ -888,7 +888,7 @@ body{
 
   .home-sticky{
     position: sticky;
-    top: 56px;                /* ✅ si tu navbar es más alta: 64px o 72px */
+    top: 56px;
     z-index: 60;
     background: var(--bg);
     padding-top: 10px;
@@ -898,10 +898,8 @@ body{
     -webkit-backdrop-filter: blur(10px);
   }
 
-  /* evita margen extra debajo del sticky */
   .home-search{ margin-bottom: 0; }
 
-  /* ✅ filtros en una sola fila */
   .home-filters{
     flex-wrap: nowrap;
     gap: 10px;
@@ -923,7 +921,6 @@ body{
     white-space: nowrap;
   }
 
-  /* texto corto "Abiertos" */
   .home-switch-text{
     font-size: 12px;
   }
@@ -940,18 +937,13 @@ body{
 .panel-actions-scroll{
   display:flex;
   gap:10px;
-
   overflow-x:auto;
   overflow-y:hidden;
-
   -webkit-overflow-scrolling: touch;
-
   padding: 6px 2px 10px;
-
   scroll-snap-type: x mandatory;
 }
 
-/* scrollbar pequeño */
 .panel-actions-scroll::-webkit-scrollbar{
   height:6px;
 }
@@ -961,36 +953,22 @@ body{
   border-radius:999px;
 }
 
-/* botones tipo app */
 .panel-btn{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-
   white-space:nowrap;
-
   flex:0 0 auto;
-
   scroll-snap-align:start;
-
   padding:10px 14px;
-
   border-radius:999px;
-
   border:1px solid #E5E7EB;
-
   background:#fff;
-
   color:#0F172A;
-
   font-weight:700;
-
   font-size:14px;
-
   text-decoration:none;
-
   box-shadow:0 6px 16px rgba(2,6,23,.06);
-
   transition:transform .12s ease, box-shadow .12s ease;
 }
 
@@ -998,16 +976,13 @@ body{
   transform:scale(.97);
 }
 
-/* botón principal */
 .panel-btn-primary{
   background:var(--brand);
   border-color:var(--brand);
   color:#fff;
-
   box-shadow:0 10px 22px rgba(225,29,46,.18);
 }
 
-/* botón outline */
 .panel-btn-outline{
   border:1px solid #3B82F6;
   color:#1D4ED8;
@@ -1015,49 +990,31 @@ body{
   box-shadow:none;
 }
 
-/* botón grande "ver mi pagina" */
 .panel-btn-link{
   border-radius:14px;
-
   padding:12px 14px;
-
   background:#fff;
-
   border:2px solid #3B82F6;
-
   color:#1D4ED8;
-
   font-weight:800;
-
   box-shadow:none;
 }
 
-/* badge estado */
 .panel-badge{
   display:inline-flex;
-
   align-items:center;
-
   white-space:nowrap;
-
   flex:0 0 auto;
-
   padding:10px 14px;
-
   border-radius:999px;
-
   font-weight:800;
-
   font-size:13px;
-
   scroll-snap-align:start;
 }
 
 .panel-badge-warning{
   background:#FEF3C7;
-
   border:1px solid #F59E0B;
-
   color:#92400E;
 }
 
@@ -1103,11 +1060,9 @@ body{
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 6px;
-
   scroll-snap-type: x mandatory;
 }
 
-/* ocultar barra fea */
 .products-row::-webkit-scrollbar{
   display: none;
 }
@@ -1117,19 +1072,17 @@ body{
   scrollbar-width: none;
 }
 
-/* cada card */
 .product-card{
   flex: 0 0 220px;
   scroll-snap-align: start;
 }
-
 
 /* ===== Categorías (chips) ===== */
 .menu-categories{
   display:flex;
   gap:10px;
   overflow-x:auto;
-  flex-wrap:nowrap;            /* ✅ que NO salten de línea */
+  flex-wrap:nowrap;
   padding:8px 2px 10px;
   scroll-snap-type:x mandatory;
 }
@@ -1140,29 +1093,47 @@ body{
 .menu-category{
   flex:0 0 auto;
   scroll-snap-align:start;
-
   padding:8px 14px;
   border-radius:999px;
   background:#F1F5F9;
   border:1px solid #E2E8F0;
-
   font-weight:700;
   font-size:14px;
   white-space:nowrap;
-
-  text-decoration:none;        /* ✅ sin subrayado */
-  color:#0f172a !important;    /* ✅ quita azul bootstrap */
+  text-decoration:none;
+  color:#0f172a !important;
 }
 
 .menu-category:hover{
   background:#E2E8F0;
 }
 
-/* activa (roja) */
 .menu-category-active{
   background:var(--brand);
   border-color:var(--brand);
   color:#fff !important;
+}
+
+/* ✅ NUEVO: cuando hay pocas categorías, llenar mejor el ancho */
+.menu-categories.menu-categories-fill{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+  overflow:visible;
+  white-space:normal;
+  scroll-snap-type:none;
+}
+
+.menu-categories.menu-categories-fill .menu-category{
+  width:100%;
+  text-align:center;
+  white-space:normal;
+}
+
+@media (min-width: 768px){
+  .menu-categories.menu-categories-fill{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* =========================
@@ -1170,11 +1141,11 @@ body{
    ========================= */
 .clamp-2{
   display: -webkit-box;
-  -webkit-line-clamp: 2;        /* ✅ 2 líneas */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.25rem;         /* ajusta si quieres */
+  line-height: 1.25rem;
   max-height: calc(1.25rem * 2);
 }
 
@@ -1633,6 +1604,7 @@ body{
     gap:6px 10px;
   }
 }
+
 /* ocultar botón buscar home temporal */
 .hide-home-search-btn{
   display:none;

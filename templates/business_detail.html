@@ -4,9 +4,6 @@
 {% block content %}
 <div class="bg-white rounded-4 shadow-soft p-4">
 
-  <!-- =======================
-       HERO NUEVO (CONTENEDOR)
-       ======================= -->
   <div class="business-hero-card">
     <div class="business-hero-bg">
       {% if business.cover_image %}
@@ -16,7 +13,6 @@
       {% endif %}
       <div class="business-hero-gradient"></div>
 
-      <!-- Estado (abierto/cerrado) arriba derecha -->
       <div class="business-hero-status">
         {% if business.is_open_now %}
           <span class="pill pill-success"><span class="dot"></span> Abierto</span>
@@ -25,7 +21,6 @@
         {% endif %}
       </div>
 
-      <!-- Contenido encima -->
       <div class="business-hero-content">
         {% if business.logo %}
           <div class="business-hero-logo">
@@ -61,7 +56,6 @@
       </div>
     </div>
 
-    <!-- Botones debajo del hero -->
     <div class="business-hero-actions">
       <div class="d-flex flex-wrap gap-2 mt-3">
 
@@ -146,7 +140,6 @@
     </div>
   </div>
 
-  <!-- Horario -->
   <div class="small mt-2">
     {% if business.opening_hours %}
       <span class="text-secondary">Horario: {{ business.opening_hours }}</span>
@@ -161,7 +154,6 @@
     <div class="text-secondary mt-2">{{ business.description }}</div>
   {% endif %}
 
-  <!-- 🔥 PROMOCIÓN -->
   {% if business.promo_active and business.promo_title %}
     <div class="alert alert-warning rounded-4 shadow-soft mt-3 mb-0">
       <div class="fw-bold">🔥 {{ business.promo_title }}</div>
@@ -179,7 +171,6 @@
 
   <hr>
 
-  <!-- Aviso carrito activo en otro negocio -->
   {% if cart_warning %}
     <div class="alert alert-warning mt-3 rounded-4 shadow-soft">
       <div class="fw-bold mb-1">⚠️ Ya tienes un carrito activo</div>
@@ -205,7 +196,6 @@
     </div>
   {% endif %}
 
-  <!-- Tabs -->
   <ul class="nav nav-pills gap-2" id="pnTabs" role="tablist">
 
     {% if not is_pdf_only %}
@@ -232,13 +222,10 @@
   <div class="tab-content mt-3">
 
     {% if not is_pdf_only %}
-      <!-- =======================
-           TAB PRODUCTOS
-           ======================= -->
       <div class="tab-pane fade show active" id="tab-products">
         <div id="menu"></div>
 
-        <div class="menu-categories mt-3 mb-2">
+        <div class="menu-categories mt-3 mb-2 {% if visible_categories_count <= 4 %}menu-categories-fill{% endif %}">
           {% for cat in categories %}
             {% if cat.items.all|length %}
               <a class="menu-category" href="#cat-{{ cat.id }}">
@@ -312,9 +299,6 @@
       </div>
     {% endif %}
 
-    <!-- =======================
-         TAB PDF
-         ======================= -->
     <div class="tab-pane fade {% if is_pdf_only %}show active{% endif %}" id="tab-pdf">
       <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2">
         <div>
@@ -346,9 +330,6 @@
       {% endif %}
     </div>
 
-    <!-- =======================
-         TAB INFO
-         ======================= -->
     <div class="tab-pane fade" id="tab-info">
       <div class="text-secondary">
         {% if business.address %}<div><strong>Dirección:</strong> {{ business.address }}</div>{% endif %}
@@ -385,9 +366,6 @@
   </div>
 
   {% if not is_pdf_only %}
-    <!-- =======================
-         CARRITO + FORM (ABAJO)
-         ======================= -->
     <hr class="my-4">
 
     <h2 id="mi-pedido" class="h6 fw-bold mb-3">
@@ -572,12 +550,12 @@
 
           <div class="col-12">
             <label class="form-label">Dirección</label>
-            <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto..." required>
+            <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto." required>
           </div>
 
           <div class="col-12">
             <label class="form-label">Notas</label>
-            <textarea class="form-control" rows="3" name="notes" placeholder="Ej: sin cebolla, tocar timbre...">{{ buyer.notes|default:'' }}</textarea>
+            <textarea class="form-control" rows="3" name="notes" placeholder="Ej: sin cebolla, tocar timbre.">{{ buyer.notes|default:'' }}</textarea>
           </div>
 
           <div class="col-12">
@@ -685,9 +663,6 @@
 {% endif %}
 
 <script>
-  // ==========================================
-  // 1) Anti-salto al actualizar cantidades (POST)
-  // ==========================================
   document.addEventListener("submit", function(e){
     const form = e.target;
     if (!form || !form.action) return;
@@ -820,9 +795,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<!-- ==============================
-     MODAL GLOBAL (una sola vez)
-     ============================== -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
