@@ -134,31 +134,33 @@ def _open_status(business, now):
     def _dt_for(t, base_dt):
         return base_dt.replace(hour=t.hour, minute=t.minute, second=0, microsecond=0)
 
+    # 🔹 Revisar día anterior (horarios que cruzan medianoche)
     yday = now - timedelta(days=1)
     sch_y = business._get_schedule_for_weekday(yday.weekday())
-    parsed_y = business._parse_range(sch_y)
+    start_y, end_y = business._parse_range(sch_y)
 
-    if parsed_y:
-        start_y, end_y = parsed_y
+    if start_y and end_y:
         if start_y > end_y:
             if now.time() <= end_y:
                 closes_at = _dt_for(end_y, now)
                 return True, closes_at
 
+    # 🔹 Día actual
     sch = business._get_schedule_for_weekday(now.weekday())
-    parsed = business._parse_range(sch)
+    start, end = business._parse_range(sch)
 
-    if not parsed:
+    # 🔥 CLAVE: validar antes de comparar
+    if not start or not end:
         return False, None
 
-    start, end = parsed
-
+    # 🔹 Horario normal (08:00-18:00)
     if start < end:
         if start <= now.time() <= end:
             closes_at = _dt_for(end, now)
             return True, closes_at
         return False, None
 
+    # 🔹 Horario cruzando medianoche (18:00-02:00)
     if now.time() >= start:
         closes_at = _dt_for(end, now) + timedelta(days=1)
         return True, closes_at

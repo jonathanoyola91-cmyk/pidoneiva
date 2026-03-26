@@ -56,6 +56,22 @@
     display: inline-block;
     margin-bottom: 0.5rem;
   }
+
+  .schedule-grid .card {
+    border-radius: 16px;
+    border: 1px solid #eef2f7;
+  }
+
+  .map-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .map-toolbar .form-control {
+    min-width: 220px;
+  }
 </style>
 {% endblock %}
 
@@ -93,6 +109,19 @@
           <label class="form-label">{{ form.menu_mode.label }}</label>
           {{ form.menu_mode }}
           {% if form.menu_mode.errors %}<div class="text-danger small mt-1">{{ form.menu_mode.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="{{ form.service_mode.id_for_label }}" class="form-label">Modalidad de entrega</label>
+          {{ form.service_mode }}
+          {% if form.service_mode.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.service_mode.errors }}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Define si este negocio vende solo a domicilio, solo para recoger en el punto o ambas opciones.
+          </div>
         </div>
 
         <div class="col-md-4">
@@ -172,21 +201,156 @@
     </div>
 
     <div class="section-card mb-4">
+      <div class="section-title">Horarios de atención</div>
+
+      <div class="row g-3 schedule-grid">
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Lunes</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.mon_start }}
+                {% if form.mon_start.errors %}<div class="text-danger small mt-1">{{ form.mon_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.mon_end }}
+                {% if form.mon_end.errors %}<div class="text-danger small mt-1">{{ form.mon_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Martes</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.tue_start }}
+                {% if form.tue_start.errors %}<div class="text-danger small mt-1">{{ form.tue_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.tue_end }}
+                {% if form.tue_end.errors %}<div class="text-danger small mt-1">{{ form.tue_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Miércoles</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.wed_start }}
+                {% if form.wed_start.errors %}<div class="text-danger small mt-1">{{ form.wed_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.wed_end }}
+                {% if form.wed_end.errors %}<div class="text-danger small mt-1">{{ form.wed_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Jueves</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.thu_start }}
+                {% if form.thu_start.errors %}<div class="text-danger small mt-1">{{ form.thu_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.thu_end }}
+                {% if form.thu_end.errors %}<div class="text-danger small mt-1">{{ form.thu_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Viernes</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.fri_start }}
+                {% if form.fri_start.errors %}<div class="text-danger small mt-1">{{ form.fri_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.fri_end }}
+                {% if form.fri_end.errors %}<div class="text-danger small mt-1">{{ form.fri_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Sábado</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.sat_start }}
+                {% if form.sat_start.errors %}<div class="text-danger small mt-1">{{ form.sat_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.sat_end }}
+                {% if form.sat_end.errors %}<div class="text-danger small mt-1">{{ form.sat_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100">
+            <div class="fw-semibold mb-2">Domingo</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Apertura</label>
+                {{ form.sun_start }}
+                {% if form.sun_start.errors %}<div class="text-danger small mt-1">{{ form.sun_start.errors }}</div>{% endif %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Cierre</label>
+                {{ form.sun_end }}
+                {% if form.sun_end.errors %}<div class="text-danger small mt-1">{{ form.sun_end.errors }}</div>{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mini-help mt-3">
+        Si dejas un día sin horas, se entenderá como cerrado ese día. También puedes poner horarios que crucen medianoche, por ejemplo 18:00 a 02:00.
+      </div>
+    </div>
+
+    <div class="section-card mb-4">
       <div class="section-title">Imágenes del negocio</div>
 
       <div class="row g-4">
         <div class="col-md-6">
           <div class="image-preview-box">
             <div class="fw-semibold mb-2">Logo actual</div>
-
-            {% if business.logo %}
-              <a href="{{ business.logo.url }}" target="_blank" class="current-file-link">{{ business.logo.name }}</a>
-              <img src="{{ business.logo.url }}" alt="Logo del negocio" class="mb-3">
+            {% if form.instance.logo %}
+              <img src="{{ form.instance.logo.url }}" alt="Logo actual" class="mb-2">
+              <a href="{{ form.instance.logo.url }}" target="_blank" class="current-file-link">Ver logo actual</a>
             {% else %}
-              <div class="mini-help mb-3">No hay logo cargado actualmente.</div>
+              <div class="mini-help mb-2">Este negocio aún no tiene logo.</div>
             {% endif %}
 
-            <label class="form-label">{{ form.logo.label|default:"Modificar logo" }}</label>
+            <label class="form-label">{{ form.logo.label }}</label>
             {{ form.logo }}
             {% if form.logo.errors %}<div class="text-danger small mt-1">{{ form.logo.errors }}</div>{% endif %}
           </div>
@@ -194,16 +358,15 @@
 
         <div class="col-md-6">
           <div class="image-preview-box">
-            <div class="fw-semibold mb-2">Imagen de portada actual</div>
-
-            {% if business.cover_image %}
-              <a href="{{ business.cover_image.url }}" target="_blank" class="current-file-link">{{ business.cover_image.name }}</a>
-              <img src="{{ business.cover_image.url }}" alt="Portada del negocio" class="mb-3">
+            <div class="fw-semibold mb-2">Portada actual</div>
+            {% if form.instance.cover_image %}
+              <img src="{{ form.instance.cover_image.url }}" alt="Portada actual" class="mb-2">
+              <a href="{{ form.instance.cover_image.url }}" target="_blank" class="current-file-link">Ver portada actual</a>
             {% else %}
-              <div class="mini-help mb-3">No hay portada cargada actualmente.</div>
+              <div class="mini-help mb-2">Este negocio aún no tiene imagen de portada.</div>
             {% endif %}
 
-            <label class="form-label">{{ form.cover_image.label|default:"Modificar portada" }}</label>
+            <label class="form-label">{{ form.cover_image.label }}</label>
             {{ form.cover_image }}
             {% if form.cover_image.errors %}<div class="text-danger small mt-1">{{ form.cover_image.errors }}</div>{% endif %}
           </div>
@@ -212,130 +375,53 @@
     </div>
 
     <div class="section-card mb-4">
-      <div class="section-title">Horario del negocio</div>
-
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Lunes apertura</label>
-          {{ form.mon_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Lunes cierre</label>
-          {{ form.mon_end }}
-          {% if form.mon_end.errors %}<div class="text-danger small mt-1">{{ form.mon_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Martes apertura</label>
-          {{ form.tue_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Martes cierre</label>
-          {{ form.tue_end }}
-          {% if form.tue_end.errors %}<div class="text-danger small mt-1">{{ form.tue_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Miércoles apertura</label>
-          {{ form.wed_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Miércoles cierre</label>
-          {{ form.wed_end }}
-          {% if form.wed_end.errors %}<div class="text-danger small mt-1">{{ form.wed_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Jueves apertura</label>
-          {{ form.thu_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Jueves cierre</label>
-          {{ form.thu_end }}
-          {% if form.thu_end.errors %}<div class="text-danger small mt-1">{{ form.thu_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Viernes apertura</label>
-          {{ form.fri_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Viernes cierre</label>
-          {{ form.fri_end }}
-          {% if form.fri_end.errors %}<div class="text-danger small mt-1">{{ form.fri_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Sábado apertura</label>
-          {{ form.sat_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Sábado cierre</label>
-          {{ form.sat_end }}
-          {% if form.sat_end.errors %}<div class="text-danger small mt-1">{{ form.sat_end.errors }}</div>{% endif %}
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Domingo apertura</label>
-          {{ form.sun_start }}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Domingo cierre</label>
-          {{ form.sun_end }}
-          {% if form.sun_end.errors %}<div class="text-danger small mt-1">{{ form.sun_end.errors }}</div>{% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="section-card mb-4">
       <div class="section-title">Ubicación del negocio</div>
-      <p class="text-muted mb-3">
-        Usa tu ubicación actual, busca una dirección o ajusta el pin manualmente en el mapa.
-      </p>
 
       {{ form.latitude }}
       {{ form.longitude }}
 
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Latitud</label>
-          <input type="text" id="lat_preview" class="form-control" readonly>
-          {% if form.latitude.errors %}<div class="text-danger small mt-1">{{ form.latitude.errors }}</div>{% endif %}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Longitud</label>
-          <input type="text" id="lng_preview" class="form-control" readonly>
-          {% if form.longitude.errors %}<div class="text-danger small mt-1">{{ form.longitude.errors }}</div>{% endif %}
-        </div>
-      </div>
+      {% if form.latitude.errors %}<div class="text-danger small mt-1">{{ form.latitude.errors }}</div>{% endif %}
+      {% if form.longitude.errors %}<div class="text-danger small mt-1">{{ form.longitude.errors }}</div>{% endif %}
 
-      <div class="row g-2 mb-3">
-        <div class="col-md-8">
+      <div class="map-toolbar">
+        <button type="button" class="btn btn-outline-primary" id="btn-use-gps">
+          Usar mi ubicación actual
+        </button>
+
+        <div class="input-group" style="max-width: 460px;">
           <input
             type="text"
-            id="addressSearch"
+            id="address-search"
             class="form-control"
-            placeholder="Buscar dirección o lugar..."
+            placeholder="Buscar dirección o lugar"
           >
-        </div>
-        <div class="col-md-4 d-grid">
-          <button type="button" class="btn btn-outline-primary" id="searchAddressBtn">
+          <button type="button" class="btn btn-outline-secondary" id="btn-search-address">
             Buscar
           </button>
         </div>
       </div>
 
-      <div class="d-flex gap-2 flex-wrap mb-3">
-        <button type="button" class="btn btn-success" id="useCurrentLocationBtn">
-          📍 Usar mi ubicación actual
-        </button>
+      <div id="business-map"></div>
+
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <label class="form-label">Latitud</label>
+          <input type="text" class="form-control" id="lat-visible" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Longitud</label>
+          <input type="text" class="form-control" id="lng-visible" readonly>
+        </div>
       </div>
 
-      <div id="business-map"></div>
+      <div class="mini-help mt-3">
+        Puedes mover el pin manualmente, usar tu GPS actual o buscar una dirección para ubicar el negocio más rápido.
+      </div>
     </div>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-brand text-white px-4">Guardar cambios</button>
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+      <a href="javascript:history.back()" class="btn btn-light">Cancelar</a>
+      <button type="submit" class="btn btn-danger px-4">Guardar cambios</button>
     </div>
   </form>
 </div>
@@ -345,157 +431,92 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const mapElement = document.getElementById("business-map");
     const latInput = document.getElementById("id_latitude");
     const lngInput = document.getElementById("id_longitude");
-    const latPreview = document.getElementById("lat_preview");
-    const lngPreview = document.getElementById("lng_preview");
-    const addressInput = document.getElementById("addressSearch");
-    const searchBtn = document.getElementById("searchAddressBtn");
-    const gpsBtn = document.getElementById("useCurrentLocationBtn");
+    const latVisible = document.getElementById("lat-visible");
+    const lngVisible = document.getElementById("lng-visible");
+    const gpsBtn = document.getElementById("btn-use-gps");
+    const searchBtn = document.getElementById("btn-search-address");
+    const searchInput = document.getElementById("address-search");
 
-    if (!mapElement || !latInput || !lngInput) {
-      console.log("No se encontró el contenedor del mapa o los inputs ocultos.");
-      return;
-    }
+    const defaultLat = parseFloat(latInput?.value || "2.9273");
+    const defaultLng = parseFloat(lngInput?.value || "-75.2819");
 
-    let defaultLat = 2.9273;
-    let defaultLng = -75.2819;
-    let zoomLevel = 13;
-
-    if (latInput.value && lngInput.value) {
-      const parsedLat = parseFloat(latInput.value);
-      const parsedLng = parseFloat(lngInput.value);
-
-      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-        defaultLat = parsedLat;
-        defaultLng = parsedLng;
-        zoomLevel = 17;
-      }
-    }
-
-    const map = L.map("business-map").setView([defaultLat, defaultLng], zoomLevel);
+    const map = L.map("business-map").setView([defaultLat, defaultLng], 15);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-      maxZoom: 19
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
     const marker = L.marker([defaultLat, defaultLng], {
       draggable: true
     }).addTo(map);
 
-    function updateFields(lat, lng) {
-      const fixedLat = Number(lat).toFixed(6);
-      const fixedLng = Number(lng).toFixed(6);
-
-      latInput.value = fixedLat;
-      lngInput.value = fixedLng;
-
-      if (latPreview) latPreview.value = fixedLat;
-      if (lngPreview) lngPreview.value = fixedLng;
+    function updatePosition(lat, lng) {
+      if (latInput) latInput.value = lat.toFixed(6);
+      if (lngInput) lngInput.value = lng.toFixed(6);
+      if (latVisible) latVisible.value = lat.toFixed(6);
+      if (lngVisible) lngVisible.value = lng.toFixed(6);
     }
 
-    function moveMarker(lat, lng, zoom = 17) {
-      const parsedLat = parseFloat(lat);
-      const parsedLng = parseFloat(lng);
+    updatePosition(defaultLat, defaultLng);
 
-      if (isNaN(parsedLat) || isNaN(parsedLng)) return;
-
-      marker.setLatLng([parsedLat, parsedLng]);
-      map.setView([parsedLat, parsedLng], zoom);
-      updateFields(parsedLat, parsedLng);
-    }
-
-    updateFields(defaultLat, defaultLng);
-
-    map.on("click", function (e) {
-      const lat = e.latlng.lat;
-      const lng = e.latlng.lng;
-      moveMarker(lat, lng);
+    marker.on("dragend", function (e) {
+      const pos = e.target.getLatLng();
+      updatePosition(pos.lat, pos.lng);
     });
 
-    marker.on("dragend", function () {
-      const pos = marker.getLatLng();
-      updateFields(pos.lat, pos.lng);
+    map.on("click", function (e) {
+      marker.setLatLng(e.latlng);
+      updatePosition(e.latlng.lat, e.latlng.lng);
     });
 
     if (gpsBtn) {
       gpsBtn.addEventListener("click", function () {
         if (!navigator.geolocation) {
-          alert("Tu navegador no permite obtener la ubicación.");
+          alert("Tu navegador no permite usar geolocalización.");
           return;
         }
-
-        gpsBtn.disabled = true;
-        gpsBtn.textContent = "Obteniendo ubicación...";
 
         navigator.geolocation.getCurrentPosition(
           function (position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            moveMarker(lat, lng, 18);
-
-            gpsBtn.disabled = false;
-            gpsBtn.textContent = "📍 Usar mi ubicación actual";
+            map.setView([lat, lng], 17);
+            marker.setLatLng([lat, lng]);
+            updatePosition(lat, lng);
           },
-          function (error) {
-            console.error("Error obteniendo ubicación:", error);
-            alert("No se pudo obtener tu ubicación actual. Revisa permisos de ubicación o GPS.");
-
-            gpsBtn.disabled = false;
-            gpsBtn.textContent = "📍 Usar mi ubicación actual";
+          function () {
+            alert("No se pudo obtener tu ubicación actual.");
           },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
+          { enableHighAccuracy: true, timeout: 10000 }
         );
       });
     }
 
     async function searchAddress() {
-      const query = (addressInput?.value || "").trim();
-      if (!query) {
-        alert("Escribe una dirección o lugar.");
-        return;
-      }
-
-      if (searchBtn) {
-        searchBtn.disabled = true;
-        searchBtn.textContent = "Buscando...";
-      }
+      const q = (searchInput?.value || "").trim();
+      if (!q) return;
 
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
-        const response = await fetch(url, {
-          headers: {
-            "Accept": "application/json"
-          }
-        });
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+        const data = await res.json();
 
-        if (!response.ok) {
-          throw new Error("Error consultando dirección");
-        }
-
-        const results = await response.json();
-
-        if (!results.length) {
-          alert("No encontramos esa dirección.");
+        if (!data.length) {
+          alert("No se encontró esa dirección.");
           return;
         }
 
-        const place = results[0];
-        moveMarker(place.lat, place.lon, 17);
+        const first = data[0];
+        const lat = parseFloat(first.lat);
+        const lng = parseFloat(first.lon);
+
+        map.setView([lat, lng], 17);
+        marker.setLatLng([lat, lng]);
+        updatePosition(lat, lng);
       } catch (err) {
-        console.error("Error buscando dirección:", err);
         alert("Ocurrió un error buscando la dirección.");
-      } finally {
-        if (searchBtn) {
-          searchBtn.disabled = false;
-          searchBtn.textContent = "Buscar";
-        }
       }
     }
 
@@ -503,8 +524,8 @@
       searchBtn.addEventListener("click", searchAddress);
     }
 
-    if (addressInput) {
-      addressInput.addEventListener("keydown", function (e) {
+    if (searchInput) {
+      searchInput.addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
           e.preventDefault();
           searchAddress();
@@ -514,7 +535,7 @@
 
     setTimeout(function () {
       map.invalidateSize();
-    }, 500);
+    }, 250);
   });
 </script>
 {% endblock %}

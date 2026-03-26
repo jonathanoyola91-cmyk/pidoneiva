@@ -75,6 +75,26 @@
             {{ business.zone }}{% if business.address %} · {{ business.address }}{% endif %}
           </div>
 
+          {% if business.service_mode == "PICKUP" %}
+            <div class="mt-2">
+              <div class="alert alert-warning py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Solo recogida en el punto
+              </div>
+            </div>
+          {% elif business.service_mode == "DELIVERY" %}
+            <div class="mt-2">
+              <div class="alert alert-info py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Solo domicilio
+              </div>
+            </div>
+          {% elif business.service_mode == "BOTH" %}
+            <div class="mt-2">
+              <div class="alert alert-success py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Domicilio y recogida en el punto
+              </div>
+            </div>
+          {% endif %}
+
           {% if business.latitude and business.longitude %}
             <div class="mt-1">
               <a
@@ -613,6 +633,47 @@
         </table>
       </div>
 
+      {% if business.service_mode == "PICKUP" %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-2">Método de entrega</h6>
+            <p class="mb-0">
+              <strong>Recoger en el punto</strong><br>
+              Este negocio no maneja domicilio.
+            </p>
+          </div>
+        </div>
+      {% elif business.service_mode == "DELIVERY" %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-2">Método de entrega</h6>
+            <p class="mb-0">
+              <strong>Domicilio</strong>
+            </p>
+          </div>
+        </div>
+      {% else %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-3">Método de entrega</h6>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_home" value="delivery" checked>
+              <label class="form-check-label" for="delivery_home">
+                Domicilio
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_pickup" value="pickup">
+              <label class="form-check-label" for="delivery_pickup">
+                Recoger en el punto
+              </label>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
       <div class="card shadow-sm border-0 mt-3">
         <div class="card-body">
           <h5 class="mb-3">Resumen del pedido</h5>
@@ -693,10 +754,12 @@
             >
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Dirección</label>
-            <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto." required>
-          </div>
+          {% if business.service_mode != "PICKUP" %}
+            <div class="col-12">
+              <label class="form-label">Dirección</label>
+              <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto." required>
+            </div>
+          {% endif %}
 
           <div class="col-12">
             <label class="form-label">Notas</label>

@@ -1,4 +1,4 @@
-from datetime import time, timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 import calendar
 
@@ -19,25 +19,35 @@ def add_one_month(dt):
 
 
 def add_business_days(dt, days: int):
-    """
-    Suma 'days' días hábiles a partir de dt.
-    lunes=0 ... domingo=6
-    """
     current = dt
     added = 0
     while added < days:
         current += timedelta(days=1)
-        if current.weekday() < 5:  # 0-4 son hábiles
+        if current.weekday() < 5:
             added += 1
     return current
 
 
-# ✅ ZONAS ESTÁNDAR (lista fija)
+# ✅ ZONAS ESTÁNDAR
 ZONE_CHOICES = [
     ("SUR", "Sur"),
     ("NORTE", "Norte"),
     ("ORIENTE", "Oriente"),
     ("CENTRO", "Centro"),
+]
+
+
+# =========================
+# ✅ MODALIDAD DE SERVICIO
+# =========================
+SERVICE_MODE_DELIVERY = "DELIVERY"
+SERVICE_MODE_PICKUP = "PICKUP"
+SERVICE_MODE_BOTH = "BOTH"
+
+SERVICE_MODE_CHOICES = [
+    (SERVICE_MODE_DELIVERY, "Solo domicilio"),
+    (SERVICE_MODE_PICKUP, "Solo recoger en el punto"),
+    (SERVICE_MODE_BOTH, "Domicilio y recoger en el punto"),
 ]
 
 
@@ -58,20 +68,33 @@ class Business(models.Model):
         PREMIUM = "PREMIUM", "Plan Premium (Destacado)"
 
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="businesses"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="businesses",
     )
 
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, unique=True, blank=True)
 
     business_type = models.CharField(
-        max_length=20, choices=BusinessType.choices, default=BusinessType.RESTAURANT
+        max_length=20,
+        choices=BusinessType.choices,
+        default=BusinessType.RESTAURANT,
     )
     menu_mode = models.CharField(
-        max_length=10, choices=MenuMode.choices, default=MenuMode.BOTH
+        max_length=10,
+        choices=MenuMode.choices,
+        default=MenuMode.BOTH,
     )
 
-    # ✅ ZONA con lista fija
+    service_mode = models.CharField(
+        max_length=20,
+        choices=SERVICE_MODE_CHOICES,
+        default=SERVICE_MODE_BOTH,
+        verbose_name="Modalidad de entrega",
+        help_text="Define si el negocio vende por domicilio, recogida en punto o ambas opciones.",
+    )
+
     zone = models.CharField(
         max_length=20,
         choices=ZONE_CHOICES,
@@ -81,26 +104,23 @@ class Business(models.Model):
 
     address = models.CharField(max_length=160, blank=True)
 
-    # Ubicación (Google Maps)
     maps_url = models.URLField(
         blank=True,
         default="",
-        help_text="Pega aquí el enlace de Google Maps (Compartir → Copiar enlace)"
+        help_text="Pega aquí el enlace de Google Maps (Compartir → Copiar enlace)",
     )
 
     map_embed_url = models.URLField(
         blank=True,
         default="",
-        help_text="Opcional: enlace de insertar mapa (Compartir → Insertar un mapa)"
+        help_text="Opcional: enlace de insertar mapa",
     )
 
-    # ✅ NUEVOS CAMPOS: coordenadas del negocio
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
         null=True,
         blank=True,
-        help_text="Latitud del negocio"
     )
 
     longitude = models.DecimalField(
@@ -108,19 +128,15 @@ class Business(models.Model):
         decimal_places=6,
         null=True,
         blank=True,
-        help_text="Longitud del negocio"
     )
 
     phone = models.CharField(max_length=30, blank=True)
     whatsapp = models.CharField(max_length=30, blank=True)
     instagram = models.CharField(max_length=80, blank=True)
 
-    # Horario (MVP)
-    is_accepting_orders = models.BooleanField(default=True)  # “Estoy recibiendo pedidos”
-    show_closed_in_list = models.BooleanField(default=False)  # si True, aparecerá aunque esté cerrado (opcional)
+    is_accepting_orders = models.BooleanField(default=True)
+    show_closed_in_list = models.BooleanField(default=False)
 
-    # Horarios por día (0=Lunes ... 6=Domingo)
-    # Formato "HH:MM-HH:MM". Ej: "11:00-22:00"
     schedule_mon = models.CharField(max_length=20, blank=True, default="")
     schedule_tue = models.CharField(max_length=20, blank=True, default="")
     schedule_wed = models.CharField(max_length=20, blank=True, default="")
@@ -131,41 +147,25 @@ class Business(models.Model):
 
     description = models.TextField(blank=True)
 
-    # ✅ tiempo promedio de preparación (en minutos)
-    avg_prep_time = models.PositiveIntegerField(
-        default=25,
-        help_text="Tiempo promedio de preparación en minutos"
-    )
+    avg_prep_time = models.PositiveIntegerField(default=25)
 
-    # ✅ NUEVOS CAMPOS: domicilio y Nequi
     delivery_fee = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal("0.00"),
-        help_text="Costo fijo del domicilio para este negocio"
     )
+
     nequi_number = models.CharField(
         max_length=20,
         blank=True,
         default="",
-        help_text="Número Nequi donde el cliente debe transferir"
     )
 
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
-    cover_image = models.ImageField(
-        upload_to="covers/",
-        blank=True,
-        null=True,
-        help_text="Foto de portada para el directorio (recomendado 1200x600)."
-    )
+    cover_image = models.ImageField(upload_to="covers/", blank=True, null=True)
 
-    tags = models.CharField(
-        "Etiquetas (tags)",
-        max_length=250,
-        blank=True,
-        default="",
-        help_text="Separa por coma. Ej: pizza, hamburguesa, café, droguería, mercado",
-    )
+    tags = models.CharField(max_length=250, blank=True, default="")
+
     is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     review_requested = models.BooleanField(default=False)
@@ -178,172 +178,170 @@ class Business(models.Model):
     )
 
     trial_ends_at = models.DateTimeField(blank=True, null=True)
-
-    # ✅ 5 días hábiles de gracia (después de vencer prueba o pago)
     grace_ends_at = models.DateTimeField(blank=True, null=True)
-
-    # ✅ hasta cuándo está pagado (renovación mensual)
     paid_until = models.DateTimeField(blank=True, null=True)
 
-    # switch manual por si quieres “pausar”
     plan_active = models.BooleanField(default=True)
 
-    # ✅ métricas
     visits_count = models.PositiveIntegerField(default=0)
     whatsapp_clicks = models.PositiveIntegerField(default=0)
     last_visited_at = models.DateTimeField(blank=True, null=True)
     last_whatsapp_click_at = models.DateTimeField(blank=True, null=True)
 
-    # ✅ PROMOCIÓN (solo UI; no afecta carrito/menú/lógica existente)
-    promo_active = models.BooleanField(
-        default=False,
-        help_text="Activa/desactiva la promoción que se mostrará en el detalle del negocio."
-    )
-    promo_title = models.CharField(
-        max_length=120,
-        blank=True,
-        default="",
-        help_text="Título corto de la promo. Ej: 2x1 en hamburguesas"
-    )
-    promo_text = models.TextField(
-        blank=True,
-        default="",
-        help_text="Texto opcional de la promo. Ej: Válido hasta las 8pm"
-    )
+    promo_active = models.BooleanField(default=False)
+    promo_title = models.CharField(max_length=120, blank=True, default="")
+    promo_text = models.TextField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def is_plan_valid(self):
-        """
-        Decide si el negocio se debe mostrar.
-        Mantiene compatibilidad con tu uso actual: `if b.is_plan_valid` (sin paréntesis).
-        """
-        now = timezone.now()
-
-        if not self.plan_active:
-            return False
-
-        # Si está pagado
-        if self.paid_until and now <= self.paid_until:
-            return True
-
-        # Si está en prueba (FREE)
-        if self.plan == self.PlanType.FREE and self.trial_ends_at and now <= self.trial_ends_at:
-            return True
-
-        # Si está en periodo de gracia (5 días hábiles)
-        if self.grace_ends_at and now <= self.grace_ends_at:
-            return True
-
-        return False
-
-    def start_grace_if_needed(self):
-        """
-        Inicia gracia de 5 días hábiles si ya venció prueba/pago y no hay gracia activa.
-        """
-        now = timezone.now()
-
-        # Si ya está pagado o aún en prueba, no hacemos nada
-        if (self.paid_until and now <= self.paid_until) or (
-            self.plan == self.PlanType.FREE and self.trial_ends_at and now <= self.trial_ends_at
-        ):
-            return
-
-        # Si no tiene gracia activa, iniciarla por 5 días hábiles
-        if not self.grace_ends_at or now > self.grace_ends_at:
-            self.grace_ends_at = add_business_days(now, 5)
-            self.save(update_fields=["grace_ends_at"])
-
-    def days_remaining(self):
-        """
-        Días restantes de la prueba FREE.
-        Si no es FREE o no hay trial_ends_at, retorna 0.
-        """
-        if self.plan != self.PlanType.FREE or not self.trial_ends_at:
-            return 0
-        delta = self.trial_ends_at - timezone.now()
-        return max(delta.days, 0)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            base = slugify(self.name)
-            slug = base
-            i = 2
-            while Business.objects.filter(slug=slug).exists():
-                slug = f"{base}-{i}"
-                i += 1
-            self.slug = slug
-
-        # ✅ Asignar prueba automáticamente si no existe (mantiene tu lógica actual)
-        if not self.trial_ends_at and self.plan == self.PlanType.FREE:
-            self.trial_ends_at = timezone.now() + timedelta(days=15)
-
-        super().save(*args, **kwargs)
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Negocio"
+        verbose_name_plural = "Negocios"
 
     def __str__(self):
         return self.name
 
-    # ---- Métodos de horario (debajo de __str__) ----
-    def _get_schedule_for_weekday(self, weekday: int) -> str:
-        # weekday: 0=Lunes ... 6=Domingo
-        return [
-            self.schedule_mon,
-            self.schedule_tue,
-            self.schedule_wed,
-            self.schedule_thu,
-            self.schedule_fri,
-            self.schedule_sat,
-            self.schedule_sun,
-        ][weekday] or ""
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)[:120] or "negocio"
+            slug = base_slug
+            i = 2
+            while Business.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                suffix = f"-{i}"
+                slug = f"{base_slug[:140 - len(suffix)]}{suffix}"
+                i += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
-    def _parse_range(self, s: str):
-        """
-        Recibe "HH:MM-HH:MM" y devuelve (start_time, end_time) como datetime.time.
-        Si está vacío o inválido, retorna None.
-        """
-        s = (s or "").strip()
-        if not s or "-" not in s:
-            return None
-        a, b = s.split("-", 1)
-        a = a.strip()
-        b = b.strip()
-        try:
-            sh, sm = [int(x) for x in a.split(":")]
-            eh, em = [int(x) for x in b.split(":")]
-            return time(sh, sm), time(eh, em)
-        except Exception:
-            return None
+    def get_tags_list(self):
+        return [t.strip() for t in (self.tags or "").split(",") if t.strip()]
+
+    def request_review(self):
+        self.review_requested = True
+        self.review_requested_at = timezone.now()
+        self.save(update_fields=["review_requested", "review_requested_at"])
+
+    def activate_free_trial(self):
+        now = timezone.now()
+        self.plan = self.PlanType.FREE
+        self.plan_active = True
+        self.trial_ends_at = add_business_days(now, 15)
+        self.save(update_fields=["plan", "plan_active", "trial_ends_at"])
+
+    def activate_paid_plan(self, plan_type=None, months=1):
+        now = timezone.now()
+        base_date = self.paid_until if self.paid_until and self.paid_until > now else now
+
+        if plan_type:
+            self.plan = plan_type
+
+        self.plan_active = True
+        new_paid_until = base_date
+        for _ in range(months):
+            new_paid_until = add_one_month(new_paid_until)
+
+        self.paid_until = new_paid_until
+        self.save(update_fields=["plan", "plan_active", "paid_until"])
 
     @property
-    def is_open_now(self) -> bool:
-        """
-        Abierto si:
-        - is_accepting_orders True
-        - y horario del día contiene rango válido
-        - y ahora está dentro del rango
-        Soporta rangos que cruzan medianoche (ej 18:00-02:00)
-        """
-        if not self.is_accepting_orders:
+    def has_active_trial(self):
+        return bool(self.trial_ends_at and self.trial_ends_at >= timezone.now())
+
+    @property
+    def has_active_paid_plan(self):
+        return bool(self.plan_active and self.paid_until and self.paid_until >= timezone.now())
+
+    @property
+    def has_active_plan(self):
+        return self.has_active_trial or self.has_active_paid_plan
+
+    def register_visit(self):
+        self.visits_count = (self.visits_count or 0) + 1
+        self.last_visited_at = timezone.now()
+        self.save(update_fields=["visits_count", "last_visited_at"])
+
+    def register_whatsapp_click(self):
+        self.whatsapp_clicks = (self.whatsapp_clicks or 0) + 1
+        self.last_whatsapp_click_at = timezone.now()
+        self.save(update_fields=["whatsapp_clicks", "last_whatsapp_click_at"])
+
+    def _parse_schedule_range(self, value: str):
+        value = (value or "").strip()
+        if not value or "-" not in value:
+            return None, None
+
+        start_str, end_str = value.split("-", 1)
+        start_str = start_str.strip()
+        end_str = end_str.strip()
+
+        try:
+            start = datetime.strptime(start_str, "%H:%M").time()
+            end = datetime.strptime(end_str, "%H:%M").time()
+            return start, end
+        except ValueError:
+            return None, None
+
+    def _parse_range(self, value: str):
+        return self._parse_schedule_range(value)
+
+    def _get_schedule_for_weekday(self, weekday: int):
+        mapping = {
+            0: self.schedule_mon,
+            1: self.schedule_tue,
+            2: self.schedule_wed,
+            3: self.schedule_thu,
+            4: self.schedule_fri,
+            5: self.schedule_sat,
+            6: self.schedule_sun,
+        }
+        return mapping.get(weekday, "")
+
+    @property
+    def opening_hours(self):
+        now = timezone.localtime()
+        return self._get_schedule_for_weekday(now.weekday())
+
+    @property
+    def opening_time(self):
+        schedule = self.opening_hours
+        start, _ = self._parse_schedule_range(schedule)
+        return start
+
+    @property
+    def closing_time(self):
+        schedule = self.opening_hours
+        _, end = self._parse_schedule_range(schedule)
+        return end
+
+    @property
+    def is_open_now(self):
+        if not self.is_active or not self.is_approved or not self.is_accepting_orders:
             return False
 
-        now = timezone.localtime(timezone.now())
-        weekday = now.weekday()  # 0..6
-        schedule = self._get_schedule_for_weekday(weekday)
-        parsed = self._parse_range(schedule)
-        if not parsed:
+        now = timezone.localtime()
+        schedule = self._get_schedule_for_weekday(now.weekday())
+        start, end = self._parse_schedule_range(schedule)
+
+        if not start or not end:
             return False
 
-        start, end = parsed
-        current_t = now.time()
+        current_time = now.time()
 
-        # Rango normal (ej 11:00-22:00)
-        if start < end:
-            return start <= current_t <= end
+        if start <= end:
+            return start <= current_time <= end
 
-        # Rango cruza medianoche (ej 18:00-02:00)
-        return current_t >= start or current_t <= end
+        return current_time >= start or current_time <= end
 
-    def open_status_label(self) -> str:
-        return "Abierto" if self.is_open_now else "Cerrado"
+    @property
+    def service_mode_label(self):
+        return dict(SERVICE_MODE_CHOICES).get(self.service_mode, "")
+
+    @property
+    def allows_delivery(self):
+        return self.service_mode in {SERVICE_MODE_DELIVERY, SERVICE_MODE_BOTH}
+
+    @property
+    def allows_pickup(self):
+        return self.service_mode in {SERVICE_MODE_PICKUP, SERVICE_MODE_BOTH}

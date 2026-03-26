@@ -214,13 +214,20 @@
             <div class="pn-home-business-row-info">
               <div class="pn-home-business-row-name">{{ b.name }}</div>
 
-              <div class="pn-home-business-row-category">
-                {% if request.GET.type == "COMMERCE" %}
-                  {{ b.get_business_type_display }}
-                {% else %}
-                  {{ b.get_business_type_display }}
-                {% endif %}
-              </div>
+            <div class="pn-home-business-row-category">
+              {{ b.get_business_type_display }}
+            </div>
+
+            <!-- 🔥 PÍLDORA DE SERVICIO -->
+            <div class="mt-1">
+              {% if b.service_mode == "DELIVERY" %}
+                <span class="service-pill service-delivery">🛵 Solo domicilio</span>
+              {% elif b.service_mode == "PICKUP" %}
+                <span class="service-pill service-pickup">🏪 Solo recoger</span>
+              {% elif b.service_mode == "BOTH" %}
+                <span class="service-pill service-both">🛵🏪 Domicilio y recoger</span>
+              {% endif %}
+            </div>
 
               <div class="pn-home-business-row-meta">
                 {% if b.zone %}

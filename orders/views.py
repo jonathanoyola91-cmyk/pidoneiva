@@ -64,6 +64,43 @@ def get_logged_app_customer(request):
     return None
 
 
+def get_effective_delivery_type(business, buyer):
+    """
+    Determina el tipo de entrega real según:
+    - la modalidad del negocio
+    - lo guardado en sesión del comprador
+    """
+    service_mode = str(getattr(business, "service_mode", "") or "").upper()
+    buyer = buyer or {}
+
+    # Si el negocio solo permite recoger, forzar pickup
+    if service_mode == "PICKUP":
+        return "pickup"
+
+    # Si el negocio solo permite domicilio, forzar delivery
+    if service_mode == "DELIVERY":
+        return "delivery"
+
+    # Si permite ambos, usar lo guardado por el comprador
+    delivery_type = (buyer.get("delivery_type") or "delivery").strip().lower()
+    if delivery_type not in ["delivery", "pickup"]:
+        delivery_type = "delivery"
+
+    return delivery_type
+
+
+def get_delivery_fee_amount(business, buyer):
+    """
+    Devuelve el costo de domicilio real según el tipo de entrega.
+    """
+    delivery_type = get_effective_delivery_type(business, buyer)
+
+    if delivery_type != "delivery":
+        return 0
+
+    return int(Decimal(str(getattr(business, "delivery_fee", 0) or 0)))
+
+
 # =========================
 # API - métodos de pago
 # =========================
@@ -190,7 +227,9 @@ def cart_update_json(request, slug, item_id):
         cart_count += q
         subtotal += price_map.get(str(k), 0) * q
 
-    delivery_fee = int(Decimal(str(business.delivery_fee or 0)))
+    buyer = request.session.get(_buyer_key(business.slug), {}) or {}
+    delivery_type = get_effective_delivery_type(business, buyer)
+    delivery_fee = get_delivery_fee_amount(business, buyer)
     total = subtotal + delivery_fee
 
     active_info = _get_active_cart_info(request)
@@ -201,6 +240,7 @@ def cart_update_json(request, slug, item_id):
         "qty": qty,
         "item_subtotal": item_subtotal,
         "cart_subtotal": subtotal,
+        "delivery_type": delivery_type,
         "delivery_fee": delivery_fee,
         "cart_total": total,
         "cart_count": cart_count,
@@ -255,6 +295,7 @@ def send_whatsapp_order(request, slug):
     buyer_address = (buyer.get("address") or "").strip()
     buyer_notes = (buyer.get("notes") or "").strip()
     payment_method = (buyer.get("payment_method") or Order.PAYMENT_TRANSFER).strip()
+    delivery_type = get_effective_delivery_type(business, buyer)
 
     customer = get_or_create_customer(buyer_name, buyer_phone)
     allowed_methods = get_available_payment_methods(customer)
@@ -273,6 +314,7 @@ def send_whatsapp_order(request, slug):
         buyer_address=buyer_address,
         buyer_notes=buyer_notes,
         payment_method=payment_method,
+        delivery_type=delivery_type,
         total=0,
     )
 
@@ -304,7 +346,7 @@ def send_whatsapp_order(request, slug):
             f"• {qty} x {item.name} (${price:,}) = ${line_subtotal:,}".replace(",", ".")
         )
 
-    delivery_fee = int(Decimal(str(business.delivery_fee or 0)))
+    delivery_fee = get_delivery_fee_amount(business, buyer)
     total = subtotal + delivery_fee
 
     order.total = total
@@ -347,6 +389,11 @@ def send_whatsapp_order(request, slug):
     else:
         payment_label = "Transferencia"
 
+    if delivery_type == "pickup":
+        delivery_label = "Recoger en el punto"
+    else:
+        delivery_label = "Domicilio"
+
     client_status = "Cliente nuevo"
     if customer and customer.can_pay_cash():
         client_status = "Cliente con historial"
@@ -359,12 +406,13 @@ def send_whatsapp_order(request, slug):
         f"{order.buyer_phone}\n"
         f"{order.buyer_address}\n"
         f"{order.buyer_notes}\n\n"
+        f"*Método de entrega:* {delivery_label}\n"
         f"*Método de pago:* {payment_label}\n"
         f"*Estado del cliente:* {client_status}\n\n"
         f"*Detalle:*\n"
         + ("\n".join(lines) if lines else "- (sin items)")
         + f"\n\n*Subtotal productos:* {subtotal_str}"
-        + f"\n*Domicilio:* {delivery_fee_str}"
+        + (f"\n*Domicilio:* {delivery_fee_str}" if delivery_fee > 0 else "\n*Domicilio:* $0")
         + f"\n*Total:* {total_str}"
     )
 

@@ -2,6 +2,9 @@ from django.db import models
 from django.utils import timezone
 
 
+# =========================
+# Customer Profile
+# =========================
 class CustomerProfile(models.Model):
     phone = models.CharField("Celular", max_length=20, unique=True)
     name = models.CharField("Nombre", max_length=120, blank=True)
@@ -21,6 +24,21 @@ class CustomerProfile(models.Model):
         return f"{self.phone} - {self.name or 'Sin nombre'}"
 
 
+# =========================
+# Tipos de entrega
+# =========================
+DELIVERY_TYPE_DELIVERY = "delivery"
+DELIVERY_TYPE_PICKUP = "pickup"
+
+DELIVERY_TYPE_CHOICES = [
+    (DELIVERY_TYPE_DELIVERY, "Domicilio"),
+    (DELIVERY_TYPE_PICKUP, "Recoger en el punto"),
+]
+
+
+# =========================
+# Order
+# =========================
 class Order(models.Model):
     STATUS_PENDING = "pending"
     STATUS_CONFIRMED = "confirmed"
@@ -69,6 +87,13 @@ class Order(models.Model):
     buyer_address = models.CharField(max_length=220)
     buyer_notes = models.TextField(blank=True)
 
+    # ✅ NUEVO CAMPO: tipo de entrega
+    delivery_type = models.CharField(
+        max_length=20,
+        choices=DELIVERY_TYPE_CHOICES,
+        default=DELIVERY_TYPE_DELIVERY,
+    )
+
     payment_method = models.CharField(
         max_length=20,
         choices=PAYMENT_CHOICES,
@@ -102,6 +127,9 @@ class Order(models.Model):
             super().save(update_fields=["number"])
 
 
+# =========================
+# Order Items
+# =========================
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
 

@@ -94,7 +94,7 @@ class BusinessForm(forms.ModelForm):
     class Meta:
         model = Business
         fields = [
-            "name", "business_type", "menu_mode", "zone", "address",
+            "name", "business_type", "menu_mode", "service_mode", "zone", "address",
             "latitude", "longitude",
             "phone", "whatsapp", "instagram", "description",
             "tags",
@@ -113,6 +113,7 @@ class BusinessForm(forms.ModelForm):
             "nequi_number": "Número Nequi",
             "latitude": "Latitud",
             "longitude": "Longitud",
+            "service_mode": "Modalidad de entrega",
         }
 
         help_texts = {
@@ -121,12 +122,14 @@ class BusinessForm(forms.ModelForm):
             "nequi_number": "Número Nequi donde el cliente debe transferir",
             "latitude": "Latitud del negocio",
             "longitude": "Longitud del negocio",
+            "service_mode": "Selecciona si el negocio ofrece domicilio, recogida o ambos",
         }
 
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "business_type": forms.Select(attrs={"class": "form-select"}),
             "menu_mode": forms.Select(attrs={"class": "form-select"}),
+            "service_mode": forms.Select(attrs={"class": "form-select"}),
             "zone": forms.Select(attrs={"class": "form-select"}),
             "address": forms.TextInput(attrs={"class": "form-control"}),
             "phone": forms.TextInput(attrs={"class": "form-control"}),
@@ -201,6 +204,9 @@ class BusinessForm(forms.ModelForm):
         if "longitude" in self.fields:
             self.fields["longitude"].required = False
 
+        if "service_mode" in self.fields:
+            self.fields["service_mode"].required = False
+
         instance = getattr(self, "instance", None)
         if instance and instance.pk:
             s, e = self._parse_range_str(instance.schedule_mon)
@@ -272,36 +278,23 @@ class BusinessForm(forms.ModelForm):
         return instance
 
 
+# =========================
+# ✅ NUEVOS FORMS (SOLUCIÓN)
+# =========================
+
 class MenuCategoryForm(forms.ModelForm):
     class Meta:
         model = MenuCategory
-        fields = ["name", "order"]
-        widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
-            "order": forms.NumberInput(attrs={"class": "form-control"}),
-        }
+        fields = "__all__"
 
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["category", "name", "description", "price", "photo", "is_available", "order"]
-        widgets = {
-            "category": forms.Select(attrs={"class": "form-select"}),
-            "name": forms.TextInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "photo": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "is_available": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "order": forms.NumberInput(attrs={"class": "form-control"}),
-        }
+        fields = "__all__"
 
 
 class MenuFileForm(forms.ModelForm):
     class Meta:
         model = MenuFile
-        fields = ["file", "is_active"]
-        widgets = {
-            "file": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        }
+        fields = "__all__"
