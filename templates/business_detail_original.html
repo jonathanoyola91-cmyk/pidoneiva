@@ -1,0 +1,1420 @@
+<div class="bg-white rounded-4 shadow-soft p-4">
+
+  <style>
+    .product-search-wrap .form-control:focus{
+      box-shadow:none;
+      border-color:#dee2e6;
+    }
+
+    .product-search-wrap .input-group{
+      border:1px solid #e9ecef;
+      background:#fff;
+      border-radius:16px;
+    }
+
+    .product-search-wrap .input-group-text,
+    .product-search-wrap .form-control,
+    .product-search-wrap .btn{
+      background:#fff;
+    }
+
+    .product-card.hidden-by-search{
+      display:none !important;
+    }
+
+    .menu-category.hidden-by-search{
+      display:none !important;
+    }
+
+    .category-block.hidden-by-search{
+      display:none !important;
+    }
+
+    .no-products-found{
+      display:none;
+      text-align:center;
+      padding:24px 16px;
+      border-radius:16px;
+      background:#f8f9fa;
+      color:#6c757d;
+      margin-top:12px;
+    }
+  </style>
+
+  <div class="business-hero-card">
+    <div class="business-hero-bg">
+      {% if business.cover_image %}
+        <img src="{{ business.cover_image.url }}" class="business-hero-img" alt="{{ business.name }}">
+      {% elif business.logo %}
+        <img src="{{ business.logo.url }}" class="business-hero-img" alt="{{ business.name }}">
+      {% endif %}
+      <div class="business-hero-gradient"></div>
+
+      <div class="business-hero-status">
+        {% if business.is_open_now %}
+          <span class="pill pill-success"><span class="dot"></span> Abierto</span>
+        {% else %}
+          <span class="pill pill-muted">Cerrado</span>
+        {% endif %}
+      </div>
+
+      <div class="business-hero-content">
+        {% if business.logo %}
+          <div class="business-hero-logo">
+            <img src="{{ business.logo.url }}" alt="{{ business.name }}">
+          </div>
+        {% endif %}
+
+        <div class="business-hero-text">
+          <h1 class="business-hero-name">{{ business.name }}</h1>
+          <div class="business-hero-sub">
+            {{ business.zone }}{% if business.address %} · {{ business.address }}{% endif %}
+          </div>
+
+          {% if business.service_mode == "PICKUP" %}
+            <div class="mt-2">
+              <div class="alert alert-warning py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Solo recogida en el punto
+              </div>
+            </div>
+          {% elif business.service_mode == "DELIVERY" %}
+            <div class="mt-2">
+              <div class="alert alert-info py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Solo domicilio
+              </div>
+            </div>
+          {% elif business.service_mode == "BOTH" %}
+            <div class="mt-2">
+              <div class="alert alert-success py-2 px-3 small mb-0">
+                <strong>Modalidad:</strong> Domicilio y recogida en el punto
+              </div>
+            </div>
+          {% endif %}
+
+          {% if business.latitude and business.longitude %}
+            <div class="mt-1">
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+                target="_blank"
+                rel="noopener"
+                class="business-hero-link"
+              >
+                📍 Cómo llegar
+              </a>
+            </div>
+          {% elif business.maps_url %}
+            <div class="mt-1">
+              <a href="{{ business.maps_url }}" target="_blank" rel="noopener" class="business-hero-link">
+                📍 Ver ubicación en Google Maps
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="business-hero-actions">
+      <div class="d-flex flex-wrap gap-2 mt-3">
+
+        {% if not is_pdf_only %}
+
+          <a class="btn btn-outline-primary" href="#menu">
+            🛒 Ver menú
+          </a>
+
+          {% if cart_items %}
+            <a class="btn btn-success" href="#cart">
+              🧾 Ver mi pedido
+            </a>
+          {% endif %}
+
+          {% if business.latitude and business.longitude %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+            >
+              Cómo llegar
+            </a>
+          {% elif business.maps_url %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="{{ business.maps_url }}"
+            >
+              Ubicación
+            </a>
+          {% endif %}
+
+          {% if business.phone %}
+            <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
+          {% endif %}
+
+          {% if business.instagram %}
+            <a class="btn btn-outline-secondary" target="_blank"
+               href="https://instagram.com/{{ business.instagram|cut:'@' }}">
+              Instagram
+            </a>
+          {% endif %}
+
+        {% else %}
+
+          {% if business.latitude and business.longitude %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+            >
+              Cómo llegar
+            </a>
+          {% elif business.maps_url %}
+            <a
+              class="btn btn-outline-secondary"
+              target="_blank"
+              rel="noopener"
+              href="{{ business.maps_url }}"
+            >
+              Ubicación
+            </a>
+          {% endif %}
+
+          {% if business.phone %}
+            <a class="btn btn-outline-secondary" href="tel:{{ business.phone }}">Llamar</a>
+          {% endif %}
+
+          {% if business.instagram %}
+            <a class="btn btn-outline-secondary" target="_blank"
+               href="https://instagram.com/{{ business.instagram|cut:'@' }}">
+              Instagram
+            </a>
+          {% endif %}
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="small mt-2">
+    {% if business.opening_hours %}
+      <span class="text-secondary">Horario: {{ business.opening_hours }}</span>
+    {% elif business.hours %}
+      <span class="text-secondary">Horario: {{ business.hours }}</span>
+    {% elif business.opening_time and business.closing_time %}
+      <span class="text-secondary">Horario: {{ business.opening_time }} - {{ business.closing_time }}</span>
+    {% endif %}
+  </div>
+
+  {% if business.description %}
+    <div class="text-secondary mt-2">{{ business.description }}</div>
+  {% endif %}
+
+  {% if business.promo_active and business.promo_title %}
+    <div class="alert alert-warning rounded-4 shadow-soft mt-3 mb-0">
+      <div class="fw-bold">🔥 {{ business.promo_title }}</div>
+      {% if business.promo_text %}
+        <div class="small">{{ business.promo_text }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if not business.is_open_now %}
+    <div class="alert alert-warning mt-3 mb-0">
+      Este negocio está <strong>cerrado</strong>. Puedes ver productos, pero no enviar pedidos hasta que abra.
+    </div>
+  {% endif %}
+
+  <hr>
+
+  {% if cart_warning %}
+    <div class="alert alert-warning mt-3 rounded-4 shadow-soft">
+      <div class="fw-bold mb-1">⚠️ Ya tienes un carrito activo</div>
+
+      <div class="small mb-3">
+        Tu pedido actual está en
+        <strong>{{ request.session.active_cart_business_name|default:"otro negocio" }}</strong>.
+        Puedes volver a ese carrito o vaciarlo para empezar aquí.
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'go_to_active_cart' %}" class="btn btn-brand text-white">
+          🛒 Ver mi carrito actual
+        </a>
+
+        <form method="post" action="{% url 'cart_clear_and_switch' business.slug %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger">
+            Vaciar carrito y comprar aquí
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <ul class="nav nav-pills gap-2" id="pnTabs" role="tablist">
+
+    {% if not is_pdf_only %}
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-products" type="button">
+          Productos
+        </button>
+      </li>
+    {% endif %}
+
+    <li class="nav-item">
+      <button class="nav-link {% if is_pdf_only %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#tab-pdf" type="button">
+        Menú PDF
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-info" type="button">
+        Info
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3">
+
+    {% if not is_pdf_only %}
+      <div class="tab-pane fade show active" id="tab-products">
+        <div id="menu"></div>
+
+        <div class="product-search-wrap mt-3 mb-3">
+          <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
+            <span class="input-group-text bg-white border-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              id="productSearchInput"
+              class="form-control border-0"
+              placeholder="Buscar productos en este negocio..."
+              autocomplete="off"
+            >
+            <button
+              class="btn btn-light border-0"
+              type="button"
+              id="clearProductSearch"
+              style="display:none;"
+            >
+              Limpiar
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            Busca por nombre o descripción del producto
+          </small>
+        </div>
+
+        {% if visible_categories_count > 1 %}
+          <div class="menu-categories mt-3 mb-2 {% if visible_categories_count <= 4 %}menu-categories-fill{% endif %}">
+            {% for cat in categories %}
+              {% if cat.items.all|length %}
+                <a class="menu-category js-menu-category" data-category-id="cat-{{ cat.id }}" href="#cat-{{ cat.id }}">
+                  {{ cat.name }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div id="noProductsFoundMessage" class="no-products-found">
+          No encontramos productos con esa búsqueda en este negocio.
+        </div>
+
+        {% for cat in categories %}
+          {% if cat.items.all|length %}
+            <div class="mt-4 category-block js-category-section" id="cat-{{ cat.id }}">
+              {% if visible_categories_count > 1 %}
+                <h3 class="h6 fw-bold">{{ cat.name }}</h3>
+              {% endif %}
+
+              <div class="products-row {% if visible_categories_count == 1 %}products-grid-fill{% endif %}">
+                {% for item in cat.items.all %}
+                  {% if item.is_available %}
+                    <div
+                      class="product-card js-product-card"
+                      data-category-id="cat-{{ cat.id }}"
+                      data-name="{{ item.name|default:''|lower }}"
+                      data-description="{{ item.description|default:''|striptags|lower }}"
+                    >
+                      <div class="card shadow-soft p-3 h-100">
+
+                        {% if item.photo %}
+                          <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
+                        {% endif %}
+
+                        <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
+                          {{ item.name }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="fw-bold fs-5 text-dark">
+                            ${{ item.price|floatformat:0 }}
+                          </div>
+                        </div>
+
+                        {% if item.description %}
+                          <div class="small text-secondary mt-1 clamp-2">
+                            {{ item.description }}
+                          </div>
+                        {% endif %}
+
+                        <button type="button"
+                                class="btn btn-outline-secondary w-100 mt-2 js-open-product"
+                                data-bs-toggle="modal"
+                                data-bs-target="#productModal"
+                                data-id="{{ item.id }}"
+                                data-name="{{ item.name|escapejs }}"
+                                data-price="{{ item.price|floatformat:0 }}"
+                                data-desc="{{ item.description|default:''|escapejs }}"
+                                {% if item.photo %}data-photo="{{ item.photo.url }}"{% else %}data-photo=""{% endif %}
+                                data-update-url="{% url 'cart_update_json' business.slug item.id %}">
+                          Ver detalles
+                        </button>
+
+                        <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
+                          {% csrf_token %}
+                          {% if business.is_open_now %}
+                            <button class="btn btn-success w-100">Agregar al pedido</button>
+                          {% else %}
+                            <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
+                          {% endif %}
+                        </form>
+
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if uncategorized_items %}
+          <div class="mt-4 category-block js-category-section" id="cat-uncategorized">
+            <h3 class="h6 fw-bold">Productos</h3>
+
+            <div class="products-row {% if visible_categories_count == 0 %}products-grid-fill{% endif %}">
+              {% for item in uncategorized_items %}
+                {% if item.is_available %}
+                  <div
+                    class="product-card js-product-card"
+                    data-category-id="cat-uncategorized"
+                    data-name="{{ item.name|default:''|lower }}"
+                    data-description="{{ item.description|default:''|striptags|lower }}"
+                  >
+                    <div class="card shadow-soft p-3 h-100">
+
+                      {% if item.photo %}
+                        <img src="{{ item.photo.url }}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">
+                      {% endif %}
+
+                      <div class="fw-bold mt-2" style="font-size:15px; line-height:1.2;">
+                        {{ item.name }}
+                      </div>
+
+                      <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="fw-bold fs-5 text-dark">
+                          ${{ item.price|floatformat:0 }}
+                        </div>
+                      </div>
+
+                      {% if item.description %}
+                        <div class="small text-secondary mt-1 clamp-2">
+                          {{ item.description }}
+                        </div>
+                      {% endif %}
+
+                      <button type="button"
+                              class="btn btn-outline-secondary w-100 mt-2 js-open-product"
+                              data-bs-toggle="modal"
+                              data-bs-target="#productModal"
+                              data-id="{{ item.id }}"
+                              data-name="{{ item.name|escapejs }}"
+                              data-price="{{ item.price|floatformat:0 }}"
+                              data-desc="{{ item.description|default:''|escapejs }}"
+                              {% if item.photo %}data-photo="{{ item.photo.url }}"{% else %}data-photo=""{% endif %}
+                              data-update-url="{% url 'cart_update_json' business.slug item.id %}">
+                        Ver detalles
+                      </button>
+
+                      <form method="post" action="{% url 'cart_add' business.slug item.id %}" class="mt-3 js-add-to-cart">
+                        {% csrf_token %}
+                        {% if business.is_open_now %}
+                          <button class="btn btn-success w-100">Agregar al pedido</button>
+                        {% else %}
+                          <button class="btn btn-secondary w-100" disabled>Negocio cerrado</button>
+                        {% endif %}
+                      </form>
+
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="tab-pane fade {% if is_pdf_only %}show active{% endif %}" id="tab-pdf">
+      <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+          Este negocio usa <strong>menú en PDF</strong>. Para pedir, contáctalo directamente:
+        </div>
+
+        {% if business.whatsapp %}
+          <a class="btn btn-success" target="_blank"
+             href="{% url 'whatsapp_redirect' business.slug %}">
+            Contactar por WhatsApp
+          </a>
+        {% else %}
+          <span class="text-danger small">
+            ⚠️ Este negocio aún no tiene WhatsApp configurado.
+          </span>
+        {% endif %}
+      </div>
+
+      {% if menu_files %}
+        <div class="d-flex flex-column gap-2">
+          {% for f in menu_files %}
+            <a class="btn btn-outline-primary" target="_blank" href="{{ f.file.url }}">
+              📄 Descargar menú PDF ({{ f.uploaded_at|date:"M d, Y" }})
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-secondary">Aún no han subido un PDF.</div>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="tab-info">
+      <div class="text-secondary">
+        {% if business.address %}<div><strong>Dirección:</strong> {{ business.address }}</div>{% endif %}
+        {% if business.zone %}<div><strong>Zona:</strong> {{ business.zone }}</div>{% endif %}
+        {% if business.phone %}<div><strong>Teléfono:</strong> {{ business.phone }}</div>{% endif %}
+        {% if business.whatsapp %}<div><strong>WhatsApp:</strong> {{ business.whatsapp }}</div>{% endif %}
+
+        {% if business.latitude and business.longitude %}
+          <div class="mt-2">
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination={{ business.latitude }},{{ business.longitude }}"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline-primary btn-sm"
+            >
+              📍 Cómo llegar
+            </a>
+          </div>
+        {% elif business.maps_url %}
+          <div class="mt-2">
+            <a
+              href="{{ business.maps_url }}"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline-primary btn-sm"
+            >
+              📍 Ver ubicación
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  {% if not is_pdf_only %}
+    <hr class="my-4">
+
+    <h2 id="mi-pedido" class="h6 fw-bold mb-3">
+      🧾 Mi pedido
+    </h2>
+
+    <div id="cart"></div>
+
+    {% if not cart_items %}
+      <div class="alert alert-secondary">
+        Aún no has agregado productos. Ve al menú y presiona <strong>“Agregar al pedido”</strong>.
+      </div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th style="width:180px;">Cantidad</th>
+              <th class="text-end">Subtotal</th>
+              <th class="text-end" style="width:90px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ci in cart_items %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ ci.name }}</div>
+                  <div class="text-secondary small">${{ ci.price|floatformat:0 }}</div>
+                </td>
+
+                <td>
+                  <div class="d-flex gap-2 align-items-center">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm js-qty"
+                            data-action="minus"
+                            data-id="{{ ci.id }}"
+                            data-next="{{ ci.qty|add:'-1' }}"
+                            data-url="{% url 'cart_update_json' business.slug ci.id %}"
+                            {% if ci.qty <= 1 %}disabled{% endif %}>-</button>
+
+                    <div id="qty-{{ ci.id }}"
+                         class="px-2 py-1 border rounded-3 js-qty-val"
+                         data-cart-qty
+                         data-id="{{ ci.id }}"
+                         data-qty-text="{{ ci.id }}">{{ ci.qty }}</div>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm js-qty"
+                            data-action="plus"
+                            data-id="{{ ci.id }}"
+                            data-next="{{ ci.qty|add:'1' }}"
+                            data-url="{% url 'cart_update_json' business.slug ci.id %}">+</button>
+
+                  </div>
+                </td>
+
+                <td class="text-end fw-bold js-subtotal"
+                    data-id="{{ ci.id }}"
+                    data-subtotal-text="{{ ci.id }}">
+                  ${{ ci.subtotal|floatformat:0 }}
+                </td>
+
+                <td class="text-end">
+                  <form method="post" action="{% url 'cart_remove' business.slug ci.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger btn-sm">✕</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-end">Subtotal productos:</td>
+              <td class="text-end fw-bold" id="js-cart-subtotal">
+                ${{ cart_total|floatformat:0 }}
+              </td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="text-end">Domicilio:</td>
+              <td class="text-end fw-bold" id="js-delivery-fee">
+                ${{ business.delivery_fee|floatformat:0 }}
+              </td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="text-end fw-bold">Total a pagar:</td>
+              <td class="text-end fw-bold" id="js-cart-total" data-cart-total>
+                ${{ cart_total|add:business.delivery_fee|floatformat:0 }}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {% if business.service_mode == "PICKUP" %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-2">Método de entrega</h6>
+            <p class="mb-0">
+              <strong>Recoger en el punto</strong><br>
+              Este negocio no maneja domicilio.
+            </p>
+          </div>
+        </div>
+      {% elif business.service_mode == "DELIVERY" %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-2">Método de entrega</h6>
+            <p class="mb-0">
+              <strong>Domicilio</strong>
+            </p>
+          </div>
+        </div>
+      {% else %}
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body">
+            <h6 class="mb-3">Método de entrega</h6>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_home" value="delivery" checked>
+              <label class="form-check-label" for="delivery_home">
+                Domicilio
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_pickup" value="pickup">
+              <label class="form-check-label" for="delivery_pickup">
+                Recoger en el punto
+              </label>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h5 class="mb-3">Resumen del pedido</h5>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal productos</span>
+            <strong id="js-summary-subtotal">$ {{ cart_total|floatformat:0 }}</strong>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Domicilio</span>
+            <strong id="js-summary-delivery">$ {{ business.delivery_fee|floatformat:0 }}</strong>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between">
+            <span>Total a pagar</span>
+            <strong id="js-summary-total">$ {{ cart_total|add:business.delivery_fee|floatformat:0 }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap mt-3">
+        <form method="post" action="{% url 'cart_clear' business.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-outline-danger">Vaciar pedido</button>
+        </form>
+
+        {% if business.whatsapp %}
+          <a class="btn btn-success" target="_blank" href="{% url 'cart_whatsapp' business.slug %}">
+            Enviar pedido por WhatsApp
+          </a>
+        {% endif %}
+      </div>
+
+      <hr class="my-4">
+
+      <h3 class="h6 fw-bold mb-3">👤 Datos para el envío</h3>
+
+      {% if not user.is_authenticated %}
+        <div class="alert alert-info mb-3">
+          💡 Estás comprando como invitado.
+          <a href="/accounts/login/?next={{ request.path }}" class="fw-bold">
+            Inicia sesión
+          </a>
+          para guardar tu historial de pedidos y comprar más rápido.
+        </div>
+      {% else %}
+        <div class="alert alert-success mb-3">
+          👤 Estás comprando como <strong>{{ user.username }}</strong>.
+          Podrás ver este pedido en tu historial.
+        </div>
+      {% endif %}
+
+      <div class="alert alert-light border mb-3">
+        📦 Completa tus datos y envía el pedido directamente por WhatsApp.
+      </div>
+
+      <form method="post" action="{% url 'cart_set_buyer' business.slug %}">
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label">Nombre</label>
+            <input class="form-control" name="name" value="{{ buyer.name|default:'' }}" required>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input
+              class="form-control"
+              id="buyer-phone"
+              name="phone"
+              value="{{ buyer.phone|default:'' }}"
+              placeholder="Ej: 3xx xxx xxxx"
+              required
+            >
+          </div>
+
+          {% if business.service_mode != "PICKUP" %}
+            <div class="col-12">
+              <label class="form-label">Dirección</label>
+              <input class="form-control" name="address" value="{{ buyer.address|default:'' }}" placeholder="Barrio, calle, número, apto." required>
+            </div>
+          {% endif %}
+
+          <div class="col-12">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" rows="3" name="notes" placeholder="Ej: sin cebolla, tocar timbre.">{{ buyer.notes|default:'' }}</textarea>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Método de pago</label>
+
+            <div id="payment-warning"
+                 class="alert alert-warning mb-3 {% if not is_first_order %}d-none{% endif %}">
+              Por seguridad, en tu primer pedido el pago disponible es únicamente por
+              <strong>transferencia</strong>. Después de tu primera compra se habilitará
+              también el pago en efectivo.
+            </div>
+
+            <div class="border rounded-4 p-3 bg-light">
+              <div class="form-check mb-2">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  id="pay_transfer"
+                  value="transfer"
+                  {% if buyer.payment_method == "cash" and not is_first_order %}{% else %}checked{% endif %}
+                >
+                <label class="form-check-label" for="pay_transfer">
+                  Transferencia
+                </label>
+              </div>
+
+              <div id="cash-option" class="{% if is_first_order %}d-none{% endif %}">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="payment_method"
+                    id="pay_cash"
+                    value="cash"
+                    {% if buyer.payment_method == "cash" and not is_first_order %}checked{% endif %}
+                  >
+                  <label class="form-check-label" for="pay_cash">
+                    Efectivo
+                  </label>
+                </div>
+              </div>
+
+              <div id="cash-locked-text"
+                   class="small text-secondary {% if not is_first_order %}d-none{% endif %}">
+                El pago en efectivo se habilita a partir de tu segundo pedido.
+              </div>
+            </div>
+
+            {% if business.nequi_number %}
+              <div id="nequi-box" class="alert alert-success mt-3" style="display:none;">
+                <strong>Pago por transferencia / Nequi</strong><br>
+                Puedes realizar el pago al número:
+                <strong>{{ business.nequi_number }}</strong>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3 flex-wrap">
+          <button class="btn btn-primary" type="submit">
+            Guardar datos
+          </button>
+
+          {% if business.whatsapp %}
+            <button class="btn btn-success"
+                    type="submit"
+                    name="go_whatsapp"
+                    value="1">
+              Enviar pedido por WhatsApp
+            </button>
+          {% else %}
+            <span class="text-danger small align-self-center">
+              ⚠️ Este negocio aún no tiene WhatsApp configurado.
+            </span>
+          {% endif %}
+        </div>
+
+      </form>
+    {% endif %}
+  {% endif %}
+
+</div>
+
+{% if not is_pdf_only and cart_items %}
+  <div class="cart-floatbar">
+    <div class="cart-floatbar-left">
+      <div class="cart-floatbar-icon">🛒</div>
+      <div class="cart-floatbar-text">
+        <div class="cart-floatbar-title">Mi pedido</div>
+
+        <div class="cart-floatbar-sub">
+          <span data-cart-count>{{ cart_items|length }}</span>
+          item{{ cart_items|length|pluralize }} · $
+          <span data-cart-total>{{ cart_total|add:business.delivery_fee|floatformat:0 }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <a href="#mi-pedido" class="btn btn-light cart-floatbar-btn" onclick="this.closest('.cart-floatbar').style.display='none'">
+      Ver pedido
+    </a>
+  </div>
+{% endif %}
+
+<script>
+  document.addEventListener("submit", function(e){
+    const form = e.target;
+    if (!form || !form.action) return;
+
+    if (
+      form.action.includes("/cart/") ||
+      form.action.includes("/orders/") ||
+      form.action.includes("cart_")
+    ) {
+      sessionStorage.setItem("pn_scrollY", String(window.scrollY));
+      sessionStorage.setItem("pn_posting", "1");
+    }
+  }, true);
+
+  window.addEventListener("load", function(){
+    const shouldRestore = sessionStorage.getItem("pn_posting") === "1";
+    if (!shouldRestore) return;
+
+    const y = parseInt(sessionStorage.getItem("pn_scrollY") || "0", 10) || 0;
+
+    sessionStorage.removeItem("pn_posting");
+    sessionStorage.removeItem("pn_scrollY");
+
+    window.scrollTo(0, y);
+    setTimeout(() => window.scrollTo(0, y), 50);
+    setTimeout(() => window.scrollTo(0, y), 200);
+  });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("productSearchInput");
+  const clearBtn = document.getElementById("clearProductSearch");
+  const productCards = document.querySelectorAll(".js-product-card");
+  const categorySections = document.querySelectorAll(".js-category-section");
+  const categoryLinks = document.querySelectorAll(".js-menu-category");
+  const noProductsMessage = document.getElementById("noProductsFoundMessage");
+
+  if (!searchInput || !productCards.length) return;
+
+  function normalizeText(text) {
+    return (text || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function filterProducts() {
+    const query = normalizeText(searchInput.value);
+    let visibleCount = 0;
+
+    productCards.forEach((card) => {
+      const name = normalizeText(card.dataset.name || "");
+      const description = normalizeText(card.dataset.description || "");
+      const matches = !query || name.includes(query) || description.includes(query);
+
+      if (matches) {
+        card.classList.remove("hidden-by-search");
+        visibleCount++;
+      } else {
+        card.classList.add("hidden-by-search");
+      }
+    });
+
+    categorySections.forEach((section) => {
+      const visibleProducts = section.querySelectorAll(".js-product-card:not(.hidden-by-search)");
+      if (visibleProducts.length) {
+        section.classList.remove("hidden-by-search");
+      } else {
+        section.classList.add("hidden-by-search");
+      }
+    });
+
+    categoryLinks.forEach((link) => {
+      const categoryId = link.dataset.categoryId;
+      const section = document.getElementById(categoryId);
+      if (!section) return;
+
+      if (section.classList.contains("hidden-by-search")) {
+        link.classList.add("hidden-by-search");
+      } else {
+        link.classList.remove("hidden-by-search");
+      }
+    });
+
+    if (noProductsMessage) {
+      noProductsMessage.style.display = visibleCount ? "none" : "block";
+    }
+
+    if (clearBtn) {
+      clearBtn.style.display = query ? "inline-block" : "none";
+    }
+  }
+
+  searchInput.addEventListener("input", filterProducts);
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      searchInput.value = "";
+      filterProducts();
+      searchInput.focus();
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function csrfToken() {
+    const el = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    return el ? el.value : "";
+  }
+
+  function money(n){
+    try { return "$" + Number(n).toLocaleString("es-CO"); }
+    catch(e){ return "$" + n; }
+  }
+
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".js-qty");
+    if (!btn) return;
+
+    const itemId = btn.dataset.id;
+    const nextQty = btn.dataset.next;
+    const url = btn.dataset.url;
+
+    if (!url) return;
+
+    const csrf = csrfToken();
+    if (!csrf) return;
+
+    const fd = new FormData();
+    fd.append("qty", nextQty);
+
+    btn.disabled = true;
+
+    try{
+      const res = await fetch(url, {
+        method: "POST",
+        body: fd,
+        headers: { "X-CSRFToken": csrf }
+      });
+
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (!data.ok) throw new Error("bad response");
+
+      const qtyEl = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
+      if (qtyEl) qtyEl.textContent = data.qty;
+
+      const qtyEl2 = document.querySelector(`[data-qty-text="${itemId}"]`);
+      if (qtyEl2) qtyEl2.textContent = data.qty;
+
+      const subEl = document.querySelector(`.js-subtotal[data-id="${itemId}"]`);
+      if (subEl) subEl.textContent = money(data.item_subtotal);
+
+      const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
+      if (subEl2) subEl2.textContent = money(data.item_subtotal);
+
+      const subtotalEl = document.getElementById("js-cart-subtotal");
+      if (subtotalEl) subtotalEl.textContent = money(data.cart_subtotal);
+
+      const deliveryEl = document.getElementById("js-delivery-fee");
+      if (deliveryEl) deliveryEl.textContent = money(data.delivery_fee);
+
+      const totalEl = document.getElementById("js-cart-total");
+      if (totalEl) totalEl.textContent = money(data.cart_total);
+
+      const summarySubtotalEl = document.getElementById("js-summary-subtotal");
+      if (summarySubtotalEl) summarySubtotalEl.textContent = money(data.cart_subtotal);
+
+      const summaryDeliveryEl = document.getElementById("js-summary-delivery");
+      if (summaryDeliveryEl) summaryDeliveryEl.textContent = money(data.delivery_fee);
+
+      const summaryTotalEl = document.getElementById("js-summary-total");
+      if (summaryTotalEl) summaryTotalEl.textContent = money(data.cart_total);
+
+      document.querySelectorAll(`[data-cart-total]`).forEach(el => {
+        el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
+      });
+
+      if (typeof data.cart_count !== "undefined") {
+        document.querySelectorAll(`[data-cart-count]`).forEach(el => {
+          el.textContent = String(data.cart_count);
+        });
+      }
+
+      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b => {
+        const n = parseInt(data.qty || 0, 10);
+        if (b.dataset.action === "minus") {
+          b.disabled = (n <= 1);
+          b.dataset.next = String(n - 1);
+        } else if (b.dataset.action === "plus") {
+          b.disabled = false;
+          b.dataset.next = String(n + 1);
+        }
+      });
+
+    } catch(err){
+      console.error("AJAX cart update error:", err);
+      window.location.reload();
+    } finally {
+      if (btn.textContent.trim() === "+") btn.disabled = false;
+      if (btn.textContent.trim() === "-") btn.disabled = false;
+    }
+  });
+});
+</script>
+
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-body p-0">
+        <img id="pmPhoto" src="" alt="" style="width:100%; height:220px; object-fit:cover; border-top-left-radius:16px; border-top-right-radius:16px; display:none;">
+        <div class="p-4">
+
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <h5 id="pmName" class="fw-bold mb-1"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div id="pmPrice" class="fw-bold fs-4 text-dark mb-2"></div>
+
+          <div id="pmDesc" class="text-secondary" style="white-space:pre-line;"></div>
+
+          <hr class="my-3">
+
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-bold">Cantidad</div>
+
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="pmMinus">–</button>
+              <div class="fw-bold" id="pmQty" style="min-width:24px;text-align:center;">0</div>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="pmPlus">+</button>
+            </div>
+          </div>
+
+          <form id="pmAddForm" class="mt-3">
+            {% csrf_token %}
+            {% if business.is_open_now %}
+              <button class="btn btn-success w-100" type="submit">
+                Agregar al pedido
+              </button>
+            {% else %}
+              <button class="btn btn-secondary w-100" type="button" disabled>
+                Negocio cerrado
+              </button>
+            {% endif %}
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const modalEl = document.getElementById("productModal");
+  if (!modalEl) return;
+
+  const pmPhoto = document.getElementById("pmPhoto");
+  const pmName  = document.getElementById("pmName");
+  const pmPrice = document.getElementById("pmPrice");
+  const pmDesc  = document.getElementById("pmDesc");
+
+  const pmMinus = document.getElementById("pmMinus");
+  const pmPlus  = document.getElementById("pmPlus");
+  const pmQtyEl = document.getElementById("pmQty");
+  const pmAddForm = document.getElementById("pmAddForm");
+
+  window.pnCartQty = window.pnCartQty || {};
+
+  let currentQty = 0;
+  let currentItemId = null;
+  let updateUrl = null;
+
+  function money(n){
+    try { return "$" + Number(n).toLocaleString("es-CO"); }
+    catch(e){ return "$" + n; }
+  }
+
+  function getQtyFromCartDOM(itemId) {
+    if (typeof window.pnCartQty[itemId] !== "undefined") {
+      return parseInt(window.pnCartQty[itemId] || 0, 10) || 0;
+    }
+
+    const byId = document.getElementById("qty-" + itemId);
+    if (byId && byId.textContent) {
+      const n = parseInt(byId.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    const el = document.querySelector(`[data-cart-qty][data-id="${itemId}"]`);
+    if (el && el.textContent) {
+      const n = parseInt(el.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    const el2 = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
+    if (el2 && el2.textContent) {
+      const n = parseInt(el2.textContent.trim(), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    return 0;
+  }
+
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".js-open-product");
+    if (!btn) return;
+
+    currentItemId = String(btn.dataset.id || "");
+    updateUrl = btn.dataset.updateUrl || "";
+
+    currentQty = 0;
+    pmQtyEl.textContent = String(currentQty);
+
+    pmName.textContent = btn.dataset.name || "";
+    pmPrice.textContent = "$" + (btn.dataset.price || "");
+    pmDesc.textContent = btn.dataset.desc || "";
+
+    const photo = btn.dataset.photo || "";
+    if (photo) {
+      pmPhoto.src = photo;
+      pmPhoto.style.display = "block";
+    } else {
+      pmPhoto.style.display = "none";
+      pmPhoto.src = "";
+    }
+  });
+
+  pmPlus.addEventListener("click", function () {
+    currentQty += 1;
+    pmQtyEl.textContent = String(currentQty);
+  });
+
+  pmMinus.addEventListener("click", function () {
+    currentQty = Math.max(0, currentQty - 1);
+    pmQtyEl.textContent = String(currentQty);
+  });
+
+  pmAddForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!updateUrl || !currentItemId) return;
+
+    if (currentQty < 1) {
+      alert("Selecciona al menos 1 unidad.");
+      return;
+    }
+
+    const csrf = pmAddForm.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+    const existing = getQtyFromCartDOM(currentItemId);
+    const finalQty = existing + currentQty;
+
+    const fd = new FormData();
+    fd.append("csrfmiddlewaretoken", csrf);
+    fd.append("qty", String(finalQty));
+
+    try {
+      const res = await fetch(updateUrl, {
+        method: "POST",
+        body: fd,
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        credentials: "same-origin",
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        console.error(data);
+        alert(data.error || "No se pudo actualizar el carrito.");
+        return;
+      }
+
+      window.pnCartQty[currentItemId] = data.qty;
+
+      const hasRow = document.querySelector(`.js-qty-val[data-id="${currentItemId}"]`);
+      const cartAreaExists = document.getElementById("cart");
+
+      if (!hasRow || !cartAreaExists) {
+        sessionStorage.setItem("pn_scrollY", String(window.scrollY));
+        sessionStorage.setItem("pn_posting", "1");
+        location.hash = "#cart";
+        location.reload();
+        return;
+      }
+
+      const itemId = String(currentItemId);
+
+      const qtyEl = document.querySelector(`.js-qty-val[data-id="${itemId}"]`);
+      if (qtyEl) qtyEl.textContent = data.qty;
+
+      const qtyEl2 = document.querySelector(`[data-qty-text="${itemId}"]`);
+      if (qtyEl2) qtyEl2.textContent = data.qty;
+
+      const byId = document.getElementById("qty-" + itemId);
+      if (byId) byId.textContent = data.qty;
+
+      const subEl = document.querySelector(`.js-subtotal[data-id="${itemId}"]`);
+      if (subEl) subEl.textContent = money(data.item_subtotal);
+
+      const subEl2 = document.querySelector(`[data-subtotal-text="${itemId}"]`);
+      if (subEl2) subEl2.textContent = money(data.item_subtotal);
+
+      const subtotalEl = document.getElementById("js-cart-subtotal");
+      if (subtotalEl) subtotalEl.textContent = money(data.cart_subtotal);
+
+      const deliveryEl = document.getElementById("js-delivery-fee");
+      if (deliveryEl) deliveryEl.textContent = money(data.delivery_fee);
+
+      const totalEl = document.getElementById("js-cart-total");
+      if (totalEl) totalEl.textContent = money(data.cart_total);
+
+      const summarySubtotalEl = document.getElementById("js-summary-subtotal");
+      if (summarySubtotalEl) summarySubtotalEl.textContent = money(data.cart_subtotal);
+
+      const summaryDeliveryEl = document.getElementById("js-summary-delivery");
+      if (summaryDeliveryEl) summaryDeliveryEl.textContent = money(data.delivery_fee);
+
+      const summaryTotalEl = document.getElementById("js-summary-total");
+      if (summaryTotalEl) summaryTotalEl.textContent = money(data.cart_total);
+
+      document.querySelectorAll(`[data-cart-total]`).forEach(el => {
+        el.textContent = String(Number(data.cart_total).toLocaleString("es-CO"));
+      });
+
+      if (typeof data.cart_count !== "undefined") {
+        document.querySelectorAll(`[data-cart-count]`).forEach(el => {
+          el.textContent = String(data.cart_count);
+        });
+      }
+
+      document.querySelectorAll(`.js-qty[data-id="${itemId}"]`).forEach(b => {
+        const n = parseInt(data.qty || 0, 10);
+        if (b.dataset.action === "minus") {
+          b.disabled = (n <= 1);
+          b.dataset.next = String(n - 1);
+        } else if (b.dataset.action === "plus") {
+          b.disabled = false;
+          b.dataset.next = String(n + 1);
+        }
+      });
+
+      const bsModal = bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+
+    } catch (err) {
+      console.error(err);
+      alert("Error de red actualizando el carrito.");
+    }
+  });
+})();
+</script>
+
+<script>
+(function () {
+  const phoneInput = document.getElementById("buyer-phone");
+  const warningBox = document.getElementById("payment-warning");
+  const cashOption = document.getElementById("cash-option");
+  const cashLockedText = document.getElementById("cash-locked-text");
+  const payTransfer = document.getElementById("pay_transfer");
+  const payCash = document.getElementById("pay_cash");
+  const nequiBox = document.getElementById("nequi-box");
+
+  if (!phoneInput) return;
+
+  let lastValue = "";
+  let timer = null;
+
+  function normalizePhone(value) {
+    return (value || "").replace(/\D/g, "");
+  }
+
+  function toggleNequi() {
+    if (!nequiBox) return;
+
+    if (payTransfer && payTransfer.checked) {
+      nequiBox.style.display = "block";
+    } else {
+      nequiBox.style.display = "none";
+    }
+  }
+
+  function setFirstOrderUI(isFirstOrder) {
+    if (isFirstOrder) {
+      if (warningBox) warningBox.classList.remove("d-none");
+      if (cashOption) cashOption.classList.add("d-none");
+      if (cashLockedText) cashLockedText.classList.remove("d-none");
+
+      if (payTransfer) payTransfer.checked = true;
+      if (payCash) payCash.checked = false;
+    } else {
+      if (warningBox) warningBox.classList.add("d-none");
+      if (cashOption) cashOption.classList.remove("d-none");
+      if (cashLockedText) cashLockedText.classList.add("d-none");
+    }
+
+    toggleNequi();
+  }
+
+  async function checkPhone() {
+    const phone = normalizePhone(phoneInput.value);
+
+    if (phone.length < 10) {
+      setFirstOrderUI(true);
+      return;
+    }
+
+    if (phone === lastValue) return;
+    lastValue = phone;
+
+    const url = "{% url 'check_customer_phone' business.slug %}?phone=" + encodeURIComponent(phone);
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      });
+
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      const data = await res.json();
+      if (!data.ok) throw new Error("Respuesta inválida");
+
+      setFirstOrderUI(Boolean(data.is_first_order));
+    } catch (err) {
+      console.error("Error validando teléfono:", err);
+      setFirstOrderUI(true);
+    }
+  }
+
+  if (payTransfer) payTransfer.addEventListener("change", toggleNequi);
+  if (payCash) payCash.addEventListener("change", toggleNequi);
+
+  toggleNequi();
+
+  phoneInput.addEventListener("input", function () {
+    clearTimeout(timer);
+    timer = setTimeout(checkPhone, 400);
+  });
+
+  phoneInput.addEventListener("blur", checkPhone);
+})();
+</script>

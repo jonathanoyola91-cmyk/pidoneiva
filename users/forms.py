@@ -102,8 +102,20 @@ class BusinessForm(forms.ModelForm):
             "cover_image",
             "avg_prep_time",
             "delivery_fee",
+
+            "min_consumption",
+            "music_type",
+            
+            
+            "parking_type",
+            "parking_cost",
+
             "nequi_number",
             "is_accepting_orders",
+
+            "allow_table_booking",
+            "table_booking_phone",
+            "table_booking_message",
         ]
 
         labels = {
@@ -114,6 +126,9 @@ class BusinessForm(forms.ModelForm):
             "latitude": "Latitud",
             "longitude": "Longitud",
             "service_mode": "Modalidad de entrega",
+            "min_consumption": "Consumo mínimo",
+            "music_type": "Tipo de música",
+            
         }
 
         help_texts = {
@@ -136,6 +151,14 @@ class BusinessForm(forms.ModelForm):
             "whatsapp": forms.TextInput(attrs={"class": "form-control"}),
             "instagram": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "min_consumption": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 50000"
+            }),
+            "music_type": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            
             "tags": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Ej: pizza, hamburguesa, café, droguería, mercado"
@@ -145,10 +168,34 @@ class BusinessForm(forms.ModelForm):
                 "step": "0.01",
                 "min": "0"
             }),
+
+            "parking_type": forms.Select(attrs={
+                "class": "form-select"
+            }),
+
+            "parking_cost": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 5000"
+            }),
+
             "nequi_number": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Ej: 3001234567"
             }),
+
+            "allow_table_booking": forms.CheckboxInput(attrs={
+                "class": "form-check-input"
+            }),
+            "table_booking_phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 573001112233"
+            }),
+
+            "table_booking_message": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Hola, quiero reservar una mesa"
+            }),
+
             "logo": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "cover_image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "is_accepting_orders": forms.CheckboxInput(attrs={"class": "form-check-input"}),
