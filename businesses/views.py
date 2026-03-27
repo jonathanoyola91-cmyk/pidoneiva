@@ -182,7 +182,7 @@ def home(request):
 
     qs = Business.objects.filter(is_active=True, is_approved=True)
 
-    if business_type in ["RESTAURANT", "COMMERCE", "NIGHT"]:
+    if business_type in ["RESTAURANT", "COMMERCE"]:
         qs = qs.filter(business_type=business_type)
 
     if zone:
@@ -322,7 +322,7 @@ def home(request):
         Q(plan="PREMIUM") | Q(visits_count__gt=100)
     )
 
-    if business_type in ["RESTAURANT", "COMMERCE", "NIGHT"]:
+    if business_type in ["RESTAURANT", "COMMERCE"]:
         featured_qs = featured_qs.filter(business_type=business_type)
 
     if zone:
@@ -461,15 +461,7 @@ def business_detail(request, slug):
                     "subtotal": subtotal,
                 })
 
-    # =========================
-    # 🎯 TEMPLATE DINÁMICO
-    # =========================
-    if business.business_type == "NIGHT":
-        template = "business_detail.html"  # diseño NIGHT
-    else:
-        template = "business_detail_original.html"  # restaurantes/comercios
-
-    return render(request, template, {
+    return render(request, "business_detail.html", {
         "business": business,
         "is_pdf_only": pdf_only,
         "menu_files": menu_files,

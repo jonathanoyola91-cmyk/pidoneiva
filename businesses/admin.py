@@ -3,42 +3,20 @@ from datetime import timedelta
 from django.contrib import admin, messages
 from django.utils import timezone
 
-from .models import Business, BusinessGallery, BusinessRating
+from .models import Business
 
 
 def add_one_month(dt):
     return dt + timedelta(days=30)
 
 
-# =========================
-# 📸 GALERÍA INLINE
-# =========================
-class BusinessGalleryInline(admin.TabularInline):
-    model = BusinessGallery
-    extra = 1
-    fields = ("image", "title", "order", "is_active")
-    ordering = ("order",)
-
-
-# =========================
-# ⭐ CALIFICACIONES INLINE
-# =========================
-class BusinessRatingInline(admin.TabularInline):
-    model = BusinessRating
-    extra = 0
-    readonly_fields = ("user", "stars", "comment", "created_at")
-    can_delete = True
-    show_change_link = False
-
-
-# =========================
-# 🏪 BUSINESS ADMIN
-# =========================
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
     def promo(self, obj):
+        # Si existe promo_active úsalo
         if hasattr(obj, "promo_active"):
             return bool(getattr(obj, "promo_active"))
+        # Si NO existe, intenta inferir promo por título/texto (ajusta si quieres)
         title = getattr(obj, "promo_title", "") or ""
         text = getattr(obj, "promo_text", "") or ""
         return bool(title.strip() or text.strip())
@@ -46,188 +24,59 @@ class BusinessAdmin(admin.ModelAdmin):
     promo.boolean = True
     promo.short_description = "Promo"
 
-    def average_rating(self, obj):
-        if hasattr(obj, "average_rating"):
-            value = obj.average_rating
-            if callable(value):
-                try:
-                    value = value()
-                except Exception:
-                    value = None
-            return value
-        return None
-
-    average_rating.short_description = "Calificación"
-    average_rating.admin_order_field = "average_rating"
-
     list_display = (
         "name",
         "business_type",
         "zone",
-        "is_active",
-        "is_approved",
         "plan",
-        "average_rating",
+        "promo",          # ✅ no depende de que exista promo_active
         "visits_count",
+        "is_approved",
+        "is_active",
+        "review_requested",
+        "owner",
+        "tags",
+        "plan_active",
+        "trial_ends_at",
+        "paid_until",
+        "whatsapp_clicks",
+        "last_visited_at",
+        "last_whatsapp_click_at",
     )
 
     list_filter = (
         "business_type",
         "zone",
-        "is_active",
-        "is_approved",
         "plan",
+        # ✅ solo filtra por promo_active si realmente existe como Field
+        *(( "promo_active", ) if "promo_active" in [f.name for f in Business._meta.get_fields()] else ()),
+        "is_approved",
+        "is_active",
+        "review_requested",
+        "plan_active",
     )
 
-    search_fields = ("name", "address", "phone", "whatsapp", "tags")
+    search_fields = ("name", "zone", "address", "tags")
     prepopulated_fields = {"slug": ("name",)}
 
-    readonly_fields = tuple(
-        field
-        for field in (
-            "visits_count",
-            "whatsapp_clicks",
-            "last_visited_at",
-            "last_whatsapp_click_at",
-        )
-        if hasattr(Business, field) or field in [f.name for f in Business._meta.get_fields()]
+    # ✅ fields: solo incluimos los campos que existan (evita reventar si faltan)
+    base_fields = (
+        "owner", "name", "slug",
+        "business_type", "menu_mode",
+        "zone", "address",
+        "maps_url", "map_embed_url",
+        "phone", "whatsapp", "instagram",
+        "is_accepting_orders", "show_closed_in_list",
+        "schedule_mon", "schedule_tue", "schedule_wed", "schedule_thu", "schedule_fri", "schedule_sat", "schedule_sun",
+        "description",
+        "tags",
+        "logo",
+        "cover_image",  # ✅ nuevo
+        "promo_active", "promo_title", "promo_text",
+        "plan", "trial_ends_at", "grace_ends_at", "paid_until", "plan_active",
+        "is_approved", "is_active",
     )
-
-    inlines = [
-        BusinessGalleryInline,
-        BusinessRatingInline,
-    ]
-
-    fieldsets = tuple(
-        section for section in [
-            ("Información básica", {
-                "fields": tuple(
-                    f for f in (
-                        "owner",
-                        "name",
-                        "slug",
-                        "business_type",
-                        "menu_mode",
-                        "service_mode",
-                        "zone",
-                        "address",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Ubicación", {
-                "fields": tuple(
-                    f for f in (
-                        "maps_url",
-                        "map_embed_url",
-                        "latitude",
-                        "longitude",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Contacto", {
-                "fields": tuple(
-                    f for f in (
-                        "phone",
-                        "whatsapp",
-                        "instagram",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Horarios", {
-                "fields": tuple(
-                    f for f in (
-                        "schedule_mon",
-                        "schedule_tue",
-                        "schedule_wed",
-                        "schedule_thu",
-                        "schedule_fri",
-                        "schedule_sat",
-                        "schedule_sun",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Operación", {
-                "fields": tuple(
-                    f for f in (
-                        "is_accepting_orders",
-                        "show_closed_in_list",
-                        "delivery_fee",
-                        "nequi_number",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Contenido", {
-                "fields": tuple(
-                    f for f in (
-                        "description",
-                        "logo",
-                        "cover_image",
-                        "tags",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Estado", {
-                "fields": tuple(
-                    f for f in (
-                        "is_active",
-                        "is_approved",
-                        "review_requested",
-                        "review_requested_at",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Plan", {
-                "fields": tuple(
-                    f for f in (
-                        "plan",
-                        "plan_active",
-                        "trial_ends_at",
-                        "grace_ends_at",
-                        "paid_until",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Métricas", {
-                "fields": tuple(
-                    f for f in (
-                        "visits_count",
-                        "whatsapp_clicks",
-                        "last_visited_at",
-                        "last_whatsapp_click_at",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-
-            ("Promoción", {
-                "fields": tuple(
-                    f for f in (
-                        "promo_active",
-                        "promo_title",
-                        "promo_text",
-                    )
-                    if f in [x.name for x in Business._meta.get_fields()]
-                )
-            }),
-        ]
-        if section[1]["fields"]
-    )
+    fields = tuple(f for f in base_fields if f in [x.name for x in Business._meta.get_fields()])
 
     actions = [
         "publish_businesses",
@@ -241,10 +90,7 @@ class BusinessAdmin(admin.ModelAdmin):
 
     @admin.action(description="Publicar negocios seleccionados")
     def publish_businesses(self, request, queryset):
-        update_data = {"is_approved": True}
-        if "review_requested" in [f.name for f in Business._meta.get_fields()]:
-            update_data["review_requested"] = False
-        updated = queryset.update(**update_data)
+        updated = queryset.update(is_approved=True, review_requested=False)
         messages.success(request, f"{updated} negocio(s) publicados correctamente.")
 
     @admin.action(description="Activar Plan Básico")
@@ -268,9 +114,8 @@ class BusinessAdmin(admin.ModelAdmin):
         for b in queryset:
             b.plan = "BASIC"
             b.plan_active = True
-            if hasattr(b, "grace_ends_at"):
-                b.grace_ends_at = None
-            base = b.paid_until if (getattr(b, "paid_until", None) and b.paid_until > now) else now
+            b.grace_ends_at = None
+            base = b.paid_until if (b.paid_until and b.paid_until > now) else now
             b.paid_until = add_one_month(base)
             b.save()
         messages.success(request, "Plan Básico activado/renovado por 1 mes.")
@@ -281,9 +126,8 @@ class BusinessAdmin(admin.ModelAdmin):
         for b in queryset:
             b.plan = "STANDARD"
             b.plan_active = True
-            if hasattr(b, "grace_ends_at"):
-                b.grace_ends_at = None
-            base = b.paid_until if (getattr(b, "paid_until", None) and b.paid_until > now) else now
+            b.grace_ends_at = None
+            base = b.paid_until if (b.paid_until and b.paid_until > now) else now
             b.paid_until = add_one_month(base)
             b.save()
         messages.success(request, "Plan Estándar activado/renovado por 1 mes.")
@@ -294,9 +138,8 @@ class BusinessAdmin(admin.ModelAdmin):
         for b in queryset:
             b.plan = "PREMIUM"
             b.plan_active = True
-            if hasattr(b, "grace_ends_at"):
-                b.grace_ends_at = None
-            base = b.paid_until if (getattr(b, "paid_until", None) and b.paid_until > now) else now
+            b.grace_ends_at = None
+            base = b.paid_until if (b.paid_until and b.paid_until > now) else now
             b.paid_until = add_one_month(base)
             b.save()
         messages.success(request, "Plan Premium activado/renovado por 1 mes.")
@@ -308,7 +151,8 @@ class BusinessAdmin(admin.ModelAdmin):
         print("ADMIN DEBUG FILES:", list(request.FILES.keys()))
         r = super().save_model(request, obj, form, change)
 
-        if hasattr(obj, "cover_image") and obj.cover_image:
+        # comprobar inmediatamente si el objeto existe en R2/storage
+        if obj.cover_image:
             try:
                 exists = obj.cover_image.storage.exists(obj.cover_image.name)
             except Exception as e:
@@ -317,7 +161,7 @@ class BusinessAdmin(admin.ModelAdmin):
             print("ADMIN DEBUG cover name:", obj.cover_image.name)
             print("ADMIN DEBUG cover exists in storage?:", exists)
 
-        if hasattr(obj, "logo") and obj.logo:
+        if obj.logo:
             try:
                 exists = obj.logo.storage.exists(obj.logo.name)
             except Exception as e:
@@ -327,23 +171,3 @@ class BusinessAdmin(admin.ModelAdmin):
             print("ADMIN DEBUG logo exists in storage?:", exists)
 
         return r
-
-
-# =========================
-# ⭐ ADMIN DE CALIFICACIONES
-# =========================
-@admin.register(BusinessRating)
-class BusinessRatingAdmin(admin.ModelAdmin):
-    list_display = ("business", "user", "stars", "created_at")
-    list_filter = ("stars", "created_at")
-    search_fields = ("business__name", "user__username", "comment")
-
-
-# =========================
-# 📸 ADMIN DE GALERÍA
-# =========================
-@admin.register(BusinessGallery)
-class BusinessGalleryAdmin(admin.ModelAdmin):
-    list_display = ("business", "order", "is_active")
-    list_filter = ("is_active",)
-    search_fields = ("business__name",)

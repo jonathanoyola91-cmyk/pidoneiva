@@ -2,345 +2,6 @@
 {% block title %}PidoNeiva{% endblock %}
 
 {% block content %}
-
-{% if request.GET.type == "NIGHT" %}
-
-<div class="container-fluid px-3 py-2">
-  <div class="night-mode">
-    <div class="night-home-grid">
-
-      <!-- COLUMNA IZQUIERDA -->
-      <div>
-        <div class="night-card night-main-card">
-
-          {% if not request.session.customer_auth and not user.is_authenticated %}
-            <div class="alert alert-light border mb-3">
-              👋 Compra sin registrarte o
-              <a href="{% url 'customer_login' %}" class="fw-bold">inicia sesión como cliente</a>
-              para guardar tus pedidos y comprar más rápido.
-            </div>
-          {% elif request.session.customer_auth %}
-            <div class="alert alert-success mb-3">
-              👤 Has iniciado sesión como cliente. Ya puedes ver tu historial en
-              <a href="{% url 'customer_my_orders' %}" class="fw-bold">Mis pedidos</a>.
-            </div>
-          {% endif %}
-
-          <div class="night-main-title">🌙 Vida nocturna en Neiva</div>
-
-          <div class="night-tabs">
-            <a href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-               class="night-tab-btn {% if request.GET.type == 'RESTAURANT' %}is-active{% endif %}">
-              Restaurantes
-            </a>
-
-            <a href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-               class="night-tab-btn {% if request.GET.type == 'COMMERCE' %}is-active{% endif %}">
-              Comercios
-            </a>
-
-            <a href="/?type=NIGHT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-               class="night-tab-btn {% if request.GET.type == 'NIGHT' %}is-active{% endif %}">
-              🌙 Night
-            </a>
-          </div>
-
-          <form method="get" id="nightSearchForm">
-            <input type="hidden" name="type" value="NIGHT">
-
-            <div class="night-search-wrap">
-              <div class="night-search-box">
-                <div class="night-search-icon">🔎</div>
-                <input
-                  type="text"
-                  name="q"
-                  value="{{ request.GET.q }}"
-                  class="night-search-input"
-                  placeholder="Buscar bares, discotecas, comida..."
-                >
-              </div>
-            </div>
-
-            <div class="night-filters-row">
-              <div class="night-filter-chip">
-                <span>📍 Zona:</span>
-                <select name="zone" data-auto="1">
-                  <option value="">Todas</option>
-                  {% for code, label in zones %}
-                    <option value="{{ code }}" {% if request.GET.zone == code %}selected{% endif %}>
-                      {{ label }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <label class="night-filter-chip mb-0" style="cursor:pointer;">
-                <input
-                  type="checkbox"
-                  name="open"
-                  value="1"
-                  data-auto="1"
-                  {% if request.GET.open == "1" %}checked{% endif %}
-                >
-                <span>Abiertos</span>
-              </label>
-            </div>
-          </form>
-
-          <div class="night-featured-box">
-            <div class="night-section-title">⭐ Destacados cerca de ti</div>
-
-            {% if featured_businesses %}
-              <div class="row g-3">
-                {% for b in featured_businesses %}
-                  <div class="col-12 col-md-6">
-                    <a href="{% url 'business_detail' b.slug %}" class="night-business-card h-100">
-                      {% if b.logo %}
-                        <img src="{{ b.logo.url }}" alt="{{ b.name }}" class="night-business-thumb">
-                      {% elif b.cover_image %}
-                        <img src="{{ b.cover_image.url }}" alt="{{ b.name }}" class="night-business-thumb">
-                      {% else %}
-                        <img src="https://via.placeholder.com/70x70.png?text=Night" alt="{{ b.name }}" class="night-business-thumb">
-                      {% endif %}
-
-                      <div class="night-business-content">
-                        <div class="night-business-name">{{ b.name }}</div>
-
-                        {% if b.avg_rating %}
-                          <div class="small text-warning fw-bold mb-1">
-                            ⭐ {{ b.avg_rating|floatformat:1 }}
-                            <span class="text-secondary fw-normal">
-                              ({{ b.total_reviews }})
-                            </span>
-                          </div>
-                        {% endif %}
-
-                        <div class="night-business-type">
-                          {{ b.get_business_type_display|default:"Night" }}
-                        </div>
-
-                        <div class="night-business-meta">
-                          {% if b.zone %}
-                            <span>📍 {{ b.get_zone_display|default:b.zone }}</span>
-                          {% endif %}
-                          {% if b.avg_prep_time %}
-                            <span>⏱ {{ b.avg_prep_time }} min</span>
-                          {% endif %}
-                          {% if b.open_now %}
-                            <span class="text-success fw-bold">🟢 Abierto</span>
-                          {% else %}
-                            <span class="text-danger fw-bold">🔴 Cerrado</span>
-                          {% endif %}
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="night-no-featured">
-                Aún no hay destacados publicados.
-              </div>
-            {% endif %}
-
-            <div class="night-chips-row">
-              <a href="/?type=NIGHT&cat=bares{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if request.GET.cat == 'bares' %}is-active{% endif %}">
-                🍸 Bares
-              </a>
-
-              <a href="/?type=NIGHT&cat=discotecas{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if request.GET.cat == 'discotecas' %}is-active{% endif %}">
-                🎧 Discotecas
-              </a>
-
-              <a href="/?type=NIGHT&cat=karaoke{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if request.GET.cat == 'karaoke' %}is-active{% endif %}">
-                🎤 Karaoke
-              </a>
-
-              <a href="/?type=NIGHT&cat=rooftop{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if request.GET.cat == 'rooftop' %}is-active{% endif %}">
-                🏙️ Rooftop
-              </a>
-
-              <a href="/?type=NIGHT&cat=popular{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if request.GET.cat == 'popular' %}is-active{% endif %}">
-                🔥 Popular
-              </a>
-
-              <a href="/?type=NIGHT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
-                 class="night-chip {% if not request.GET.cat %}is-active{% endif %}">
-                🌙 Todos
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- LISTADO PRINCIPAL NIGHT -->
-        <div class="night-business-list">
-          {% for b in businesses %}
-            <a href="{% url 'business_detail' b.slug %}" class="night-business-card mb-3">
-
-              {% if b.logo %}
-                <img src="{{ b.logo.url }}" alt="{{ b.name }}" class="night-business-thumb">
-              {% else %}
-                <div class="night-business-thumb d-flex align-items-center justify-content-center text-white">
-                  🌙
-                </div>
-              {% endif %}
-
-              <div class="night-business-content">
-                <div class="night-business-name">{{ b.name }}</div>
-
-                {% if b.avg_rating %}
-                  <div class="small text-warning fw-bold mb-1">
-                    ⭐ {{ b.avg_rating|floatformat:1 }}
-                    <span class="text-secondary fw-normal">
-                      ({{ b.total_reviews }})
-                    </span>
-                  </div>
-                {% endif %}
-
-                <div class="night-business-type">
-                  {{ b.get_business_type_display|default:"Night" }}
-                </div>
-
-                <div class="night-business-badges">
-                  {% if b.service_mode == "DELIVERY" %}
-                    <span class="night-pill info">🛵 Solo domicilio</span>
-                  {% elif b.service_mode == "PICKUP" %}
-                    <span class="night-pill warning">📍 Solo recogida</span>
-                  {% elif b.service_mode == "BOTH" %}
-                    <span class="night-pill success">🛵📍 Domicilio y recogida</span>
-                  {% endif %}
-
-                  {% if b.has_parking %}
-                    <span class="night-pill">🚗 Parqueadero</span>
-                  {% endif %}
-
-                  {% if b.min_consumption %}
-                    <span class="night-pill">💵 Min ${{ b.min_consumption }}</span>
-                  {% endif %}
-
-                  {% if b.plan == "PREMIUM" %}
-                    <span class="night-pill">⭐ Premium</span>
-                  {% endif %}
-                </div>
-
-                <div class="night-business-meta">
-                  {% if b.zone %}
-                    <span>📍 {{ b.get_zone_display|default:b.zone }}</span>
-                  {% endif %}
-
-                  {% if b.open_now %}
-                    <span class="text-success fw-bold">🟢 Abierto</span>
-                  {% else %}
-                    <span class="text-danger fw-bold">🔴 Cerrado</span>
-                  {% endif %}
-
-                  {% if b.avg_prep_time %}
-                    <span>⏱ {{ b.avg_prep_time }} min</span>
-                  {% endif %}
-
-                  {% if b.music_type %}
-                    <span>🎵 {{ b.music_type }}</span>
-                  {% endif %}
-                </div>
-
-                {% if b.description %}
-                  <div class="small text-secondary mt-1">
-                    {{ b.description|truncatechars:90 }}
-                  </div>
-                {% endif %}
-              </div>
-
-            </a>
-          {% empty %}
-            <div class="night-card p-4 text-white">
-              No hay negocios night disponibles con esos filtros.
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- COLUMNA DERECHA -->
-      <div class="night-sidebar">
-
-        <div class="night-highlight-card">
-          <h4>🚀 Destaca tu negocio</h4>
-          <p>Aparece primero, recibe más visitas y aumenta tus pedidos.</p>
-
-          <a href="{% url 'request_access' %}" class="btn btn-light">
-            Ver planes
-          </a>
-        </div>
-
-        <div class="night-card night-side-card">
-          <h5>¿Tienes un negocio?</h5>
-
-          <ul class="night-side-list">
-            <li>✔ Aparece en tu sector</li>
-            <li>✔ Botón directo a WhatsApp</li>
-            <li>✔ Ubicación en Google Maps</li>
-            <li>✔ Estadísticas de visitas</li>
-            <li>✔ Opción de destacarte como ⭐ Premium</li>
-            <li>✔ Posibilidad de aparecer como 🔥 Popular</li>
-          </ul>
-
-          <a href="{% url 'request_access' %}" class="btn btn-danger night-register-btn">
-            🧾 Registrar mi negocio (Prueba gratis)
-          </a>
-
-          <a href="/accounts/login/" class="night-panel-btn">
-            Ingresar al panel de negocio
-          </a>
-        </div>
-
-        <div class="night-right-featured-wrap">
-          <div class="night-right-featured-head">
-            <h6>🏆 Negocios destacados</h6>
-            <a href="/?type=NIGHT">Ver todos</a>
-          </div>
-
-          {% for b in businesses|slice:":5" %}
-            <a href="{% url 'business_detail' b.slug %}" class="night-right-featured-card mb-2 text-decoration-none">
-              <div class="night-right-rank">{{ forloop.counter }}</div>
-
-              {% if b.logo %}
-                <img src="{{ b.logo.url }}" alt="{{ b.name }}" class="night-right-thumb">
-              {% else %}
-                <img src="https://via.placeholder.com/44x44.png?text=N" alt="{{ b.name }}" class="night-right-thumb">
-              {% endif %}
-
-              <div class="flex-grow-1">
-                <div class="night-right-name">
-                  {{ b.name }}
-                  {% if b.plan == "PREMIUM" %}
-                    <span class="mini-pill">⭐</span>
-                  {% endif %}
-                </div>
-
-                <div class="night-right-meta">
-                  {{ b.get_zone_display|default:b.zone }}
-                  {% if b.avg_prep_time %} • ⏱ {{ b.avg_prep_time }} min{% endif %}
-                </div>
-              </div>
-            </a>
-          {% empty %}
-            <div class="night-card night-side-card text-white">
-              Aún no hay negocios destacados.
-            </div>
-          {% endfor %}
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-{% else %}
-
 <div class="row g-4">
   <div class="col-lg-8">
 
@@ -371,22 +32,17 @@
 
       <div class="home-sticky">
 
-<div class="home-tabs mb-3">
-  <a class="home-tab {% if request.GET.type != 'COMMERCE' and request.GET.type != 'NIGHT' %}active{% endif %}"
-     href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-    Restaurantes
-  </a>
+        <div class="home-tabs mb-3">
+          <a class="home-tab {% if request.GET.type != 'COMMERCE' %}active{% endif %}"
+             href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+            Restaurantes
+          </a>
 
-  <a class="home-tab {% if request.GET.type == 'COMMERCE' %}active{% endif %}"
-     href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-    Comercios
-  </a>
-
-  <a class="home-tab {% if request.GET.type == 'NIGHT' %}active{% endif %}"
-     href="/?type=NIGHT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
-    Night
-  </a>
-</div>
+          <a class="home-tab {% if request.GET.type == 'COMMERCE' %}active{% endif %}"
+             href="/?type=COMMERCE{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}">
+            Comercios
+          </a>
+        </div>
 
         <form method="get" class="home-search" id="homeSearchForm">
 
@@ -712,48 +368,26 @@
 
 </div>
 
-{% endif %}
-
 <script>
 (function () {
   const form = document.getElementById("homeSearchForm");
-  if (form) {
-    const autos = form.querySelectorAll("[data-auto='1']");
-    autos.forEach((el) => {
-      el.addEventListener("change", () => {
+  if (!form) return;
+
+  const autos = form.querySelectorAll("[data-auto='1']");
+  autos.forEach((el) => {
+    el.addEventListener("change", () => {
+      form.requestSubmit ? form.requestSubmit() : form.submit();
+    });
+  });
+
+  const qInput = form.querySelector("input[name='q']");
+  if (qInput) {
+    qInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
         form.requestSubmit ? form.requestSubmit() : form.submit();
-      });
+      }
     });
-
-    const qInput = form.querySelector("input[name='q']");
-    if (qInput) {
-      qInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          form.requestSubmit ? form.requestSubmit() : form.submit();
-        }
-      });
-    }
-  }
-
-  const nightForm = document.getElementById("nightSearchForm");
-  if (nightForm) {
-    const autos = nightForm.querySelectorAll("[data-auto='1']");
-    autos.forEach((el) => {
-      el.addEventListener("change", () => {
-        nightForm.requestSubmit ? nightForm.requestSubmit() : nightForm.submit();
-      });
-    });
-
-    const qInput = nightForm.querySelector("input[name='q']");
-    if (qInput) {
-      qInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          nightForm.requestSubmit ? nightForm.requestSubmit() : nightForm.submit();
-        }
-      });
-    }
   }
 })();
 </script>
