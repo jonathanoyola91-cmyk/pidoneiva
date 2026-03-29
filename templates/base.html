@@ -3,7 +3,8 @@
 <html lang="es">
 
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}PidoNeiva{% endblock %}</title>
 
@@ -29,8 +30,8 @@
   {% block extra_css %}{% endblock %}
 </head>
 
-<body>
-<nav class="navbar navbar-expand-lg border-bottom">
+<body class="{% if request.GET.type == 'NIGHT' %}night-layout-body{% endif %}">
+<nav class="navbar navbar-expand-lg border-bottom {% if request.GET.type == 'NIGHT' %}night-navbar{% endif %}">
   <div class="container py-2">
     <a class="navbar-brand d-flex align-items-center gap-2" href="/">
       <img src="{% static 'img/logo-pidoneiva.png' %}" alt="PidoNeiva" class="brand-logo">
@@ -58,7 +59,7 @@
   </div>
 </nav>
 
-<main class="container my-4">
+<main class="{% if request.GET.type == 'NIGHT' %}night-main-wrap{% else %}container my-4{% endif %}">
   {% if messages %}
     <div class="mb-3">
       {% for message in messages %}
