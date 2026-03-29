@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 def add_one_month(dt):
@@ -36,6 +37,25 @@ ZONE_CHOICES = [
     ("CENTRO", "Centro"),
 ]
 
+PARKING_CHOICES = [
+    ("NO", "No tiene"),
+    ("FREE", "Gratis"),
+    ("PAID", "Pago"),
+]
+
+# =========================
+# 🎵 TIPOS DE MÚSICA
+# =========================
+MUSIC_TYPE_CHOICES = [
+    ("SALSA", "Salsa"),
+    ("REGGAETON", "Reggaetón"),
+    ("CROSSOVER", "Crossover"),
+    ("POPULAR", "Popular"),
+    ("ELECTRONICA", "Electrónica"),
+    ("VALLENATO", "Vallenato"),
+    ("VARIADA", "Variada"),
+]
+
 
 # =========================
 # ✅ MODALIDAD DE SERVICIO
@@ -55,6 +75,7 @@ class Business(models.Model):
     class BusinessType(models.TextChoices):
         RESTAURANT = "RESTAURANT", "Restaurante"
         COMMERCE = "COMMERCE", "Comercio"
+        NIGHT = "NIGHT", "Night"
 
     class MenuMode(models.TextChoices):
         PDF = "PDF", "Menú PDF"
@@ -116,6 +137,38 @@ class Business(models.Model):
         help_text="Opcional: enlace de insertar mapa",
     )
 
+    allow_table_booking = models.BooleanField(
+        default=False,
+        verbose_name="Permitir reservar mesa"
+    )
+
+    table_booking_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name="WhatsApp para reservas"
+    )
+
+    table_booking_message = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Mensaje predeterminado para reserva"
+    )
+
+    parking_type = models.CharField(
+        "Parqueadero",
+        max_length=10,
+        choices=PARKING_CHOICES,
+        default="NO",
+    )
+
+    parking_cost = models.PositiveIntegerField(
+        "Costo del parqueadero",
+        null=True,
+        blank=True,
+    )
+
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
@@ -165,6 +218,40 @@ class Business(models.Model):
     cover_image = models.ImageField(upload_to="covers/", blank=True, null=True)
 
     tags = models.CharField(max_length=250, blank=True, default="")
+
+    # =========================
+    # 🌙 CAMPOS NIGHT
+    # =========================
+    min_consumption = models.DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        default=0,
+        verbose_name="Consumo mínimo",
+    )
+
+    music_type = models.CharField(
+        max_length=20,
+        choices=MUSIC_TYPE_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Tipo de música",
+    )
+
+
+    night_description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Descripción Night",
+    )
+
+    reservation_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        verbose_name="WhatsApp reservas",
+    )
 
     is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -345,3 +432,61 @@ class Business(models.Model):
     @property
     def allows_pickup(self):
         return self.service_mode in {SERVICE_MODE_PICKUP, SERVICE_MODE_BOTH}
+
+    @property
+    def average_rating(self):
+        data = self.ratings.aggregate(avg=models.Avg("stars"))
+        return round(data["avg"] or 0, 1)
+
+    @property
+    def total_ratings(self):
+        return self.ratings.count()
+
+
+class BusinessGallery(models.Model):
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="gallery_images",
+    )
+    image = models.ImageField(upload_to="business_gallery/")
+    title = models.CharField(max_length=120, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Foto de galería"
+        verbose_name_plural = "Galería de fotos"
+
+    def __str__(self):
+        return f"{self.business.name} - Foto {self.id}"
+
+
+class BusinessRating(models.Model):
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="ratings",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="business_ratings",
+    )
+    stars = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("business", "user")
+        ordering = ["-created_at"]
+        verbose_name = "Calificación"
+        verbose_name_plural = "Calificaciones"
+
+    def __str__(self):
+        return f"{self.business.name} - {self.stars} estrellas"

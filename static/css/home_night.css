@@ -1,0 +1,476 @@
+/* =========================
+   LAYOUT BASE SOLO NIGHT
+   ========================= */
+
+.night-layout-body{
+  background: #070b16 !important;
+}
+
+.night-navbar{
+  background: #0b1120 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+
+.night-navbar .brand-name{
+  color: #fff !important;
+}
+
+.night-navbar .btn-outline-secondary,
+.night-navbar .btn-outline-primary,
+.night-navbar .btn-outline-dark{
+  border-color: rgba(255,255,255,.16) !important;
+  color: #e5e7eb !important;
+  background: transparent !important;
+}
+
+.night-navbar .btn-outline-secondary:hover,
+.night-navbar .btn-outline-primary:hover,
+.night-navbar .btn-outline-dark:hover{
+  background: rgba(255,255,255,.06) !important;
+  color: #fff !important;
+}
+
+.night-main-wrap{
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   HOME NIGHT
+   ========================= */
+
+.night-home-page{
+  background:
+    radial-gradient(circle at top, rgba(124,58,237,.20), transparent 28%),
+    linear-gradient(180deg, #070b16 0%, #091224 45%, #0b1220 100%);
+  min-height: calc(100vh - 72px);
+  margin: 0;
+  padding: 0;
+}
+
+.night-home-page .night-mode{
+  background: transparent;
+  border-radius: 0;
+  padding: 16px 16px 24px;
+}
+
+.night-home-grid{
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, .8fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.night-card{
+  background: rgba(15,23,42,.88);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 34px rgba(2,6,23,.16);
+  backdrop-filter: blur(10px);
+}
+
+.night-main-card{
+  background:
+    radial-gradient(circle at top, rgba(124,58,237,.18), transparent 26%),
+    linear-gradient(180deg, rgba(2,6,23,.94), rgba(3,10,28,.96));
+  padding: 18px;
+  border: 1px solid rgba(124,58,237,.18);
+  box-shadow: 0 18px 42px rgba(0,0,0,.24);
+}
+
+.night-main-title{
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 14px;
+  letter-spacing: -.4px;
+}
+
+.night-tabs{
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.night-tab-btn{
+  flex: 1;
+  min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 16px;
+  color: #f8fafc;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+  transition: all .18s ease;
+}
+
+.night-tab-btn:hover{
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.night-tab-btn.is-active{
+  background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+  border-color: rgba(255,255,255,.16);
+  box-shadow: 0 10px 22px rgba(124,58,237,.22);
+}
+
+.night-search-wrap{
+  margin-top: 6px;
+}
+
+.night-search-box{
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+
+.night-search-icon{
+  width: 56px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: rgba(0,0,0,.18);
+  border-right: 1px solid rgba(255,255,255,.10);
+}
+
+.night-search-input{
+  flex: 1;
+  min-height: 52px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.night-search-input::placeholder{
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.night-filters-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  margin-bottom: 14px;
+}
+
+.night-filter-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.night-filter-chip select{
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.night-filter-chip select option{
+  color: #111827;
+}
+
+.night-filter-chip input[type="checkbox"]{
+  width: 18px;
+  height: 18px;
+}
+
+.night-featured-box{
+  margin-top: 14px;
+}
+
+.night-section-title{
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.night-no-featured{
+  color: #cbd5e1;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.night-business-list{
+  margin-top: 14px;
+}
+
+.night-business-card{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(30,41,59,.85);
+  border: 1px solid rgba(255,255,255,.08);
+  text-decoration: none;
+  color: inherit;
+  transition: all .2s ease;
+  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+}
+
+.night-business-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(167,139,250,.28);
+}
+
+.night-business-card + .night-business-card{
+  margin-top: 10px;
+}
+
+.night-business-card img,
+.night-business-logo{
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.night-business-info{
+  min-width: 0;
+  flex: 1;
+}
+
+.night-business-name{
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.night-business-category{
+  font-size: 13px;
+  color: #cbd5e1;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.night-business-meta{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.night-business-meta .is-open{
+  color: #4ade80;
+  font-weight: 800;
+}
+
+.night-business-meta .is-closed{
+  color: #f87171;
+  font-weight: 800;
+}
+
+.night-chips-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.night-chip{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 13px;
+  color: #f8fafc;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  transition: all .18s ease;
+}
+
+.night-chip:hover{
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.night-chip.is-active{
+  background: rgba(109,40,217,.28);
+  border-color: rgba(167,139,250,.45);
+  box-shadow: 0 8px 18px rgba(109,40,217,.16);
+}
+
+/* SIDEBAR NIGHT */
+.night-side-card{
+  padding: 18px;
+}
+
+.night-side-title{
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.night-side-card p,
+.night-side-card li,
+.night-side-card a{
+  font-size: 14px;
+}
+
+.night-side-card .btn,
+.night-side-card .button,
+.night-side-card button{
+  min-height: 44px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991.98px){
+  .night-home-grid{
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .night-home-page .night-mode{
+    padding: 14px 12px 20px;
+  }
+
+  .night-main-card{
+    padding: 16px;
+  }
+
+  .night-main-title{
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .night-tabs{
+    gap: 10px;
+  }
+
+  .night-tab-btn{
+    min-width: 0;
+    flex: 1 1 calc(33.333% - 8px);
+    height: 44px;
+    font-size: 15px;
+    padding: 0 12px;
+  }
+
+  .night-search-icon{
+    width: 50px;
+    min-height: 48px;
+    font-size: 20px;
+  }
+
+  .night-search-input{
+    min-height: 48px;
+    font-size: 15px;
+    padding: 0 12px;
+  }
+
+  .night-filter-chip{
+    min-height: 38px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .night-business-card{
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .night-business-card img,
+  .night-business-logo{
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 14px;
+  }
+
+  .night-business-name{
+    font-size: 14px;
+  }
+
+  .night-business-category,
+  .night-business-meta{
+    font-size: 12px;
+  }
+
+  .night-chip{
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 575.98px){
+  .night-main-title{
+    font-size: 22px;
+  }
+
+  .night-tabs{
+    flex-direction: column;
+  }
+
+  .night-tab-btn{
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .night-filters-row{
+    gap: 8px;
+  }
+
+  .night-filter-chip{
+    width: auto;
+    max-width: 100%;
+  }
+
+  .night-chips-row{
+    gap: 8px;
+  }
+
+  .night-chip{
+    font-size: 12px;
+    min-height: 34px;
+    padding: 0 12px;
+  }
+}
+

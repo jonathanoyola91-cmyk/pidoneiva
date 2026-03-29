@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
-from businesses.models import Business
+from businesses.models import Business, BusinessGallery
 from menu.models import MenuCategory, MenuItem, MenuFile
 from orders.models import Order
 from orders.utils import normalize_phone
@@ -110,17 +110,29 @@ def business_edit(request):
 
         if ok:
             obj = form.save()
+
+            gallery_files = request.FILES.getlist("gallery_images")
+            for img in gallery_files:
+                BusinessGallery.objects.create(
+                    business=obj,
+                    image=img
+                )
+
             print("DEBUG saved logo:", obj.logo.name if obj.logo else None)
             print("DEBUG saved cover:", obj.cover_image.name if obj.cover_image else None)
             print("DEBUG saved latitude:", obj.latitude)
             print("DEBUG saved longitude:", obj.longitude)
+
             messages.success(request, "Negocio actualizado correctamente.")
             return redirect("dashboard")
+
     else:
         form = BusinessForm(instance=business)
 
-    return render(request, "dashboard/business_edit.html", {"form": form, "business": business})
-
+    return render(request, "dashboard/business_edit.html", {
+        "form": form,
+        "business": business
+    })
 
 @login_required
 def category_list(request):

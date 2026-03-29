@@ -3,8 +3,21 @@ from businesses.models import Business
 from menu.models import MenuCategory, MenuItem, MenuFile
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        if not isinstance(data, (list, tuple)):
+            data = [data]
+        return [super().clean(d, initial) for d in data]
+
 class BusinessForm(forms.ModelForm):
-    # Campos "bonitos" (no existen en el modelo; son del form)
+    # Campos de horarios
     mon_start = forms.TimeField(
         required=False,
         label="Lunes (inicio)",
@@ -91,6 +104,14 @@ class BusinessForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control", "min": "1", "max": "240"})
     )
 
+    gallery_images = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(attrs={
+            "class": "form-control",
+            "accept": "image/*",
+        })
+    )
+
     class Meta:
         model = Business
         fields = [
@@ -102,8 +123,16 @@ class BusinessForm(forms.ModelForm):
             "cover_image",
             "avg_prep_time",
             "delivery_fee",
+            "min_consumption",
+            "music_type",
+            "night_description",
+            "parking_type",
+            "parking_cost",
             "nequi_number",
             "is_accepting_orders",
+            "allow_table_booking",
+            "table_booking_phone",
+            "table_booking_message",
         ]
 
         labels = {
@@ -114,6 +143,8 @@ class BusinessForm(forms.ModelForm):
             "latitude": "Latitud",
             "longitude": "Longitud",
             "service_mode": "Modalidad de entrega",
+            "min_consumption": "Consumo mínimo",
+            "music_type": "Tipo de música",
         }
 
         help_texts = {
@@ -136,6 +167,13 @@ class BusinessForm(forms.ModelForm):
             "whatsapp": forms.TextInput(attrs={"class": "form-control"}),
             "instagram": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+
+            "min_consumption": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 50000"
+            }),
+            "music_type": forms.Select(attrs={"class": "form-select"}),
+
             "tags": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Ej: pizza, hamburguesa, café, droguería, mercado"
@@ -145,10 +183,37 @@ class BusinessForm(forms.ModelForm):
                 "step": "0.01",
                 "min": "0"
             }),
+            "night_description": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Describe el ambiente del lugar..."
+            }),
+
+            "parking_type": forms.Select(attrs={"class": "form-select"}),
+
+            "parking_cost": forms.NumberInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 5000"
+            }),
+
             "nequi_number": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Ej: 3001234567"
             }),
+
+            "allow_table_booking": forms.CheckboxInput(attrs={
+                "class": "form-check-input"
+            }),
+            "table_booking_phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ej: 573001112233"
+            }),
+
+            "table_booking_message": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Hola, quiero reservar una mesa"
+            }),
+
             "logo": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "cover_image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "is_accepting_orders": forms.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -189,21 +254,16 @@ class BusinessForm(forms.ModelForm):
             self.fields["logo"].required = False
         if "cover_image" in self.fields:
             self.fields["cover_image"].required = False
-
         if "delivery_fee" in self.fields:
             self.fields["delivery_fee"].required = False
-
         if "nequi_number" in self.fields:
             self.fields["nequi_number"].required = False
-
         if "tags" in self.fields:
             self.fields["tags"].required = False
-
         if "latitude" in self.fields:
             self.fields["latitude"].required = False
         if "longitude" in self.fields:
             self.fields["longitude"].required = False
-
         if "service_mode" in self.fields:
             self.fields["service_mode"].required = False
 
@@ -277,10 +337,6 @@ class BusinessForm(forms.ModelForm):
 
         return instance
 
-
-# =========================
-# ✅ NUEVOS FORMS (SOLUCIÓN)
-# =========================
 
 class MenuCategoryForm(forms.ModelForm):
     class Meta:

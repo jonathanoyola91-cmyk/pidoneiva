@@ -72,15 +72,34 @@
   .map-toolbar .form-control {
     min-width: 220px;
   }
+
+  .night-short-help {
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #e5e7eb;
+    border: 1px solid #374151;
+    border-radius: 16px;
+    padding: 14px 16px;
+  }
+
+  .night-short-help .small {
+    color: #cbd5e1;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="bg-white rounded-4 shadow-soft p-4">
   {% include "dashboard/_back_to_dashboard.html" %}
-  <h1 class="h4 fw-bold mb-4">Editar perfil</h1>
 
-  <form method="post" enctype="multipart/form-data">
+  <h1 class="h4 fw-bold mb-4" id="business-edit-title">
+    {% if form.instance.business_type == "NIGHT" %}
+      Editar perfil Night
+    {% else %}
+      Editar perfil
+    {% endif %}
+  </h1>
+
+  <form method="post" enctype="multipart/form-data" class="your-form-class">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -92,6 +111,17 @@
     <div class="section-card mb-4">
       <div class="section-title">Información general</div>
 
+      <div
+        id="night-short-help"
+        class="night-short-help mb-4"
+        {% if form.instance.business_type != "NIGHT" %}style="display:none;"{% endif %}
+      >
+        <div class="fw-bold mb-1">🌙 Formulario abreviado para negocios Night</div>
+        <div class="small">
+          Para este tipo de negocio se ocultan campos como modalidad de entrega, tiempo de preparación, costo de domicilio y menú, porque normalmente no aplican a discotecas, bares y vida nocturna.
+        </div>
+      </div>
+
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">{{ form.name.label }}</label>
@@ -100,37 +130,99 @@
         </div>
 
         <div class="col-md-3">
-          <label class="form-label">{{ form.business_type.label }}</label>
-          {{ form.business_type }}
-          {% if form.business_type.errors %}<div class="text-danger small mt-1">{{ form.business_type.errors }}</div>{% endif %}
-        </div>
+  <label class="form-label">{{ form.business_type.label }}</label>
+  {{ form.business_type }}
+  {% if form.business_type.errors %}<div class="text-danger small mt-1">{{ form.business_type.errors }}</div>{% endif %}
+</div>
 
-        <div class="col-md-3">
-          <label class="form-label">{{ form.menu_mode.label }}</label>
-          {{ form.menu_mode }}
-          {% if form.menu_mode.errors %}<div class="text-danger small mt-1">{{ form.menu_mode.errors }}</div>{% endif %}
-        </div>
+<div
+  class="col-md-3"
+  id="wrap-menu-mode"
+  {% if form.instance.business_type == "NIGHT" %}style="display:none;"{% endif %}
+>
+  <label class="form-label">{{ form.menu_mode.label }}</label>
+  {{ form.menu_mode }}
+  {% if form.menu_mode.errors %}<div class="text-danger small mt-1">{{ form.menu_mode.errors }}</div>{% endif %}
+</div>
 
-        <div class="col-md-6">
-          <label for="{{ form.service_mode.id_for_label }}" class="form-label">Modalidad de entrega</label>
-          {{ form.service_mode }}
-          {% if form.service_mode.errors %}
-            <div class="text-danger small mt-1">
-              {{ form.service_mode.errors }}
-            </div>
-          {% endif %}
-          <div class="form-text">
-            Define si este negocio vende solo a domicilio, solo para recoger en el punto o ambas opciones.
-          </div>
-        </div>
+<div
+  class="col-md-6"
+  id="wrap-service-mode"
+  {% if form.instance.business_type == "NIGHT" %}style="display:none;"{% endif %}
+>
+  <label for="{{ form.service_mode.id_for_label }}" class="form-label">Modalidad de entrega</label>
+  {{ form.service_mode }}
+  {% if form.service_mode.errors %}
+    <div class="text-danger small mt-1">
+      {{ form.service_mode.errors }}
+    </div>
+  {% endif %}
+  <div class="form-text">
+    Define si este negocio vende solo a domicilio, solo para recoger en el punto o ambas opciones.
+  </div>
+</div>
 
-        <div class="col-md-4">
-          <label class="form-label">{{ form.zone.label }}</label>
-          {{ form.zone }}
-          {% if form.zone.errors %}<div class="text-danger small mt-1">{{ form.zone.errors }}</div>{% endif %}
-        </div>
+{% if form.instance.business_type == "NIGHT" %}
 
-        <div class="col-md-8">
+  <div class="col-md-4">
+    <label class="form-label">{{ form.parking_type.label }}</label>
+    {{ form.parking_type }}
+    {% if form.parking_type.errors %}
+      <div class="text-danger small mt-1">{{ form.parking_type.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4" id="wrap-parking-cost">
+    <label class="form-label">{{ form.parking_cost.label }}</label>
+    {{ form.parking_cost }}
+    {% if form.parking_cost.errors %}
+      <div class="text-danger small mt-1">{{ form.parking_cost.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label d-block">{{ form.allow_table_booking.label }}</label>
+    <div class="form-check form-switch mt-2">
+      {{ form.allow_table_booking }}
+      <label class="form-check-label" for="{{ form.allow_table_booking.id_for_label }}">
+        Activar reservas de mesa
+      </label>
+    </div>
+    {% if form.allow_table_booking.errors %}
+      <div class="text-danger small mt-1">{{ form.allow_table_booking.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">{{ form.table_booking_phone.label }}</label>
+    {{ form.table_booking_phone }}
+    {% if form.table_booking_phone.errors %}
+      <div class="text-danger small mt-1">{{ form.table_booking_phone.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">{{ form.table_booking_message.label }}</label>
+    {{ form.table_booking_message }}
+    {% if form.table_booking_message.errors %}
+      <div class="text-danger small mt-1">{{ form.table_booking_message.errors }}</div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<div
+  class="{% if form.instance.business_type == 'NIGHT' %}col-md-9{% else %}col-md-4{% endif %}"
+  id="wrap-zone"
+>
+  <label class="form-label">{{ form.zone.label }}</label>
+  {{ form.zone }}
+  {% if form.zone.errors %}<div class="text-danger small mt-1">{{ form.zone.errors }}</div>{% endif %}
+</div>
+
+        <div
+          class="{% if form.instance.business_type == 'NIGHT' %}col-md-12{% else %}col-md-8{% endif %}"
+          id="wrap-address"
+        >
           <label class="form-label">{{ form.address.label }}</label>
           {{ form.address }}
           {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors }}</div>{% endif %}
@@ -160,28 +252,64 @@
           {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
         </div>
 
-        <div class="col-md-6">
+        <div
+          class="{% if form.instance.business_type == 'NIGHT' %}col-md-12{% else %}col-md-6{% endif %}"
+          id="wrap-tags"
+        >
           <label class="form-label">{{ form.tags.label }}</label>
           {{ form.tags }}
           {% if form.tags.help_text %}<div class="form-text">{{ form.tags.help_text }}</div>{% endif %}
           {% if form.tags.errors %}<div class="text-danger small mt-1">{{ form.tags.errors }}</div>{% endif %}
         </div>
 
-        <div class="col-md-3">
+{% if form.instance.business_type == "NIGHT" %}
+  <div class="col-md-4">
+    <label class="form-label">{{ form.min_consumption.label }}</label>
+    {{ form.min_consumption }}
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">{{ form.music_type.label }}</label>
+    {{ form.music_type }}
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label d-block">{{ form.has_parking.label }}</label>
+    <div class="form-check form-switch mt-2">
+      {{ form.has_parking }}
+      <label class="form-check-label" for="{{ form.has_parking.id_for_label }}">
+        Sí, tiene parqueadero
+      </label>
+    </div>
+    {% if form.has_parking.errors %}
+      <div class="text-danger small mt-1">{{ form.has_parking.errors }}</div>
+    {% endif %}
+  </div>
+  
+{% endif %}
+        <div
+          class="col-md-3"
+          id="wrap-avg-prep-time"
+          {% if form.instance.business_type == "NIGHT" %}style="display:none;"{% endif %}
+        >
           <label class="form-label">{{ form.avg_prep_time.label }}</label>
           {{ form.avg_prep_time }}
           {% if form.avg_prep_time.help_text %}<div class="form-text">{{ form.avg_prep_time.help_text }}</div>{% endif %}
           {% if form.avg_prep_time.errors %}<div class="text-danger small mt-1">{{ form.avg_prep_time.errors }}</div>{% endif %}
         </div>
 
-        <div class="col-md-3">
+        <div
+          class="col-md-3"
+          id="wrap-delivery-fee"
+          {% if form.instance.business_type == "NIGHT" %}style="display:none;"{% endif %}
+        >
           <label class="form-label">{{ form.delivery_fee.label }}</label>
           {{ form.delivery_fee }}
           {% if form.delivery_fee.help_text %}<div class="form-text">{{ form.delivery_fee.help_text }}</div>{% endif %}
           {% if form.delivery_fee.errors %}<div class="text-danger small mt-1">{{ form.delivery_fee.errors }}</div>{% endif %}
         </div>
 
-        <div class="col-md-6">
+        <div class="{% if form.instance.business_type == 'NIGHT' %}col-md-6{% else %}col-md-6{% endif %}">
           <label class="form-label">{{ form.nequi_number.label }}</label>
           {{ form.nequi_number }}
           {% if form.nequi_number.help_text %}<div class="form-text">{{ form.nequi_number.help_text }}</div>{% endif %}
@@ -201,7 +329,13 @@
     </div>
 
     <div class="section-card mb-4">
-      <div class="section-title">Horarios de atención</div>
+      <div class="section-title" id="schedule-title">
+        {% if form.instance.business_type == "NIGHT" %}
+          Horarios del negocio Night
+        {% else %}
+          Horarios de atención
+        {% endif %}
+      </div>
 
       <div class="row g-3 schedule-grid">
         <div class="col-md-6 col-xl-4">
@@ -336,43 +470,88 @@
       </div>
     </div>
 
-    <div class="section-card mb-4">
-      <div class="section-title">Imágenes del negocio</div>
+<div class="section-card mb-4">
+  <div class="section-title">Imágenes del negocio</div>
 
-      <div class="row g-4">
-        <div class="col-md-6">
-          <div class="image-preview-box">
-            <div class="fw-semibold mb-2">Logo actual</div>
-            {% if form.instance.logo %}
-              <img src="{{ form.instance.logo.url }}" alt="Logo actual" class="mb-2">
-              <a href="{{ form.instance.logo.url }}" target="_blank" class="current-file-link">Ver logo actual</a>
-            {% else %}
-              <div class="mini-help mb-2">Este negocio aún no tiene logo.</div>
-            {% endif %}
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="image-preview-box">
+        <div class="fw-semibold mb-2">Logo actual</div>
+        {% if form.instance.logo %}
+          <img src="{{ form.instance.logo.url }}" alt="Logo actual" class="mb-2">
+          <a href="{{ form.instance.logo.url }}" target="_blank" class="current-file-link">Ver logo actual</a>
+        {% else %}
+          <div class="mini-help mb-2">Este negocio aún no tiene logo.</div>
+        {% endif %}
 
-            <label class="form-label">{{ form.logo.label }}</label>
-            {{ form.logo }}
-            {% if form.logo.errors %}<div class="text-danger small mt-1">{{ form.logo.errors }}</div>{% endif %}
-          </div>
+        <label class="form-label">{{ form.logo.label }}</label>
+        {{ form.logo }}
+        {% if form.logo.errors %}<div class="text-danger small mt-1">{{ form.logo.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="image-preview-box">
+        <div class="fw-semibold mb-2">Portada actual</div>
+        {% if form.instance.cover_image %}
+          <img src="{{ form.instance.cover_image.url }}" alt="Portada actual" class="mb-2">
+          <a href="{{ form.instance.cover_image.url }}" target="_blank" class="current-file-link">Ver portada actual</a>
+        {% else %}
+          <div class="mini-help mb-2">Este negocio aún no tiene imagen de portada.</div>
+        {% endif %}
+
+        <label class="form-label">{{ form.cover_image.label }}</label>
+        {{ form.cover_image }}
+        {% if form.cover_image.errors %}<div class="text-danger small mt-1">{{ form.cover_image.errors }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-12">
+      <div class="image-preview-box">
+        <div class="fw-semibold mb-2">Galería del negocio</div>
+
+        <label class="form-label">Subir imágenes de galería</label>
+        {{ form.gallery_images }}
+        <div class="mini-help mt-2">
+          Puedes seleccionar varias imágenes para mostrar en la galería del negocio.
         </div>
+        {% if form.gallery_images.errors %}
+          <div class="text-danger small mt-1">{{ form.gallery_images.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
 
-        <div class="col-md-6">
-          <div class="image-preview-box">
-            <div class="fw-semibold mb-2">Portada actual</div>
-            {% if form.instance.cover_image %}
-              <img src="{{ form.instance.cover_image.url }}" alt="Portada actual" class="mb-2">
-              <a href="{{ form.instance.cover_image.url }}" target="_blank" class="current-file-link">Ver portada actual</a>
-            {% else %}
-              <div class="mini-help mb-2">Este negocio aún no tiene imagen de portada.</div>
-            {% endif %}
+    {% if form.instance.gallery_images.all %}
+      <div class="col-12">
+        <div class="image-preview-box">
+          <div class="fw-semibold mb-3">Imágenes actuales de la galería</div>
 
-            <label class="form-label">{{ form.cover_image.label }}</label>
-            {{ form.cover_image }}
-            {% if form.cover_image.errors %}<div class="text-danger small mt-1">{{ form.cover_image.errors }}</div>{% endif %}
+          <div class="row g-3">
+            {% for photo in form.instance.gallery_images.all %}
+              {% if photo.is_active %}
+                <div class="col-6 col-md-4 col-lg-3">
+                  <div class="border rounded-3 p-2 h-100 bg-white">
+                    <img
+                      src="{{ photo.image.url }}"
+                      alt="Foto galería {{ forloop.counter }}"
+                      style="width:100%; height:160px; object-fit:cover; border-radius:10px;"
+                      class="mb-2"
+                    >
+                    {% if photo.title %}
+                      <div class="small fw-semibold">{{ photo.title }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
       </div>
-    </div>
+    {% endif %}
+  </div>
+</div>
 
     <div class="section-card mb-4">
       <div class="section-title">Ubicación del negocio</div>
@@ -438,6 +617,63 @@
     const gpsBtn = document.getElementById("btn-use-gps");
     const searchBtn = document.getElementById("btn-search-address");
     const searchInput = document.getElementById("address-search");
+
+    const businessTypeSelect = document.getElementById("id_business_type");
+    const businessEditTitle = document.getElementById("business-edit-title");
+    const scheduleTitle = document.getElementById("schedule-title");
+    const nightShortHelp = document.getElementById("night-short-help");
+
+    const wrapMenuMode = document.getElementById("wrap-menu-mode");
+    const wrapServiceMode = document.getElementById("wrap-service-mode");
+    const wrapAvgPrepTime = document.getElementById("wrap-avg-prep-time");
+    const wrapDeliveryFee = document.getElementById("wrap-delivery-fee");
+    const wrapZone = document.getElementById("wrap-zone");
+    const wrapAddress = document.getElementById("wrap-address");
+    const wrapTags = document.getElementById("wrap-tags");
+
+    function setDisplay(el, show, displayValue = "") {
+      if (!el) return;
+      el.style.display = show ? displayValue : "none";
+    }
+
+    function applyNightModeUI() {
+      if (!businessTypeSelect) return;
+
+      const currentType = (businessTypeSelect.value || "").toUpperCase();
+      const isNight = currentType === "NIGHT";
+
+      setDisplay(wrapMenuMode, !isNight);
+      setDisplay(wrapServiceMode, !isNight);
+      setDisplay(wrapAvgPrepTime, !isNight);
+      setDisplay(wrapDeliveryFee, !isNight);
+      setDisplay(nightShortHelp, isNight);
+
+      if (businessEditTitle) {
+        businessEditTitle.textContent = isNight ? "Editar perfil Night" : "Editar perfil";
+      }
+
+      if (scheduleTitle) {
+        scheduleTitle.textContent = isNight ? "Horarios del negocio Night" : "Horarios de atención";
+      }
+
+      if (wrapZone) {
+        wrapZone.className = isNight ? "col-md-9" : "col-md-4";
+      }
+
+      if (wrapAddress) {
+        wrapAddress.className = isNight ? "col-md-12" : "col-md-8";
+      }
+
+      if (wrapTags) {
+        wrapTags.className = isNight ? "col-md-12" : "col-md-6";
+      }
+    }
+
+    applyNightModeUI();
+
+    if (businessTypeSelect) {
+      businessTypeSelect.addEventListener("change", applyNightModeUI);
+    }
 
     const defaultLat = parseFloat(latInput?.value || "2.9273");
     const defaultLng = parseFloat(lngInput?.value || "-75.2819");
@@ -531,6 +767,26 @@
           searchAddress();
         }
       });
+    }
+
+    const parkingType = document.getElementById("id_parking_type");
+    const parkingCostWrap = document.getElementById("wrap-parking-cost");
+    const parkingCostInput = document.getElementById("id_parking_cost");
+
+    function toggleParkingCost() {
+      if (!parkingType || !parkingCostWrap) return;
+
+      if (parkingType.value === "PAID") {
+        parkingCostWrap.style.display = "block";
+      } else {
+        parkingCostWrap.style.display = "none";
+        if (parkingCostInput) parkingCostInput.value = "";
+      }
+    }
+
+    if (parkingType) {
+      parkingType.addEventListener("change", toggleParkingCost);
+      toggleParkingCost();
     }
 
     setTimeout(function () {
