@@ -474,3 +474,138 @@
   }
 }
 
+
+/* =========================================================
+   CTA NEGOCIO - LIMPIO Y COMPACTO
+========================================================= */
+
+.night-business-cta-card {
+  background: linear-gradient(180deg, rgba(9, 18, 40, 0.92), rgba(5, 12, 30, 0.96));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.22);
+}
+
+.night-business-cta-card h3 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.night-business-cta-list {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  color: rgba(255,255,255,0.85);
+}
+
+.night-business-cta-list li {
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+
+.night-cta-main,
+.night-cta-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  width: 100%;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.night-cta-main {
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #ef4444, #f43f5e);
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.night-cta-secondary {
+  background: rgba(255,255,255,0.02);
+  color: #b9c6ff;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.night-cta-main:hover,
+.night-cta-secondary:hover {
+  transform: translateY(-1px);
+  color: inherit;
+}
+
+/* =========================================================
+   OCULTAR PROMO MORADA EN MÓVIL
+========================================================= */
+
+@media (max-width: 768px) {
+  .night-business-cta-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .night-business-cta-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .night-business-cta-list {
+    margin-bottom: 14px;
+    padding-left: 16px;
+    font-size: 0.95rem;
+  }
+
+  .night-business-cta-list li {
+    margin-bottom: 6px;
+  }
+
+  .night-cta-main,
+  .night-cta-secondary {
+    min-height: 46px;
+    font-size: 0.95rem;
+    padding: 0 14px;
+  }
+}
+
+/* =========================================
+   LIMPIEZA MOBILE PRO
+========================================= */
+
+@media (max-width: 768px) {
+
+  /* ❌ ocultar cualquier banner viejo */
+  .premium-banner,
+  .sidebar-card {
+    display: none !important;
+  }
+
+  /* ✅ hacer el CTA compacto */
+  .night-business-cta-card {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .night-business-cta-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .night-business-cta-list {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+
+  .night-business-cta-list li {
+    margin-bottom: 6px;
+  }
+
+  .night-cta-main,
+  .night-cta-secondary {
+    min-height: 46px;
+    font-size: 0.95rem;
+  }
+}

@@ -263,75 +263,25 @@
         </div>
 
         <!-- COLUMNA DERECHA -->
-        <div class="night-sidebar">
+      
+          <div class="night-business-cta-card">
+  <h3>¿Tienes un negocio?</h3>
+  <ul class="night-business-cta-list">
+    <li>✔ Pedidos directos por WhatsApp</li>
+    <li>✔ Más visibilidad en Neiva</li>
+    <li>✔ Ubicación y estadísticas</li>
+  </ul>
 
-          <div class="night-highlight-card">
-            <h4>🚀 Destaca tu negocio</h4>
-            <p>Aparece primero, recibe más visitas y aumenta tus pedidos.</p>
+  <a href="/registrar-negocio/" class="night-cta-main">
+    🧾 Registrar mi negocio
+  </a>
 
-            <a href="{% url 'request_access' %}" class="btn btn-light">
-              Ver planes
-            </a>
-          </div>
+  <a href="/accounts/login/" class="night-cta-secondary">
+    Ingresar al panel de negocio
+  </a>
+</div>
 
-          <div class="night-card night-side-card">
-            <h5>¿Tienes un negocio?</h5>
-
-            <ul class="night-side-list">
-              <li>✔ Aparece en tu sector</li>
-              <li>✔ Botón directo a WhatsApp</li>
-              <li>✔ Ubicación en Google Maps</li>
-              <li>✔ Estadísticas de visitas</li>
-              <li>✔ Opción de destacarte como ⭐ Premium</li>
-              <li>✔ Posibilidad de aparecer como 🔥 Popular</li>
-            </ul>
-
-            <a href="{% url 'request_access' %}" class="btn btn-danger night-register-btn">
-              🧾 Registrar mi negocio (Prueba gratis)
-            </a>
-
-            <a href="/accounts/login/" class="night-panel-btn">
-              Ingresar al panel de negocio
-            </a>
-          </div>
-
-          <div class="night-right-featured-wrap">
-            <div class="night-right-featured-head">
-              <h6>🏆 Negocios destacados</h6>
-              <a href="/?type=NIGHT">Ver todos</a>
-            </div>
-
-            {% for b in businesses|slice:":5" %}
-              <a href="{% url 'business_detail' b.slug %}" class="night-right-featured-card mb-2 text-decoration-none">
-                <div class="night-right-rank">{{ forloop.counter }}</div>
-
-                {% if b.logo %}
-                  <img src="{{ b.logo.url }}" alt="{{ b.name }}" class="night-right-thumb">
-                {% else %}
-                  <img src="https://via.placeholder.com/44x44.png?text=N" alt="{{ b.name }}" class="night-right-thumb">
-                {% endif %}
-
-                <div class="flex-grow-1">
-                  <div class="night-right-name">
-                    {{ b.name }}
-                    {% if b.plan == "PREMIUM" %}
-                      <span class="mini-pill">⭐</span>
-                    {% endif %}
-                  </div>
-
-                  <div class="night-right-meta">
-                    {{ b.get_zone_display|default:b.zone }}
-                    {% if b.music_type %} • 🎵 {{ b.get_music_type_display|default:b.music_type }}{% endif %}
-                  </div>
-                </div>
-              </a>
-            {% empty %}
-              <div class="night-card night-side-card text-white">
-                Aún no hay negocios destacados.
-              </div>
-            {% endfor %}
-          </div>
-
+         
         </div>
       </div>
     </div>
@@ -616,18 +566,7 @@
   <div class="col-lg-4">
     <div class="sidebar-sticky">
 
-      <div class="premium-banner mb-4">
-        <div class="premium-content">
-          <div class="premium-title">🚀 Destaca tu negocio</div>
-          <div class="premium-sub">
-            Aparece primero, recibe más visitas y aumenta tus pedidos.
-          </div>
-
-          <a href="{% url 'request_access' %}" class="btn btn-light premium-btn">
-            Ver planes
-          </a>
-        </div>
-      </div>
+      
 
       <div class="p-4 bg-white rounded-4 shadow-soft sidebar-card">
         <h3 class="h6 fw-bold">¿Tienes un negocio?</h3>
@@ -643,7 +582,7 @@
 
         <div class="d-grid gap-2">
           <a class="btn btn-brand text-white" href="{% url 'request_access' %}">
-            🏪 Registrar mi negocio (Prueba gratis)
+            🏪 Registrar mi negocio
           </a>
 
           <a class="btn btn-outline-dark" href="/accounts/login/">

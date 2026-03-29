@@ -12,17 +12,56 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-  :root{
-    --brand:#E11D2E;
-    --brand-2:#F97316;
-    --bg:#F8FAFC;
-    --text:#0F172A;
-    --muted:#64748B;
-    --line:#EAEFF5;
-  }
-  body{ background: var(--bg); }
-  .navbar{ background:#fff; }
-  .shadow-soft{ box-shadow: 0 10px 30px rgba(2, 6, 23, .08); }
+    :root{
+      --brand:#E11D2E;
+      --brand-2:#F97316;
+      --bg:#F8FAFC;
+      --text:#0F172A;
+      --muted:#64748B;
+      --line:#EAEFF5;
+    }
+
+    html, body{
+      min-height:100%;
+    }
+
+    body{
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .navbar{
+      background:#fff;
+    }
+
+    .shadow-soft{
+      box-shadow: 0 10px 30px rgba(2, 6, 23, .08);
+    }
+
+    /* ===== MODO NIGHT GLOBAL ===== */
+    body.night-layout-body{
+      background:
+        radial-gradient(circle at top center, rgba(168, 85, 247, 0.18), transparent 24%),
+        linear-gradient(180deg, #020617 0%, #03112b 45%, #020617 100%);
+      color:#F8FAFC;
+    }
+
+    body.night-layout-body .navbar{
+      background: rgba(2, 6, 23, 0.94) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    }
+
+    body.night-layout-body .night-main-wrap{
+      width:100%;
+      min-height:calc(100vh - 72px);
+      padding:24px 0 40px;
+      background:transparent;
+    }
+
+    body.night-layout-body .alert{
+      position:relative;
+      z-index:2;
+    }
   </style>
 
   <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1000">
@@ -30,50 +69,88 @@
   {% block extra_css %}{% endblock %}
 </head>
 
-<body class="{% if request.GET.type == 'NIGHT' %}night-layout-body{% endif %}">
-<nav class="navbar navbar-expand-lg border-bottom {% if request.GET.type == 'NIGHT' %}night-navbar{% endif %}">
-  <div class="container py-2">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-      <img src="{% static 'img/logo-pidoneiva.webp' %}" alt="PidoNeiva" class="brand-logo">
-      <span class="brand-name">PidoNeiva</span>
+<body class="{% block body_class %}{% if request.GET.type == 'NIGHT' %}night-layout-body{% endif %}{% endblock %}">
+  <nav class="navbar navbar-expand-lg border-bottom {% block nav_class %}{% if request.GET.type == 'NIGHT' %}night-navbar{% endif %}{% endblock %}">
+    <div class="container py-2">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="{% static 'img/logo-pidoneiva.webp' %}" alt="PidoNeiva" class="brand-logo">
+        <span class="brand-name">PidoNeiva</span>
+      </a>
+
+<div class="ms-auto d-flex gap-2 align-items-center flex-wrap nav-actions">
+
+  <a class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex nav-pill-btn" href="/?type=RESTAURANT">
+    Restaurantes
+  </a>
+
+  <a class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex nav-pill-btn" href="/?type=COMMERCE">
+    Comercios
+  </a>
+
+  {% if request.session.customer_auth %}
+    <a class="btn btn-sm nav-btn nav-btn-soft" href="{% url 'customer_my_orders' %}">
+      Mis pedidos
+    </a>
+    <a class="btn btn-sm nav-btn nav-btn-danger-outline" href="{% url 'customer_logout' %}">
+      Salir
     </a>
 
-    <div class="ms-auto d-flex gap-2 align-items-center flex-wrap">
-      <a class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex" href="/?type=RESTAURANT">Restaurantes</a>
-      <a class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex" href="/?type=COMMERCE">Comercios</a>
+  {% elif user.is_authenticated %}
+    <a class="btn btn-sm nav-btn nav-btn-primary" href="{% url 'dashboard' %}">
+      Mi Panel
+    </a>
+    <a class="btn btn-sm nav-btn nav-btn-danger-outline" href="/accounts/logout/">
+      Salir panel
+    </a>
 
-      {% if request.session.customer_auth %}
-        <a class="btn btn-sm btn-outline-primary" href="{% url 'customer_my_orders' %}">Mis pedidos</a>
-        <a class="btn btn-sm btn-outline-danger" href="{% url 'customer_logout' %}">Salir</a>
+  {% else %}
+    <div class="dropdown">
+      <button
+        class="btn btn-sm nav-btn nav-btn-soft dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Ingresar
+      </button>
 
-      {% elif user.is_authenticated %}
-        <a class="btn btn-sm btn-brand text-white" href="{% url 'dashboard' %}">Mi Panel</a>
-        <a class="btn btn-sm btn-outline-danger" href="/accounts/logout/">Salir panel</a>
-
-      {% else %}
-        <a class="btn btn-sm btn-outline-primary" href="{% url 'customer_login' %}">Ingresar</a>
-        <a class="btn btn-sm btn-brand text-white" href="{% url 'customer_register' %}">Crear cuenta</a>
-        <a class="btn btn-sm btn-outline-dark" href="/accounts/login/">Panel negocio</a>
-      {% endif %}
+      <ul class="dropdown-menu dropdown-menu-end nav-login-dropdown">
+        <li>
+          <a class="dropdown-item" href="{% url 'customer_login' %}">
+            👤 Ingresar como usuario
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="/accounts/login/">
+            🏪 Ingresar como negocio
+          </a>
+        </li>
+      </ul>
     </div>
-  </div>
-</nav>
 
-<main class="{% if request.GET.type == 'NIGHT' %}night-main-wrap{% else %}container my-4{% endif %}">
-  {% if messages %}
-    <div class="mb-3">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} mb-2" role="alert">
-          {{ message }}
-        </div>
-      {% endfor %}
-    </div>
+    <a class="btn btn-sm nav-btn nav-btn-primary" href="{% url 'customer_register' %}">
+      Crear cuenta
+    </a>
   {% endif %}
+</div>
+    </div>
+  </nav>
 
-  {% block content %}{% endblock %}
-</main>
+  <main class="{% block main_class %}{% if request.GET.type == 'NIGHT' %}night-main-wrap{% else %}container my-4{% endif %}{% endblock %}">
+    {% if messages %}
+      <div class="{% block messages_class %}mb-3{% endblock %}">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-2" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
