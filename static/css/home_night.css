@@ -26,7 +26,7 @@
 .night-navbar .btn-outline-secondary:hover,
 .night-navbar .btn-outline-primary:hover,
 .night-navbar .btn-outline-dark:hover{
-  background: rgba(255,255,255,.06) !important;
+  background: rgba(255,255,255,.06) !importanbt;
   color: #fff !important;
 }
 
@@ -61,6 +61,10 @@
   grid-template-columns: minmax(0, 1.45fr) minmax(280px, .8fr);
   gap: 18px;
   align-items: start;
+}
+
+.night-home-grid > *{
+  min-width:0;
 }
 
 .night-card{
@@ -298,12 +302,6 @@
   font-weight: 800;
 }
 
-.night-chips-row{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
 
 .night-chip{
   display: inline-flex;
@@ -463,10 +461,7 @@
     max-width: 100%;
   }
 
-  .night-chips-row{
-    gap: 8px;
-  }
-
+ 
   .night-chip{
     font-size: 12px;
     min-height: 34px;
@@ -607,5 +602,386 @@
   .night-cta-secondary {
     min-height: 46px;
     font-size: 0.95rem;
+  }
+}
+
+/* =========================
+   TÍTULO PRINCIPAL NIGHT
+   ========================= */
+.night-main-title{
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+  font-size:1.9rem;
+  font-weight:900;
+  line-height:1.1;
+  color:#fff;
+  margin:0 0 1rem;
+  letter-spacing:-.02em;
+}
+
+/* =========================
+   TABS NIGHT
+   ========================= */
+.night-tabs{
+  display:flex;
+  gap:12px;
+  margin:0 0 1rem;
+  flex-wrap:nowrap;
+}
+
+.night-tab-btn{
+  flex:1 1 0;
+  min-width:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  text-decoration:none;
+  font-weight:800;
+  font-size:1rem;
+  color:#fff !important;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.night-tab-btn:hover{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+
+.night-tab-btn.is-active{
+  background:linear-gradient(90deg,#6d28d9 0%, #a855f7 100%);
+  border-color:rgba(168,85,247,.45);
+  box-shadow:
+    0 10px 24px rgba(109,40,217,.28),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+@media (max-width: 768px){
+  .night-tabs{
+    display:none !important;
+  }
+
+  .night-main-title{
+    font-size:1.55rem;
+    margin-bottom:.85rem;
+  }
+}
+
+@media (min-width: 769px){
+  .night-tabs{
+    display:flex !important;
+    flex-direction:row !important;
+  }
+}
+/* =========================
+   MÓVIL: ocultar tabs
+   ========================= */
+@media (max-width: 768px){
+  .night-tabs{
+    display:none !important;
+  }
+
+  .night-main-title{
+    font-size:1.55rem;
+    margin-bottom:.85rem;
+  }
+}
+
+/* =========================
+   DESKTOP: mantener tabs
+   ========================= */
+@media (min-width: 769px){
+  .night-tabs{
+    display:flex;
+  }
+}
+
+/* ===== CHIPS NIGHT SCROLL SEGURO ===== */
+.night-chips-wrap{
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.night-chips-scroll{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center;
+  gap:10px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:4px 2px 8px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+
+.night-chips-scroll::-webkit-scrollbar{
+  display:none;
+}
+
+.night-chip{
+  flex:0 0 auto !important;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* IMPORTANTE dentro de grid/flex */
+.night-home-grid > div,
+.night-main-card,
+.night-featured-box{
+  min-width: 0;
+}
+
+/* =========================================
+   FIX FINAL NIGHT HOME - SOBRESCRIBIR TODO
+   pegar al FINAL de home_night.css
+========================================= */
+
+/* escritorio: tabs horizontales */
+@media (min-width: 769px){
+  .night-tabs{
+    display:flex !important;
+    flex-direction:row !important;
+    flex-wrap:nowrap !important;
+    gap:12px !important;
+    margin:0 0 1rem !important;
+  }
+
+  .night-tab-btn{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    width:auto !important;
+    min-height:48px !important;
+    padding:0 18px !important;
+    white-space:nowrap !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:1rem !important;
+    border-radius:999px !important;
+  }
+}
+
+/* móvil: mantener ocultas si así lo deseas */
+@media (max-width: 768px){
+  .night-tabs{
+    display:none !important;
+  }
+}
+
+/* chips de categorías: scroll horizontal real */
+.night-chips-wrap{
+  width:100% !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+
+.night-chips-scroll{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  gap:10px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  padding:4px 2px 8px !important;
+  -webkit-overflow-scrolling:touch !important;
+  scrollbar-width:none !important;
+}
+
+.night-chips-scroll::-webkit-scrollbar{
+  display:none !important;
+}
+
+.night-chip{
+  flex:0 0 auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  white-space:nowrap !important;
+}
+
+/* evitar que el grid rompa el ancho */
+.night-home-grid{
+  display:grid !important;
+  grid-template-columns:minmax(0, 1.45fr) minmax(280px, .8fr) !important;
+  gap:18px !important;
+  align-items:start !important;
+}
+
+.night-home-grid > *{
+  min-width:0 !important;
+}
+
+@media (max-width: 991.98px){
+  .night-home-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* navbar escritorio más compacto */
+@media (min-width: 992px){
+  .nav-actions{
+    gap:10px !important;
+  }
+
+  .nav-pill-btn,
+  .nav-btn{
+    min-height:40px !important;
+    padding:0 16px !important;
+    font-size:.96rem !important;
+  }
+
+  .brand-logo{
+    height:34px !important;
+  }
+
+  .brand-name{
+    font-size:1rem !important;
+  }
+}
+
+.night-home-grid > *{
+  min-width:0 !important;
+}
+
+.night-main-card{
+  min-width:0 !important;
+}
+
+.night-featured-box{
+  min-width:0 !important;
+}
+
+/* =========================================
+   FIX GRID NIGHT DESKTOP
+========================================= */
+
+.night-home-grid{
+  display:grid !important;
+  grid-template-columns:minmax(0, 1.55fr) minmax(320px, .72fr) !important;
+  gap:24px !important;
+  align-items:start !important;
+}
+
+.night-left-col,
+.night-right-col{
+  min-width:0 !important;
+  width:100% !important;
+}
+
+.night-right-col{
+  display:block !important;
+}
+
+.night-main-card,
+.night-featured-box,
+.night-business-list{
+  min-width:0 !important;
+}
+
+@media (max-width: 991.98px){
+  .night-home-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* =========================================
+   NIGHT MOBILE - BUSCADOR Y ZONA COMPACTOS
+========================================= */
+
+@media (max-width: 768px){
+
+  .night-search-box{
+    border-radius: 16px !important;
+  }
+
+  .night-search-icon{
+    width: 46px !important;
+    min-height: 46px !important;
+    font-size: 18px !important;
+  }
+
+  .night-search-input{
+    min-height: 46px !important;
+    font-size: 14px !important;
+    padding: 0 10px !important;
+  }
+
+  .night-filters-row{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+
+  .night-filter-chip{
+    min-height: 38px !important;
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+  }
+
+  .night-filter-chip-zone{
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 88px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    gap: 6px !important;
+  }
+
+  .night-zone-icon{
+    font-size: 15px;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+
+  .night-zone-select{
+    max-width: 68px;
+    min-width: 68px;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    padding-right: 2px !important;
+  }
+
+  .night-zone-select option{
+    color:#111827;
+  }
+}
+
+/* escritorio: dejar zona completa */
+@media (min-width: 769px){
+  .night-filter-chip-zone{
+    gap: 8px;
+  }
+
+  .night-zone-select{
+    min-width: 90px;
+    background: transparent;
+    color: #fff;
+    border: 0;
+    outline: 0;
+    font-weight: 800;
   }
 }

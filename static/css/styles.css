@@ -880,7 +880,6 @@ body{
 
   .hero-search{ padding: 14px !important; }
 
-  /* cards más compactas */
   .row.g-3{ row-gap: 14px !important; }
   .business-hero{ height: 120px; }
   .business-cover{ height: 120px; }
@@ -912,10 +911,14 @@ body{
     flex: 0 0 auto;
     padding: 10px 12px;
     white-space: nowrap;
+    gap: 8px;
   }
 
   .home-switch-text{
-    display: none;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
   }
 }
 
@@ -1050,7 +1053,10 @@ body{
   }
 
   .home-switch-text{
-    font-size: 12px;
+  display: inline-block !important;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
   }
 }
 
@@ -1386,6 +1392,7 @@ body{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  align-items:center;
 }
 
 .pn-home-zone-pill,
@@ -2583,294 +2590,6 @@ body{
   }
 }
 
-/* =========================
-   NIGHT HOME - LAYOUT FINAL
-========================= */
-
-.night-mode {
-  background:
-    radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 30%),
-    radial-gradient(circle at top right, rgba(236, 72, 153, 0.14), transparent 25%),
-    linear-gradient(180deg, #041024 0%, #061327 100%);
-  border-radius: 28px;
-  padding: 18px;
-}
-
-/* GRID GENERAL */
-.night-home-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 18px;
-  align-items: start;
-}
-
-@media (max-width: 991.98px) {
-  .night-home-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* TARJETAS GENERALES */
-.night-card {
-  background: rgba(10, 20, 40, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-}
-
-/* HERO IZQUIERDO */
-.night-main-card {
-  padding: 22px;
-}
-
-.night-main-title {
-  color: #fff;
-  font-weight: 800;
-  font-size: 1.6rem;
-  margin-bottom: 16px;
-}
-
-.night-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-@media (max-width: 575.98px) {
-  .night-tabs {
-    grid-template-columns: 1fr;
-  }
-}
-
-.night-tab-btn {
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.06);
-  color: #fff;
-  border-radius: 999px;
-  padding: 12px 16px;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  transition: all .2s ease;
-}
-
-.night-tab-btn:hover {
-  color: #fff;
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.10);
-}
-
-.night-tab-btn.is-active {
-  background: linear-gradient(90deg, #6d28d9, #8b5cf6);
-  border-color: transparent;
-  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.28);
-}
-
-.night-search-wrap {
-  margin-bottom: 14px;
-}
-
-.night-search-box {
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(3, 10, 22, 0.72);
-}
-
-.night-search-icon {
-  padding: 0 14px;
-  font-size: 1.1rem;
-  color: #a78bfa;
-}
-
-.night-search-input {
-  width: 100%;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: #fff;
-  padding: 14px 14px 14px 0;
-}
-
-.night-search-input::placeholder {
-  color: #9ca3af;
-}
-
-.night-filters-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.night-filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: #fff;
-  border-radius: 999px;
-  padding: 10px 14px;
-  min-height: 46px;
-}
-
-.night-filter-chip select {
-  background: transparent;
-  color: #fff;
-  border: 0;
-  outline: none;
-}
-
-.night-filter-chip select option {
-  color: #111827;
-}
-
-.night-featured-box {
-  margin-top: 8px;
-}
-
-.night-section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.night-no-featured {
-  margin: 0 0 12px 0;
-  padding: 4px 0;
-  color: #bcc5d6;
-  font-size: 0.96rem;
-}
-
-.night-chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.night-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.06);
-  color: #e5e7eb;
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 999px;
-  padding: 10px 14px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all .2s ease;
-}
-
-.night-chip:hover,
-.night-chip.is-active {
-  color: #fff;
-  background: rgba(139, 92, 246, 0.18);
-  border-color: rgba(167, 139, 250, 0.45);
-}
-
-/* SIDEBAR DERECHA */
-.night-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.night-highlight-card {
-  background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-  border: 0;
-  color: #fff;
-  padding: 22px;
-  border-radius: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.night-highlight-card::after {
-  content: "";
-  position: absolute;
-  right: -20px;
-  top: -20px;
-  width: 120px;
-  height: 120px;
-  background: rgba(255,255,255,0.10);
-  border-radius: 50%;
-}
-
-.night-highlight-card h4 {
-  position: relative;
-  z-index: 1;
-  font-size: 1.35rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.night-highlight-card p {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 16px;
-  color: rgba(255,255,255,0.92);
-}
-
-.night-highlight-card .btn {
-  position: relative;
-  z-index: 1;
-  border-radius: 999px;
-  font-weight: 700;
-  padding: 10px 18px;
-}
-
-.night-side-card {
-  padding: 20px;
-}
-
-.night-side-card h5 {
-  color: #fff;
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-
-.night-side-list {
-  padding-left: 18px;
-  margin: 0 0 16px 0;
-  color: #d1d5db;
-}
-
-.night-side-list li {
-  margin-bottom: 6px;
-}
-
-.night-register-btn {
-  display: block;
-  width: 100%;
-  text-align: center;
-  border-radius: 999px;
-  font-weight: 800;
-  padding: 12px 16px;
-  text-decoration: none;
-  margin-bottom: 10px;
-}
-
-.night-panel-btn {
-  display: block;
-  width: 100%;
-  text-align: center;
-  border-radius: 14px;
-  padding: 10px 14px;
-  text-decoration: none;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.10);
-  color: #a5b4fc;
-}
 
 /* LISTADO NEGOCIOS */
 .night-business-list {
@@ -3314,4 +3033,389 @@ body{
 .night-btn-parking:hover {
   transform: translateY(-1px);
   opacity: 0.95;
+}
+
+/* =========================
+   NAVBAR LIMPIO MÓVIL
+   ========================= */
+.mobile-clean-navbar{
+  background: #ffffff;
+  min-height: 72px;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  border-bottom: 1px solid #eaeff5;
+}
+
+/* Navbar en modo NIGHT */
+body.night-layout-body .mobile-clean-navbar{
+  background: #050816;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.brand-logo{
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand-name{
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+body.night-layout-body .brand-name{
+  color: #fff;
+}
+
+/* Botones desktop */
+.top-nav-btn{
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 999px;
+  padding: .52rem .95rem;
+  min-height: 42px;
+  font-size: .96rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: .2s ease;
+}
+
+.top-nav-btn:hover{
+  color: #0f172a !important;
+  background: #eef2f7;
+  border-color: #d7e0ea;
+}
+
+body.night-layout-body .top-nav-btn{
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.04);
+  padding: .52rem .95rem;
+  min-height: 42px;
+  font-size: .96rem;
+  line-height: 1;
+}
+
+body.night-layout-body .top-nav-btn:hover{
+  color: #fff !important;
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.22);
+}
+
+.active-top-btn{
+  background: #eef2f7;
+  border-color: #d7e0ea;
+  color: #0f172a !important;
+}
+
+body.night-layout-body .active-top-btn{
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.25);
+  color: #fff !important;
+}
+
+/* Botón menú móvil */
+.mobile-menu-btn{
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-size: 1.35rem;
+  min-width: 52px;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.mobile-menu-btn:hover,
+.mobile-menu-btn:focus{
+  color: #0f172a;
+  background: #eef2f7;
+  border-color: #d7e0ea;
+  box-shadow: none;
+}
+
+/* Botón menú móvil en NIGHT */
+body.night-layout-body .mobile-menu-btn{
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+}
+
+body.night-layout-body .mobile-menu-btn:hover,
+body.night-layout-body .mobile-menu-btn:focus{
+  color: #fff;
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.24);
+  box-shadow: none;
+}
+
+/* Overlay */
+.mobile-menu-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.58);
+  opacity: 0;
+  visibility: hidden;
+  transition: .25s ease;
+  z-index: 1040;
+}
+
+.mobile-menu-overlay.show{
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Drawer */
+.mobile-drawer{
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 295px;
+  max-width: 88vw;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -12px 0 30px rgba(0,0,0,.18);
+  transition: right .28s ease;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-drawer.show{
+  right: 0;
+}
+
+.mobile-drawer-night{
+  background: linear-gradient(180deg, #07101f 0%, #09061a 50%, #0d0823 100%);
+  box-shadow: -12px 0 30px rgba(0,0,0,.35);
+}
+
+.mobile-drawer-header{
+  padding: 16px;
+  border-bottom: 1px solid #eaeff5;
+  color: #0f172a;
+}
+
+.mobile-drawer-night .mobile-drawer-header{
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  color: #fff;
+}
+
+.mobile-drawer-body{
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.mobile-menu-section{
+  margin-bottom: 18px;
+}
+
+.mobile-menu-title{
+  font-size: .82rem;
+  color: #64748b;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.mobile-drawer-night .mobile-menu-title{
+  color: #9ea7bc;
+}
+
+.mobile-menu-link{
+  display: block;
+  text-decoration: none;
+  color: #0f172a;
+  padding: 13px 14px;
+  margin-bottom: 9px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+.mobile-menu-link:hover{
+  color: #0f172a;
+  background: #eef2f7;
+  transform: translateX(2px);
+}
+
+.mobile-drawer-night .mobile-menu-link{
+  color: #fff;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.mobile-drawer-night .mobile-menu-link:hover{
+  color: #fff;
+  background: rgba(255,255,255,.08);
+}
+
+.mobile-menu-cta{
+  background: linear-gradient(135deg, #e11d2e, #ff4d5c);
+  border: none;
+  color: #fff !important;
+}
+
+.mobile-menu-danger{
+  color: #dc2626 !important;
+}
+
+.mobile-drawer-night .mobile-menu-danger{
+  color: #ff8b8b !important;
+}
+
+@media (max-width: 991.98px){
+  .mobile-clean-navbar .container{
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .brand-name{
+    font-size: 1.55rem;
+  }
+
+  .brand-logo{
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (min-width: 992px){
+  .nav-actions{
+    gap: 10px !important;
+  }
+
+  .nav-pill-btn{
+    min-height: 40px;
+    padding: 0 18px !important;
+    font-size: .98rem;
+  }
+
+  .nav-btn{
+    min-height: 40px;
+    padding: 0 18px !important;
+    font-size: .98rem;
+  }
+
+  .brand-logo{
+    height: 34px;
+  }
+
+  .brand-name{
+    font-size: 1.05rem;
+  }
+}
+
+/* =========================================
+   HEADER DESKTOP COMPACTO
+========================================= */
+@media (min-width: 992px){
+  .nav-actions{
+    gap: 10px !important;
+  }
+
+  .nav-pill-btn{
+    min-height: 42px !important;
+    padding: 0 18px !important;
+    font-size: .96rem !important;
+    font-weight: 700 !important;
+    border-radius: 999px !important;
+  }
+
+  .nav-btn,
+  .nav-btn.dropdown-toggle{
+    min-height: 42px !important;
+    padding: 0 18px !important;
+    font-size: .96rem !important;
+    font-weight: 700 !important;
+    border-radius: 14px !important;
+  }
+
+  .brand-logo{
+    height: 32px !important;
+    width: auto !important;
+  }
+
+  .brand-name{
+    font-size: 1rem !important;
+    line-height: 1 !important;
+  }
+}
+
+/* =========================================
+   FILTROS ESTILO NIGHT PARA HOME
+========================================= */
+
+.pn-home-zone-pill{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.home-filter-select{
+  border:0;
+  background:transparent;
+  font-weight:800;
+  max-width:90px;
+}
+
+/* NUEVO CHECKBOX */
+.pn-home-open-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:8px 14px;
+  margin:0;
+  white-space:nowrap;
+  cursor:pointer;
+  line-height:1;
+}
+
+.pn-home-open-pill input{
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#22c55e;
+  cursor:pointer;
+  flex:0 0 auto;
+  display:block;
+}
+
+.pn-home-open-text{
+  display:inline-flex;
+  align-items:center;
+  line-height:1;
+  font-weight:800;
+  color:#0f172a;
+}
+
+@media (max-width: 576px){
+  .pn-home-filters-row{
+    align-items:center;
+    gap:8px;
+  }
+
+  .pn-home-zone-pill,
+  .pn-home-open-pill{
+    min-height:42px;
+    padding:7px 12px;
+  }
+
+  .pn-home-open-text{
+    font-size:13px;
+  }
 }

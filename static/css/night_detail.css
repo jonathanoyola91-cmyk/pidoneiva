@@ -915,3 +915,268 @@ body.night-layout-body .navbar {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* =========================================
+   MODAL RESERVA NIGHT
+   ========================================= */
+.night-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.night-modal.d-none{
+  display: none !important;
+}
+
+.night-modal-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 6, 18, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.night-modal-content{
+  position: relative;
+  z-index: 2;
+  width: min(100%, 460px);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  border-radius: 24px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(10,18,45,.98), rgba(7,12,30,.98));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 25px 70px rgba(0,0,0,.45);
+}
+
+.night-modal-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.night-modal-header h5{
+  margin: 0;
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.night-modal-close{
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.night-modal .form-label{
+  color: rgba(255,255,255,.88);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.night-modal .form-control,
+.night-modal .form-select{
+  min-height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  color: #fff;
+}
+
+.night-modal .form-control:focus,
+.night-modal .form-select:focus{
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  border-color: rgba(99,102,241,.65);
+  box-shadow: 0 0 0 .2rem rgba(99,102,241,.18);
+}
+
+.night-modal textarea.form-control{
+  min-height: 96px;
+  resize: vertical;
+}
+
+@media (max-width: 576px){
+  .night-modal{
+    padding: 12px;
+    align-items: center;
+  }
+
+  .night-modal-content{
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .night-modal-header h5{
+    font-size: 1.3rem;
+  }
+}
+
+.night-modal-content {
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all .25s ease;
+}
+
+.night-modal:not(.d-none) .night-modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* =========================
+   MODAL NIGHT PREMIUM
+   ========================= */
+.night-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.night-modal.d-none{
+  display: none !important;
+}
+
+.night-modal-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 20, .72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+.night-modal-content{
+  position: relative;
+  z-index: 2;
+  width: min(100%, 460px);
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  border-radius: 24px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(12,18,40,.98), rgba(8,12,28,.98));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 24px 70px rgba(0,0,0,.45);
+  transform: translateY(24px) scale(.96);
+  opacity: 0;
+  transition: transform .28s ease, opacity .28s ease;
+}
+
+.night-modal:not(.d-none) .night-modal-overlay{
+  opacity: 1;
+}
+
+.night-modal:not(.d-none) .night-modal-content{
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.night-modal-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.night-modal-header h5{
+  margin: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.night-modal-close{
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.night-modal-close:hover{
+  transform: scale(1.06);
+  background: rgba(255,255,255,.14);
+}
+
+.night-modal .form-label{
+  color: rgba(255,255,255,.90);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.night-modal .form-control,
+.night-modal .form-select{
+  min-height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  color: #fff;
+}
+
+.night-modal .form-control::placeholder{
+  color: rgba(255,255,255,.45);
+}
+
+.night-modal .form-control:focus,
+.night-modal .form-select:focus{
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  border-color: rgba(225,29,46,.55);
+  box-shadow: 0 0 0 .2rem rgba(225,29,46,.12);
+}
+
+.night-modal textarea.form-control{
+  min-height: 92px;
+  resize: vertical;
+}
+
+.night-modal .night-btn-reserve{
+  min-height: 50px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+@media (max-width: 576px){
+  .night-modal{
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .night-modal-content{
+    width: 100%;
+    max-height: 88vh;
+    border-radius: 22px 22px 0 0;
+    padding: 16px;
+    transform: translateY(40px);
+  }
+
+  .night-modal:not(.d-none) .night-modal-content{
+    transform: translateY(0);
+  }
+
+  .night-modal-header h5{
+    font-size: 1.05rem;
+  }
+}

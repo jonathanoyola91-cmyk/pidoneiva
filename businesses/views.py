@@ -174,7 +174,7 @@ def _open_status(business, now):
 
 def home(request):
     q = request.GET.get("q", "").strip()
-    business_type = request.GET.get("type", "").strip()
+    business_type = request.GET.get("type", "RESTAURANT").strip()
     zone = request.GET.get("zone", "").strip()
     cat = request.GET.get("cat", "").strip().lower()
 

@@ -47,74 +47,15 @@
 
         <div class="night-hero-actions">
 
-        {% if business.allow_table_booking %}
-
-<!-- BOTÓN -->
-<button
-  type="button"
-  class="btn night-btn-reserve"
-  id="openReserveModal"
->
-  🍾 Reservar mesa
-</button>
-
-<!-- MODAL -->
-<div class="night-modal d-none" id="reserveModal">
-  <div class="night-modal-overlay"></div>
-
-  <div class="night-modal-content">
-
-    <div class="night-modal-header">
-      <h5>🍾 Reservar mesa</h5>
-      <button id="closeReserveModal" class="night-modal-close">✕</button>
-    </div>
-
-    <form id="reserveTableForm" class="row g-2 mt-2">
-
-      <div class="col-6">
-        <label class="form-label small">Personas</label>
-        <select id="reserve_people" class="form-select">
-          <option value="2">2 personas</option>
-          <option value="4">4 personas</option>
-          <option value="6">6 personas</option>
-          <option value="8">8 personas</option>
-        </select>
-      </div>
-
-      <div class="col-6">
-        <label class="form-label small">Fecha</label>
-        <input type="date" id="reserve_date" class="form-control">
-      </div>
-
-      <div class="col-6">
-        <label class="form-label small">Hora</label>
-        <input type="time" id="reserve_time" class="form-control">
-      </div>
-
-      <div class="col-6">
-        <label class="form-label small">Nombre</label>
-        <input type="text" id="reserve_name" class="form-control">
-      </div>
-
-      <div class="col-12">
-        <label class="form-label small">Notas</label>
-        <textarea id="reserve_notes" class="form-control" rows="2"></textarea>
-      </div>
-
-      <div class="col-12 mt-2">
-        <button type="button" id="reserveTableBtn" class="btn night-btn-reserve w-100">
-          🍾 Enviar por WhatsApp
-        </button>
-      </div>
-
-    </form>
-
-  </div>
-</div>
-
-{% endif %}
-
-
+          {% if business.allow_table_booking %}
+          <button
+            type="button"
+            class="btn night-btn-reserve"
+            id="openReserveModal"
+          >
+            🍾 Reservar mesa
+          </button>
+          {% endif %}
 
           {% if business.instagram %}
             <a
@@ -131,94 +72,92 @@
       </div>
     </div>
   </div>
-
   
-  <div class="night-info-grid mt-4">
-    <div class="night-info-card">
-      <h5>🌙 Ambiente Night</h5>
-      <p class="mb-0">
-        {{ business.night_description|default:"Disfruta una experiencia nocturna con música, ambiente y reservas." }}
-      </p>
-    </div>
-
-    <div class="night-info-card">
-      <h5>⏰ Horario</h5>
-      <p class="mb-0">
-        {% if business.opening_time and business.closing_time %}
-          {{ business.opening_time|time:"H:i" }} - {{ business.closing_time|time:"H:i" }}
-        {% elif business.opening_hours %}
-          {{ business.opening_hours }}
-        {% else %}
-          No definido
-        {% endif %}
-      </p>
-    </div>
-
-    <div class="night-info-card">
-      <h5>💳 Consumo mínimo</h5>
-      <p class="mb-0">
-        {% if business.min_consumption %}
-          ${{ business.min_consumption }}
-        {% else %}
-          No definido
-        {% endif %}
-      </p>
-    </div>
-
-    <div class="night-info-card">
-      <h5>🎵 Tipo de música</h5>
-      <p class="mb-0">
-        {{ business.get_music_type_display|default:"No especificado" }}
-      </p>
-    </div>
-
-    <div class="night-info-card">
-      <h5>🅿️ Parqueadero</h5>
-
-      {% if business.parking_type == "FREE" %}
-        <p class="text-success fw-bold mb-2">Gratis</p>
-
-      {% elif business.parking_type == "PAID" %}
-        <p class="text-warning fw-bold mb-2">
-          ${{ business.parking_cost }}
-        </p>
-
-        <a
-          href="https://www.google.com/maps/search/parqueadero+{{ business.address|urlencode }}"
-          target="_blank"
-          class="night-btn-parking"
-        >
-          🅿️ Ver parqueaderos cercanos
-        </a>
-
-      {% elif business.parking_type == "NO" %}
-        <p class="text-danger mb-0">No disponible</p>
-
-      {% else %}
-        <p class="text-secondary mb-0">No especificado</p>
-      {% endif %}
-    </div>
-
-    <div class="night-info-card">
-      <h5>📍 Dirección</h5>
-
-      {% if business.address %}
-        <p class="mb-2">{{ business.address }}</p>
-
-        <a
-          href="https://www.google.com/maps/search/?api=1&query={{ business.address|urlencode }}"
-          target="_blank"
-          rel="noopener"
-          class="night-btn-map"
-        >
-          📍 Cómo llegar
-        </a>
-      {% else %}
-        <p class="mb-0 text-light-emphasis">Sin dirección registrada</p>
-      {% endif %}
-    </div>
+<div class="night-info-grid mt-4">
+  <div class="night-info-card">
+    <h5>🌙 Ambiente Night</h5>
+    <p class="mb-0">
+      {{ business.night_description|default:"Disfruta una experiencia nocturna con música, ambiente y reservas." }}
+    </p>
   </div>
 
+  <div class="night-info-card">
+    <h5>⏰ Horario</h5>
+    <p class="mb-0">
+      {% if business.opening_time and business.closing_time %}
+        {{ business.opening_time|time:"H:i" }} - {{ business.closing_time|time:"H:i" }}
+      {% elif business.opening_hours %}
+        {{ business.opening_hours }}
+      {% else %}
+        No definido
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="night-info-card">
+    <h5>💳 Consumo mínimo</h5>
+    <p class="mb-0">
+      {% if business.min_consumption %}
+        ${{ business.min_consumption }}
+      {% else %}
+        No definido
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="night-info-card">
+    <h5>🎵 Tipo de música</h5>
+    <p class="mb-0">
+      {{ business.get_music_type_display|default:"No especificado" }}
+    </p>
+  </div>
+
+  <div class="night-info-card">
+    <h5>🅿️ Parqueadero</h5>
+
+    {% if business.parking_type == "FREE" %}
+      <p class="text-success fw-bold mb-2">Gratis</p>
+
+    {% elif business.parking_type == "PAID" %}
+      <p class="text-warning fw-bold mb-2">
+        ${{ business.parking_cost }}
+      </p>
+
+      <a
+        href="https://www.google.com/maps/search/parqueadero+{{ business.address|urlencode }}"
+        target="_blank"
+        class="night-btn-parking"
+      >
+        🅿️ Ver parqueaderos cercanos
+      </a>
+
+    {% elif business.parking_type == "NO" %}
+      <p class="text-danger mb-0">No disponible</p>
+
+    {% else %}
+      <p class="text-secondary mb-0">No especificado</p>
+    {% endif %}
+  </div>
+
+  <div class="night-info-card">
+    <h5>📍 Dirección</h5>
+
+    {% if business.address %}
+      <p class="mb-2">{{ business.address }}</p>
+
+      <a
+        href="https://www.google.com/maps/search/?api=1&query={{ business.address|urlencode }}"
+        target="_blank"
+        rel="noopener"
+        class="night-btn-map"
+      >
+        📍 Cómo llegar
+      </a>
+    {% else %}
+      <p class="mb-0 text-light-emphasis">Sin dirección registrada</p>
+    {% endif %}
+  </div>
+</div>
   <div id="night-gallery" class="night-section mt-4">
     <h4 class="night-section-title">📸 Galería</h4>
 
@@ -248,7 +187,6 @@
       </button>
     </li>
 
-
     <li class="nav-item">
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#night-reviews" type="button">
         <span class="night-tab-icon">⭐</span>
@@ -256,37 +194,24 @@
       </button>
     </li>
 
-    
+    {% if business.allow_table_booking %}
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#night-reserve" type="button">
+        <span class="night-tab-icon">🍾</span>
+        <span>Reservar</span>
+      </button>
+    </li>
+    {% endif %}
   </ul>
 
-<div class="night-info-card premium-pane">
-  <h5>Información del lugar</h5>
-  <div>
-    {{ business.description|default:"Sin información adicional." }}
-  </div>
-</div>
+  <div class="tab-content mt-3">
 
-    <div class="tab-pane fade" id="night-gallery-tab">
+    <div class="tab-pane fade show active" id="night-info-tab">
       <div class="night-info-card premium-pane">
-        <div class="premium-pane-head">
-          <h5 class="premium-pane-title">Galería del negocio</h5>
+        <h5>Información del lugar</h5>
+        <div>
+          {{ business.description|default:"Sin información adicional." }}
         </div>
-
-        {% if business.gallery_images.all %}
-          <div class="night-gallery-scroll premium-gallery-scroll">
-            {% for img in business.gallery_images.all %}
-              {% if img.is_active %}
-                <div class="night-gallery-item premium-gallery-item">
-                  <img src="{{ img.image.url }}" alt="{{ business.name }}">
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="night-empty">
-            Este negocio aún no tiene imágenes.
-          </div>
-        {% endif %}
       </div>
     </div>
 
@@ -341,6 +266,56 @@
 </div>
 
 </section>
+{% if business.allow_table_booking %}
+<div class="night-modal d-none" id="reserveModal">
+  <div class="night-modal-overlay"></div>
+
+  <div class="night-modal-content">
+    <div class="night-modal-header">
+      <h5>🍾 Reservar mesa</h5>
+      <button id="closeReserveModal" class="night-modal-close" type="button">✕</button>
+    </div>
+
+    <form id="reserveTableForm" class="row g-2 mt-2">
+      <div class="col-6">
+        <label class="form-label small">Personas</label>
+        <select id="reserve_people" class="form-select">
+          <option value="2">2 personas</option>
+          <option value="4">4 personas</option>
+          <option value="6">6 personas</option>
+          <option value="8">8 personas</option>
+        </select>
+      </div>
+
+      <div class="col-6">
+        <label class="form-label small">Fecha</label>
+        <input type="date" id="reserve_date" class="form-control">
+      </div>
+
+      <div class="col-6">
+        <label class="form-label small">Hora</label>
+        <input type="time" id="reserve_time" class="form-control">
+      </div>
+
+      <div class="col-6">
+        <label class="form-label small">Nombre</label>
+        <input type="text" id="reserve_name" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label small">Notas</label>
+        <textarea id="reserve_notes" class="form-control" rows="2"></textarea>
+      </div>
+
+      <div class="col-12 mt-2">
+        <button type="button" id="reserveTableBtn" class="btn night-btn-reserve w-100">
+          🍾 Enviar por WhatsApp
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 
 {% if business.allow_table_booking %}
 <script>
@@ -350,6 +325,11 @@
   const modal = document.getElementById("reserveModal");
   const closeBtn = document.getElementById("closeReserveModal");
   const reserveBtn = document.getElementById("reserveTableBtn");
+  const nameInput = document.getElementById("reserve_name");
+
+  if (nameInput && localStorage.getItem("pn_reserve_name")) {
+    nameInput.value = localStorage.getItem("pn_reserve_name");
+  }
 
   function openModal() {
     modal?.classList.remove("d-none");
@@ -369,46 +349,59 @@
     }
   });
 
-  reserveBtn?.addEventListener("click", function () {
-    const people = document.getElementById("reserve_people")?.value || "";
-    const date = document.getElementById("reserve_date")?.value || "";
-    const time = document.getElementById("reserve_time")?.value || "";
-    const name = document.getElementById("reserve_name")?.value || "";
-    const notes = document.getElementById("reserve_notes")?.value || "";
+reserveBtn?.addEventListener("click", function () {
+  const people = document.getElementById("reserve_people")?.value || "";
+  const date = document.getElementById("reserve_date")?.value || "";
+  const time = document.getElementById("reserve_time")?.value || "";
+  const name = document.getElementById("reserve_name")?.value || "";
+  const notes = document.getElementById("reserve_notes")?.value || "";
 
-    const phone = "{{ business.table_booking_phone|default:business.whatsapp }}".replace(/\D/g, "");
+  if (name) {
+    localStorage.setItem("pn_reserve_name", name);
+  }
 
-    if (!people || !date || !time || !name) {
-      alert("Por favor completa todos los campos obligatorios.");
-      return;
-    }
+  let phone = "{{ business.table_booking_phone|default:business.whatsapp }}".replace(/\D/g, "");
 
-    let dateFormatted = date;
-    if (date.includes("-")) {
-      const [year, month, day] = date.split("-");
-      dateFormatted = `${day}/${month}/${year}`;
-    }
+  if (phone.length === 10 && phone.startsWith("3")) {
+    phone = "57" + phone;
+  }
 
-    function formatTime24to12(time24) {
-      if (!time24) return "";
-      const [h, m] = time24.split(":");
-      let hour = parseInt(h, 10);
-      const ampm = hour >= 12 ? "PM" : "AM";
-      hour = hour % 12 || 12;
-      return `${hour}:${m} ${ampm}`;
-    }
+  if (!people || !date || !time || !name) {
+    alert("Por favor completa todos los campos obligatorios.");
+    return;
+  }
 
-    const timeFormatted = formatTime24to12(time);
+  if (!phone) {
+    alert("Este negocio no tiene un número de WhatsApp válido para reservas.");
+    return;
+  }
 
-    const EMOJI_BOTTLE = "\u{1F37E}";
-    const EMOJI_PARTY = "\u{1F389}";
-    const EMOJI_PEOPLE = "\u{1F465}";
-    const EMOJI_DATE = "\u{1F4C5}";
-    const EMOJI_TIME = "\u{1F552}";
-    const EMOJI_PERSON = "\u{1F64B}";
-    const EMOJI_NOTES = "\u{1F4DD}";
+  let dateFormatted = date;
+  if (date.includes("-")) {
+    const [year, month, day] = date.split("-");
+    dateFormatted = `${day}/${month}/${year}`;
+  }
 
-    const message =
+  function formatTime24to12(time24) {
+    if (!time24) return "";
+    const [h, m] = time24.split(":");
+    let hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${m} ${ampm}`;
+  }
+
+  const timeFormatted = formatTime24to12(time);
+
+  const EMOJI_BOTTLE = "\u{1F37E}";
+  const EMOJI_PARTY = "\u{1F389}";
+  const EMOJI_PEOPLE = "\u{1F465}";
+  const EMOJI_DATE = "\u{1F4C5}";
+  const EMOJI_TIME = "\u{1F552}";
+  const EMOJI_PERSON = "\u{1F64B}";
+  const EMOJI_NOTES = "\u{1F4DD}";
+
+  const message =
 `${EMOJI_BOTTLE} *Reserva de Mesa - {{ business.name|escapejs }}* ${EMOJI_PARTY}
 
 ${EMOJI_PEOPLE} Personas: ${people}
@@ -419,9 +412,10 @@ ${EMOJI_PERSON} Cliente: ${name}${notes ? `
 ${EMOJI_NOTES} Notas:
 ${notes}` : ""}`;
 
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
-    closeModal();
-  });
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+  closeModal();
+});
+
 })();
 </script>
 {% endif %}
