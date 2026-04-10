@@ -56,6 +56,17 @@ MUSIC_TYPE_CHOICES = [
     ("VARIADA", "Variada"),
 ]
 
+# =========================
+# 🌙 TIPOS DE NEGOCIO NIGHT
+# =========================
+NIGHT_CATEGORY_CHOICES = [
+    ("BAR", "Bar"),
+    ("GASTROBAR", "Gastrobar"),
+    ("PUB", "Pub"),
+    ("KARAOKE", "Karaoke"),
+    ("DISCOTECA", "Discoteca"),
+    ("ROOFTOP", "Rooftop"),
+]
 
 # =========================
 # ✅ MODALIDAD DE SERVICIO
@@ -219,9 +230,9 @@ class Business(models.Model):
 
     tags = models.CharField(max_length=250, blank=True, default="")
 
-    # =========================
-    # 🌙 CAMPOS NIGHT
-    # =========================
+# =========================
+# 🌙 CAMPOS NIGHT
+# =========================
     min_consumption = models.DecimalField(
         max_digits=10,
         decimal_places=0,
@@ -229,6 +240,14 @@ class Business(models.Model):
         blank=True,
         default=0,
         verbose_name="Consumo mínimo",
+    )
+
+    night_category = models.CharField(
+        max_length=20,
+        choices=NIGHT_CATEGORY_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Tipo de negocio Night",
     )
 
     music_type = models.CharField(

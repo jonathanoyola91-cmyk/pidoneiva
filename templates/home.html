@@ -34,7 +34,6 @@
         </div>
       {% endif %}
 
-      <div class="night-main-title">🌙 Vida nocturna en Neiva</div>
 
       <div class="night-tabs">
         <a href="/?type=RESTAURANT{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
@@ -123,9 +122,11 @@
                       </div>
                     {% endif %}
 
-                    <div class="night-business-type">
+                    <div class="night-business-type text-uppercase small fw-bold text-purple"><div class="night-business-type">
                       {{ b.get_business_type_display|default:"Night" }}
                     </div>
+                    
+                    <div class="night-business-name">{{ b.name }}</div>
 
                     <div class="night-business-meta">
                       {% if b.zone %}
@@ -162,6 +163,16 @@
             <a href="/?type=NIGHT&cat=discotecas{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
                class="night-chip {% if request.GET.cat == 'discotecas' %}is-active{% endif %}">
               🎧 Discotecas
+            </a>
+   
+            <a href="/?type=NIGHT&cat=gastrobar{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
+               class="night-chip {% if request.GET.cat == 'gastrobar' %}is-active{% endif %}">
+              🍽️ Gastrobar
+            </a>
+
+            <a href="/?type=NIGHT&cat=pub{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
+               class="night-chip {% if request.GET.cat == 'pub' %}is-active{% endif %}">
+              🍺 Pub
             </a>
 
             <a href="/?type=NIGHT&cat=karaoke{% if request.GET.zone %}&zone={{ request.GET.zone }}{% endif %}{% if request.GET.open %}&open={{ request.GET.open }}{% endif %}"
@@ -215,7 +226,7 @@
             {% endif %}
 
             <div class="night-business-type">
-              {{ b.get_business_type_display|default:"Night" }}
+              {{ b.get_night_category_display|default:"Night" }}
             </div>
 
             <div class="night-business-badges">

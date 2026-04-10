@@ -115,9 +115,19 @@ class BusinessForm(forms.ModelForm):
     class Meta:
         model = Business
         fields = [
-            "name", "business_type", "menu_mode", "service_mode", "zone", "address",
-            "latitude", "longitude",
-            "phone", "whatsapp", "instagram", "description",
+            "name", 
+            "business_type",
+            "menu_mode", 
+            "service_mode",
+            "zone",
+            "address",
+            "latitude",
+            "longitude",
+            "phone", 
+            "whatsapp", 
+            "instagram",
+            "description",
+            "night_category", 
             "tags",
             "logo",
             "cover_image",
@@ -159,6 +169,7 @@ class BusinessForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "business_type": forms.Select(attrs={"class": "form-select"}),
+            "night_category": forms.Select(attrs={"class": "form-select"}),
             "menu_mode": forms.Select(attrs={"class": "form-select"}),
             "service_mode": forms.Select(attrs={"class": "form-select"}),
             "zone": forms.Select(attrs={"class": "form-select"}),

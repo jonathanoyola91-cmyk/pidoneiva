@@ -168,10 +168,6 @@ def _open_status(business, now):
     return False, None
 
 
-# =====================================================
-# HOME
-# =====================================================
-
 def home(request):
     q = request.GET.get("q", "").strip()
     business_type = request.GET.get("type", "RESTAURANT").strip()
@@ -185,6 +181,27 @@ def home(request):
     if business_type in ["RESTAURANT", "COMMERCE", "NIGHT"]:
         qs = qs.filter(business_type=business_type)
 
+    # =========================
+    # 🌙 FILTRO NIGHT REAL
+    # =========================
+    if business_type == "NIGHT":
+        mapping = {
+            "bares": "BAR",
+            "gastrobar": "GASTROBAR",
+            "pub": "PUB",
+            "karaoke": "KARAOKE",
+            "discotecas": "DISCOTECA",
+            "rooftop": "ROOFTOP",
+        }
+
+        selected = mapping.get(cat)
+
+        if selected:
+            qs = qs.filter(night_category=selected)
+
+    # =========================
+    # 🔹 FILTROS GENERALES
+    # =========================
     if zone:
         qs = qs.filter(zone=zone)
 
@@ -200,93 +217,97 @@ def home(request):
             Q(menu_categories__items__description__icontains=q)
         ).distinct()
 
-    if cat == "pizza":
-        qs = qs.filter(
-            Q(name__icontains="pizza") |
-            Q(name__icontains="pizzer") |
-            Q(description__icontains="pizza") |
-            Q(tags__icontains="pizza") |
-            Q(menu_categories__name__icontains="pizza") |
-            Q(menu_categories__items__name__icontains="pizza") |
-            Q(menu_categories__items__description__icontains="pizza")
-        ).distinct()
+    # =========================
+    # 🔹 FILTROS POR CHIP SOLO PARA RESTAURANT / COMMERCE
+    # =========================
+    if business_type != "NIGHT":
+        if cat == "pizza":
+            qs = qs.filter(
+                Q(name__icontains="pizza") |
+                Q(name__icontains="pizzer") |
+                Q(description__icontains="pizza") |
+                Q(tags__icontains="pizza") |
+                Q(menu_categories__name__icontains="pizza") |
+                Q(menu_categories__items__name__icontains="pizza") |
+                Q(menu_categories__items__description__icontains="pizza")
+            ).distinct()
 
-    elif cat == "hamburguesa":
-        qs = qs.filter(
-            Q(name__icontains="hamburgues") |
-            Q(description__icontains="hamburgues") |
-            Q(tags__icontains="hamburgues") |
-            Q(menu_categories__name__icontains="hamburgues") |
-            Q(menu_categories__items__name__icontains="hamburgues") |
-            Q(menu_categories__items__description__icontains="hamburgues")
-        ).distinct()
+        elif cat == "hamburguesa":
+            qs = qs.filter(
+                Q(name__icontains="hamburgues") |
+                Q(description__icontains="hamburgues") |
+                Q(tags__icontains="hamburgues") |
+                Q(menu_categories__name__icontains="hamburgues") |
+                Q(menu_categories__items__name__icontains="hamburgues") |
+                Q(menu_categories__items__description__icontains="hamburgues")
+            ).distinct()
 
-    elif cat == "pollo":
-        qs = qs.filter(
-            Q(name__icontains="pollo") |
-            Q(description__icontains="pollo") |
-            Q(tags__icontains="pollo") |
-            Q(menu_categories__name__icontains="pollo") |
-            Q(menu_categories__items__name__icontains="pollo") |
-            Q(menu_categories__items__description__icontains="pollo")
-        ).distinct()
+        elif cat == "pollo":
+            qs = qs.filter(
+                Q(name__icontains="pollo") |
+                Q(description__icontains="pollo") |
+                Q(tags__icontains="pollo") |
+                Q(menu_categories__name__icontains="pollo") |
+                Q(menu_categories__items__name__icontains="pollo") |
+                Q(menu_categories__items__description__icontains="pollo")
+            ).distinct()
 
-    elif cat == "sushi":
-        qs = qs.filter(
-            Q(name__icontains="sushi") |
-            Q(description__icontains="sushi") |
-            Q(tags__icontains="sushi") |
-            Q(menu_categories__name__icontains="sushi") |
-            Q(menu_categories__items__name__icontains="sushi") |
-            Q(menu_categories__items__description__icontains="sushi")
-        ).distinct()
+        elif cat == "sushi":
+            qs = qs.filter(
+                Q(name__icontains="sushi") |
+                Q(description__icontains="sushi") |
+                Q(tags__icontains="sushi") |
+                Q(menu_categories__name__icontains="sushi") |
+                Q(menu_categories__items__name__icontains="sushi") |
+                Q(menu_categories__items__description__icontains="sushi")
+            ).distinct()
 
-    elif cat == "drogueria":
-        qs = qs.filter(
-            Q(name__icontains="droguer") |
-            Q(description__icontains="droguer") |
-            Q(tags__icontains="droguer") |
-            Q(menu_categories__name__icontains="droguer") |
-            Q(menu_categories__items__name__icontains="droguer") |
-            Q(menu_categories__items__description__icontains="droguer")
-        ).distinct()
+        elif cat == "drogueria":
+            qs = qs.filter(
+                Q(name__icontains="droguer") |
+                Q(description__icontains="droguer") |
+                Q(tags__icontains="droguer") |
+                Q(menu_categories__name__icontains="droguer") |
+                Q(menu_categories__items__name__icontains="droguer") |
+                Q(menu_categories__items__description__icontains="droguer")
+            ).distinct()
 
-    elif cat == "ferreteria":
-        qs = qs.filter(
-            Q(name__icontains="ferreter") |
-            Q(description__icontains="ferreter") |
-            Q(tags__icontains="ferreter") |
-            Q(menu_categories__name__icontains="ferreter") |
-            Q(menu_categories__items__name__icontains="ferreter") |
-            Q(menu_categories__items__description__icontains="ferreter")
-        ).distinct()
+        elif cat == "ferreteria":
+            qs = qs.filter(
+                Q(name__icontains="ferreter") |
+                Q(description__icontains="ferreter") |
+                Q(tags__icontains="ferreter") |
+                Q(menu_categories__name__icontains="ferreter") |
+                Q(menu_categories__items__name__icontains="ferreter") |
+                Q(menu_categories__items__description__icontains="ferreter")
+            ).distinct()
 
-    elif cat == "market":
-        qs = qs.filter(
-            Q(name__icontains="market") |
-            Q(name__icontains="supermerc") |
-            Q(description__icontains="market") |
-            Q(description__icontains="supermerc") |
-            Q(tags__icontains="market") |
-            Q(tags__icontains="supermerc") |
-            Q(menu_categories__name__icontains="market") |
-            Q(menu_categories__name__icontains="supermerc") |
-            Q(menu_categories__items__name__icontains="market") |
-            Q(menu_categories__items__name__icontains="supermerc") |
-            Q(menu_categories__items__description__icontains="market") |
-            Q(menu_categories__items__description__icontains="supermerc")
-        ).distinct()
+        elif cat == "market":
+            qs = qs.filter(
+                Q(name__icontains="market") |
+                Q(name__icontains="supermerc") |
+                Q(description__icontains="market") |
+                Q(description__icontains="supermerc") |
+                Q(tags__icontains="market") |
+                Q(tags__icontains="supermerc") |
+                Q(menu_categories__name__icontains="market") |
+                Q(menu_categories__name__icontains="supermerc") |
+                Q(menu_categories__items__name__icontains="market") |
+                Q(menu_categories__items__name__icontains="supermerc") |
+                Q(menu_categories__items__description__icontains="market") |
+                Q(menu_categories__items__description__icontains="supermerc")
+            ).distinct()
 
-    elif cat == "licores":
-        qs = qs.filter(
-            Q(name__icontains="licor") |
-            Q(name__icontains="licores") |
-            Q(description__icontains="licor") |
-            Q(tags__icontains="licor") |
-            Q(menu_categories__name__icontains="licor") |
-            Q(menu_categories__items__name__icontains="licor") |
-            Q(menu_categories__items__description__icontains="licor")
-        ).distinct()
+        elif cat == "licores":
+            qs = qs.filter(
+                Q(name__icontains="licor") |
+                Q(name__icontains="licores") |
+                Q(description__icontains="licor") |
+                Q(tags__icontains="licor") |
+                Q(menu_categories__name__icontains="licor") |
+                Q(menu_categories__items__name__icontains="licor") |
+                Q(menu_categories__items__description__icontains="licor")
+            ).distinct()
 
     if hasattr(Business, "plan"):
         qs = qs.annotate(
@@ -325,6 +346,21 @@ def home(request):
     if business_type in ["RESTAURANT", "COMMERCE", "NIGHT"]:
         featured_qs = featured_qs.filter(business_type=business_type)
 
+    if business_type == "NIGHT":
+        mapping = {
+            "bares": "BAR",
+            "gastrobar": "GASTROBAR",
+            "pub": "PUB",
+            "karaoke": "KARAOKE",
+            "discotecas": "DISCOTECA",
+            "rooftop": "ROOFTOP",
+        }
+
+        selected = mapping.get(cat)
+
+        if selected:
+            featured_qs = featured_qs.filter(night_category=selected)
+
     if zone:
         featured_qs = featured_qs.filter(zone=zone)
 
@@ -362,7 +398,6 @@ def home(request):
         "only_open": only_open,
         "zones": zones,
     })
-
 
 # =====================================================
 # BUSINESS DETAIL  (tu URL es /negocio/<slug>/)
